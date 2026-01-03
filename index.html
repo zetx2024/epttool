@@ -179,12 +179,12 @@
       if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
 
       // --- Title ---
-      ctx.fillStyle = "#FFD700"; // Gold color for title
+      ctx.fillStyle = "#0a0a0a"; // Gold color for title
       ctx.font = "bold 40px 'Segoe UI'";
       ctx.textAlign = "center";
       ctx.fillText("VOCABULARY CHALLENGE", canvas.width / 2, 220);
       
-      ctx.fillStyle = "#aaa";
+      ctx.fillStyle = "#615c56";
       ctx.font = "italic 30px 'Segoe UI'";
       ctx.fillText("(Find the Synonym)", canvas.width / 2, 270);
 
@@ -241,9 +241,9 @@
 
       // --- Footer ---
       ctx.fillStyle = "#fff";
-      ctx.font = "20px Arial";
+      ctx.font = "18px Arial";
       ctx.textAlign = "left";
-      ctx.fillText("Practice More:", 60, 1020);
+      ctx.fillText("Practice More:", 70, 1020);
       const webLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Logo_Sitio_Web.png/960px-Logo_Sitio_Web.png";
       // Social Icons
       const fb = await loadImage(fbLogo);
