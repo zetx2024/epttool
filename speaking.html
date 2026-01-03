@@ -40,6 +40,7 @@
       width: 100%;
       max-width: 800px;
       margin-bottom: 20px;
+      align-items: center;
     }
 
     button {
@@ -60,6 +61,24 @@
 
     .btn-copy { background: #2a9d8f; color: white; }
     .btn-copy:hover { background: #21867a; }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      gap: 10px;
+      background: #333;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: #2a9d8f;
+    }
 
     /* Caption Box Styles */
     .caption-box {
@@ -105,6 +124,10 @@
   <canvas id="flashcard" width="1080" height="1080"></canvas>
 
   <div class="controls">
+    <div class="toggle-container">
+        <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
+        <label for="showAnswer">Show Sample Answer</label>
+    </div>
     <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Topic</button>
     <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
   </div>
@@ -128,13 +151,28 @@
     const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
     const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
 
-    // --- DATA: IELTS Speaking Cue Cards ---
+    // --- DATA: IELTS Speaking Cue Cards + Sample Answers ---
     const topics = [
-      "Describe a person who has influenced your life.",
-      "Describe a beautiful place you visited in your country.",
-      "Describe an electronic device you find very useful.",
-      "Describe a hobby you would like to start.",
-      "Describe a gift you received that was very special."
+      {
+        question: "Describe a person who has influenced your life.",
+        answer: "My grandfather is my biggest influence. He taught me that patience and kindness are stronger than anger, and he always encouraged me to pursue my education."
+      },
+      {
+        question: "Describe a beautiful place you visited in your country.",
+        answer: "I visited Cox's Bazar last winter. The endless sandy beach and the golden sunset over the ocean were mesmerizing and incredibly peaceful."
+      },
+      {
+        question: "Describe an electronic device you find very useful.",
+        answer: "My smartphone is essential. It helps me organize my schedule, stay connected with family, and access information instantly whenever I need it."
+      },
+      {
+        question: "Describe a hobby you would like to start.",
+        answer: "I would love to start photography. Capturing moments and seeing the world through a lens seems like a creative way to appreciate nature."
+      },
+      {
+        question: "Describe a gift you received that was very special.",
+        answer: "I received a handmade watch from my father on my 18th birthday. It is special because he restored it himself, making it a unique family heirloom."
+      }
     ];
 
     // --- DATA: Hashtag Pools ---
@@ -142,10 +180,9 @@
     const examTags = ["#IELTSPreparation", "#TOEFL", "#EnglishSpeaking", "#StudyAbroad", "#PublicSpeaking"];
     const engagementTags = ["#EnglishDaily", "#LearnEnglish", "#Discussion", "#IdeaGeneration"];
 
-    let currentTopic = "";
+    let currentItem = null;
 
     function getRandomColor() {
-      // Keeping the yellow/gold theme from your previous request, but you can change this
       const colors = ["#faf339", "#faf339", "#faf339"];
       return colors[Math.floor(Math.random() * colors.length)];
     }
@@ -163,7 +200,7 @@
       });
     }
 
-    // --- HELPER: Wrap Text for Long Sentences ---
+    // --- HELPER: Wrap Text ---
     function wrapText(context, text, x, y, maxWidth, lineHeight) {
         const words = text.split(' ');
         let line = '';
@@ -182,13 +219,13 @@
           }
         }
         context.fillText(line, x, currentY);
-        return currentY; // Return last Y position
+        return currentY; 
     }
 
     // --- CAPTION GENERATOR ---
-    function generateCaptionText(topic) {
+    function generateCaptionText(item) {
         let text = `🗣️ IELTS SPEAKING CUE CARD 🗣️\n\n`;
-        text += `Topic: ${topic}\n\n`;
+        text += `Topic: ${item.question}\n\n`;
         
         text += `💡 Idea Generation Challenge:\n`;
         text += `Write at least 2-3 sentences about this topic in English in the comments below! 👇\n\n`;
@@ -229,11 +266,12 @@
     }
 
     async function generateFlashcard() {
-      // Logic to prevent generating on load if already exists, 
-      // but here we just generate new on click or init.
-      if (!currentTopic || (event && event.type === 'click')) {
-          currentTopic = topics[Math.floor(Math.random() * topics.length)];
-          const caption = generateCaptionText(currentTopic);
+      const showAnswer = document.getElementById("showAnswer").checked;
+
+      // Generate new topic only if clicked or first load
+      if (!currentItem || (event && event.type === 'click' && event.target.classList.contains('btn-gen'))) {
+          currentItem = topics[Math.floor(Math.random() * topics.length)];
+          const caption = generateCaptionText(currentItem);
           document.getElementById('captionText').value = caption;
       }
 
@@ -262,10 +300,9 @@
       ctx.font = "italic 30px 'Segoe UI'";
       ctx.fillText("(Idea Generation)", canvas.width / 2, 270);
 
-      // --- Main Topic Box ---
-      // We will draw a semi-transparent box behind the text
+      // --- Main Box Container ---
       const boxY = 350;
-      const boxHeight = 400;
+      const boxHeight = 450;
       const boxWidth = 900;
       const boxX = (canvas.width - boxWidth) / 2;
 
@@ -277,25 +314,59 @@
       ctx.lineWidth = 3;
       ctx.stroke();
 
-      // --- The Topic Text ---
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 65px 'Arial'"; 
+      // --- CONTENT LOGIC ---
+      ctx.textAlign = "center";
       ctx.shadowColor = "rgba(0,0,0,0.5)";
       ctx.shadowBlur = 10;
-      ctx.textAlign = "center";
-      
-      // Use wrapText helper to center the sentence inside the box
-      // Start slightly lower than top of box
-      wrapText(ctx, currentTopic, canvas.width / 2, boxY + 140, 850, 85);
+
+      if (!showAnswer) {
+        // --- VIEW 1: QUESTION ONLY ---
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 65px 'Arial'"; 
+        
+        // Center text in box
+        wrapText(ctx, currentItem.question, canvas.width / 2, boxY + 140, 850, 85);
+
+        // Call to action
+        ctx.shadowBlur = 0; 
+        ctx.font = "italic bold 35px 'Segoe UI'";
+        ctx.fillStyle = "#e0e0e0";
+        ctx.fillText("👇 Write 2-3 sentences in the comments! 👇", canvas.width / 2, boxY + boxHeight + 60);
+
+      } else {
+        // --- VIEW 2: QUESTION + SAMPLE ANSWER ---
+        
+        // 1. Question (Top of box, Smaller)
+        ctx.fillStyle = "#faf339"; // Yellow highlight for question
+        ctx.font = "bold 45px 'Arial'"; 
+        // Move Y up
+        let nextY = wrapText(ctx, currentItem.question, canvas.width / 2, boxY + 70, 850, 55);
+
+        // 2. Separator Line
+        ctx.beginPath();
+        ctx.moveTo(boxX + 100, nextY + 30);
+        ctx.lineTo(boxX + boxWidth - 100, nextY + 30);
+        ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 3. Label
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#ccc";
+        ctx.font = "italic 24px 'Segoe UI'";
+        ctx.fillText("Sample Idea:", canvas.width / 2, nextY + 70);
+
+        // 4. Sample Answer
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "normal 38px 'Segoe UI'"; 
+        ctx.shadowBlur = 5;
+        // Print answer below label
+        wrapText(ctx, currentItem.answer, canvas.width / 2, nextY + 120, 850, 50);
+      }
       
       ctx.shadowBlur = 0; 
 
-      // --- Call to Action (Instruction) on Card ---
-      ctx.font = "italic bold 35px 'Segoe UI'";
-      ctx.fillStyle = "#e0e0e0";
-      ctx.fillText("👇 Write 2-3 sentences in the comments! 👇", canvas.width / 2, boxY + boxHeight + 60);
-
-      // --- Footer (SAME AS BEFORE) ---
+      // --- Footer ---
       ctx.fillStyle = "#0a0a0a";
       ctx.font = "15px Arial";
       ctx.textAlign = "left";
@@ -306,17 +377,15 @@
       const yt = await loadImage(ytLogo);
       const webIcon = await loadImage(webLogoUrl);
       
-      // 1. Website Link (Bottom Left)
+      // Links
       if (webIcon) {
           ctx.drawImage(webIcon, 50, 1020, 24, 24); 
-          
           ctx.font = "bold 20px Arial";
           ctx.fillStyle = "white"; 
           ctx.textAlign = "left";
           ctx.fillText("eptonline.org", 80, 1040); 
       }
       
-      // 2. Facebook (Starts at 990)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
           ctx.font = "bold 16px Arial"; 
@@ -324,7 +393,6 @@
           ctx.fillText("@eptonline.org", 905, 1005); 
       }
 
-      // 3. Instagram (Tight gap: +24px)
       if(insta) {
           ctx.drawImage(insta, 880, 1014, 18, 18);
           ctx.font = "bold 16px Arial"; 
@@ -332,7 +400,6 @@
           ctx.fillText("@eptonline_org", 905, 1029);
       }
 
-      // 4. YouTube (Tight gap: +24px)
       if(yt) {
           ctx.drawImage(yt, 880, 1038, 18, 18);
           ctx.font = "bold 16px Arial"; 
@@ -341,7 +408,7 @@
       }
     }
 
-    // Polyfill for roundRect if not supported in all browsers
+    // Polyfill for roundRect
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
@@ -364,11 +431,10 @@
 
     // Initialize
     window.onload = function() {
-        // Trigger initial generation
-        currentTopic = topics[0]; 
-        generateFlashcard();
-        const caption = generateCaptionText(currentTopic);
+        currentItem = topics[0];
+        const caption = generateCaptionText(currentItem);
         document.getElementById('captionText').value = caption;
+        generateFlashcard();
     };
   </script>
 </body>
