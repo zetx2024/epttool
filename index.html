@@ -89,7 +89,7 @@
     const ctx = canvas.getContext("2d");
 
     // --- ASSETS ---
-    const logoUrl = "https://zetx2024.github.io/epttool/instaeptologo.PNG";
+    const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
     const fbLogo = "https://upload.wikimedia.org/wikipedia/commons/1/16/Facebook-icon-1.png";
     const ytLogo = "https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png";
     // Using a generic placeholder for Insta to prevent load errors if the wiki link breaks
@@ -167,7 +167,7 @@
 
       // --- Background ---
       const color1 = getRandomColor();
-      const color2 = "#111111"; // Fade to black at bottom
+      const color2 = "#c76e08"; // Fade to black at bottom
       const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
@@ -241,9 +241,9 @@
 
       // --- Footer ---
       ctx.fillStyle = "#fff";
-      ctx.font = "30px Arial";
+      ctx.font = "20px Arial";
       ctx.textAlign = "left";
-      ctx.fillText("eptonline.org", 60, 1020);
+      ctx.fillText("Practice More:", 60, 1020);
       const webLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Logo_Sitio_Web.png/960px-Logo_Sitio_Web.png";
       // Social Icons
       const fb = await loadImage(fbLogo);
@@ -252,9 +252,8 @@
       
       // Removed the Instagram text logic for now as requested layout, 
       // but if you want it back, uncomment below:
- // Configure Font for all handles
-      ctx.font = "bold 16px Arial"; 
-      ctx.fillStyle = "white"; // Ensure text is white
+       // Configure Font for all handles
+      
       // 1. Website Link (Bottom Left)
       const webIcon = await loadImage(webLogoUrl);
       
@@ -269,18 +268,24 @@
       // 1. Facebook (Starts at 990)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; // Ensure text is white
           ctx.fillText("@eptonline.org", 905, 1005); 
       }
 
       // 2. Instagram (Tight gap: +24px)
       if(insta) {
           ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; // Ensure text is white
           ctx.fillText("@eptonline_org", 905, 1029);
       }
 
       // 3. YouTube (Tight gap: +24px)
       if(yt) {
           ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; // Ensure text is white
           ctx.fillText("@eptonline", 905, 1053);
       }
  
