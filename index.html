@@ -254,25 +254,25 @@
       // but if you want it back, uncomment below:
  
       
-      // 1. Facebook
+     // 1. Facebook (Starts at 990)
       if(fb) {
-          ctx.drawImage(fb, 700, 960, 24, 24);      // Moves up to make room
-          ctx.font = "bold 22px Arial";             // Adjusted size
-          ctx.fillText("@eptonline.org", 735, 980); // Aligned text center-ish to icon
+          ctx.drawImage(fb, 700, 990, 20, 20);
+          ctx.font = "bold 18px Arial";
+          ctx.fillText("@eptonline.org", 730, 1007); 
       }
 
-      // 2. Instagram
+      // 2. Instagram (30px gap below FB)
       if(insta) {
-          ctx.drawImage(insta, 700, 1000, 24, 24);  // 40px gap below FB
-          ctx.font = "bold 22px Arial";
-          ctx.fillText("@eptonline_org", 735, 1020);
+          ctx.drawImage(insta, 700, 1020, 20, 20);
+          ctx.font = "bold 18px Arial";
+          ctx.fillText("@eptonline_org", 730, 1037);
       }
 
-      // 3. YouTube
+      // 3. YouTube (30px gap below Insta)
       if(yt) {
-          ctx.drawImage(yt, 700, 1040, 24, 24);     // 40px gap below Insta
-          ctx.font = "bold 22px Arial";
-          ctx.fillText("@eptonline", 735, 1060);
+          ctx.drawImage(yt, 700, 1050, 20, 20);
+          ctx.font = "bold 18px Arial";
+          ctx.fillText("@eptonline", 730, 1067);
       }
  
     }
