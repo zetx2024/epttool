@@ -252,27 +252,26 @@
       
       // Removed the Instagram text logic for now as requested layout, 
       // but if you want it back, uncomment below:
- 
-      
-     // 1. Facebook (Starts at 990)
+ // Configure Font for all handles
+      ctx.font = "bold 16px Arial"; 
+      ctx.fillStyle = "white"; // Ensure text is white
+
+      // 1. Facebook (Starts at 990)
       if(fb) {
-          ctx.drawImage(fb, 700, 990, 20, 20);
-          ctx.font = "bold 18px Arial";
-          ctx.fillText("@eptonline.org", 730, 1007); 
+          ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.fillText("@eptonline.org", 905, 1005); 
       }
 
-      // 2. Instagram (30px gap below FB)
+      // 2. Instagram (Tight gap: +24px)
       if(insta) {
-          ctx.drawImage(insta, 700, 1020, 20, 20);
-          ctx.font = "bold 18px Arial";
-          ctx.fillText("@eptonline_org", 730, 1037);
+          ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.fillText("@eptonline_org", 905, 1029);
       }
 
-      // 3. YouTube (30px gap below Insta)
+      // 3. YouTube (Tight gap: +24px)
       if(yt) {
-          ctx.drawImage(yt, 700, 1050, 20, 20);
-          ctx.font = "bold 18px Arial";
-          ctx.fillText("@eptonline", 730, 1067);
+          ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.fillText("@eptonline", 905, 1053);
       }
  
     }
