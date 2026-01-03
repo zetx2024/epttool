@@ -43,11 +43,12 @@
 
     <h2>Options</h2>
                 <div class="btn-container">
-                    <a href="vocab.html" class="link-btn">Vocabulary</a>
-                    <a href="grammar.html" class="link-btn">Grammar</a>
-                    <a href="spelling.html" class="link-btn">Spelling</a>
-                    <a href="speaking.html" class="link-btn">Speaking</a>
-                    <a href="motivation.html" class="link-btn">Study Motivation</a>
+                    <a href="vocab" class="link-btn">Vocabulary</a>
+                    <a href="grammar" class="link-btn">Grammar</a>
+                    <a href="spelling" class="link-btn">Spelling</a>
+                    <a href="speaking" class="link-btn">Speaking</a>
+                    <a href="motivation" class="link-btn">Study Motivation</a>
+                     <a href="video" class="link-btn">Video Generator</a>
                 </div>
 </div>
 
@@ -65,32 +66,36 @@
 
         // পোস্টের ডাটাবেজ
         const schedule = {
-            'Saturday': { title: "Vocabulary Quiz (MCQ)", link: "vocab.html" },
-            'Monday':   { title: "Grammar Tip (Learning)", link: "grammar.html" },
-            'Thursday':{ title: "Spelling Topic", link: "spelling.html" },
-            'Wednesday':{ title: "Speaking Topic (Discussion)", link: "speaking.html" },
-            'Friday':   { title: "Study Motivation/Resources", link: "motivation.html" }
+            'Saturday': { title: "Vocabulary Quiz (MCQ)", link: "vocab" },
+            'Sunday':   { title: "Video Generation", link: "video" },
+            'Monday':   { title: "Grammar Tip (Learning)", link: "grammar" },
+            'Thursday':{ title: "Spelling Topic", link: "spelling" },
+            'Wednesday':{ title: "Speaking Topic (Discussion)", link: "speaking" },
+            'Friday':   { title: "Study Motivation/Resources", link: "motivation" }
         };
 
         // চেক করা আজ কোনো স্পেশাল দিন কি না
         if (schedule[dayName]) {
             const post = schedule[dayName];
             contentArea.innerHTML = `
-                <h2>আজকের বিশেষ টাস্ক (${dayName})</h2>
+                <h2>Today's Task (${dayName})</h2>
                 <div class="btn-container">
                     <a href="${post.link}" class="link-btn special-day">${post.title}</a>
                 </div>
-                <p style="margin-top:15px; font-size:12px; color:#999;">আজকের জন্য শুধুমাত্র এই টাস্কটি নির্ধারিত।</p>
+                <p style="margin-top:15px; font-size:12px; color:#999;">For Today</p>
             `;
         } else {
             // অন্য দিনগুলোতে সব বাটন দেখাবে
             contentArea.innerHTML = `
-                <h2>সবগুলো অপশন দেখুন</h2>
+                <h2>All</h2>
                 <div class="btn-container">
-                    <a href="vocab.html" class="link-btn">Vocabulary</a>
-                    <a href="grammar.html" class="link-btn">Grammar</a>
-                    <a href="speaking.html" class="link-btn">Speaking</a>
-                    <a href="motivation.html" class="link-btn">Resources</a>
+                     <a href="vocab" class="link-btn">Vocabulary</a>
+                    <a href="grammar" class="link-btn">Grammar</a>
+                    <a href="spelling" class="link-btn">Spelling</a>
+                    <a href="speaking" class="link-btn">Speaking</a>
+                    <a href="motivation" class="link-btn">Study Motivation</a>
+                     <a href="video" class="link-btn">Video Generator</a>
+                    
                 </div>
             `;
         }
