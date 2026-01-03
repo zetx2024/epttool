@@ -89,7 +89,7 @@
     const ctx = canvas.getContext("2d");
 
     // --- ASSETS ---
-    const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
+    const logoUrl = "https://zetx2024.github.io/epttool/instaeptologo.PNG";
     const fbLogo = "https://upload.wikimedia.org/wikipedia/commons/1/16/Facebook-icon-1.png";
     // Using a generic placeholder for Insta to prevent load errors if the wiki link breaks
     // You can replace this with your specific uploaded icon
@@ -129,7 +129,7 @@
 
     function getRandomColor() {
       // Darker, richer gradients for a "Pro" look
-      const colors = ["#2b2d42", "#0f4c5c", "#5f0f40", "#3a0ca3", "#386641", "#bc4749"];
+      const colors = ["#ed9b1f", "#c9ab7d", "#91764d", "#f2db0c", "#9c8d06", "#9fd108"];
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
@@ -255,12 +255,12 @@
       
       // Removed the Instagram text logic for now as requested layout, 
       // but if you want it back, uncomment below:
-      /*
+ 
       if(insta) {
           ctx.drawImage(insta, 700, 930, 40, 40);
           ctx.fillText("@eptonline_org", 750, 960);
       }
-      */
+ 
     }
 
     // Helper for rounded rectangles in canvas
