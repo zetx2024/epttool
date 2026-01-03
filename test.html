@@ -96,6 +96,26 @@
             padding: 5px;
         }
 
+        /* Caption Generator Area */
+        .caption-area {
+            grid-column: 1 / -1;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.5rem;
+            box-sizing: border-box;
+            font-family: monospace;
+            margin-top: 0.5rem;
+        }
+
         /* Buttons */
         .btn-primary {
             background-color: var(--primary);
@@ -111,6 +131,16 @@
         }
         .btn-primary:hover { background-color: #ea580c; }
         .btn-primary:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+
+        .btn-secondary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
 
         .checkbox-wrapper {
             display: flex;
@@ -187,7 +217,7 @@
                     <strong>Add "Outro" Slide (3 Secs)</strong>
                 </label>
                 <small style="display:block; margin-top:5px; color:#666;">
-                    Shows centered Logo, Social Links, and Website.
+                    Shows centered Logo, Social Links (FB, IG, YT, TikTok), and Website.
                 </small>
             </div>
 
@@ -199,7 +229,6 @@
                     <option value="track2">Upbeat/Lofi (Track 2)</option>
                     <option value="track3">Cinematic (Track 3)</option>
                 </select>
-                <small style="color: #666; font-size: 0.8em;">*Ensure files exist in your folder or use URLs</small>
             </div>
         </div>
 
@@ -213,6 +242,14 @@
             <div class="playlist-container" id="playlistContainer">
                 <p style="text-align: center; color: #999; margin-top: 50px;">Upload images to see them here.</p>
             </div>
+        </div>
+
+        <div class="caption-area">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Social Media Caption Generator</label>
+                <button class="btn-secondary" onclick="generateCaption()">Generate & Copy</button>
+            </div>
+            <textarea id="captionBox" placeholder="Click 'Generate' to create a caption with your links and hashtags..."></textarea>
         </div>
 
         <div class="status-bar" id="progressBar"><div class="status-fill" id="progressFill"></div></div>
@@ -238,25 +275,25 @@
         //  1. CONFIGURATION (EDIT HERE)
         // ==========================================
         
-        // 1.1 Hardcoded Social Handles
+        // 1.1 Hardcoded Social Handles (Add your real handles here)
         const SOCIAL_HANDLES = {
-            fb: "My Facebook Page",
-            ig: "@my.instagram",
-            yt: "My Channel Name"
+            fb: "Facebook Name",
+            ig: "@insta_handle",
+            yt: "Channel Name",
+            tiktok: "@tiktok_handle" 
         };
 
         const WEBSITE_URL = "https://eptonline.org";
         
-        // 1.2 PNG Icon Links (Replace with your actual PNG URLs)
-        // Using placeholders for demonstration.
+        // 1.2 PNG Icon Links
         const ICONS = {
             fb: 'https://cdn-icons-png.flaticon.com/512/5968/5968764.png',
             ig: 'https://cdn-icons-png.flaticon.com/512/3955/3955024.png',
-            yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png'
+            yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png',
+            tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'
         };
 
         // 1.3 Music Tracks (Replace with your local paths or URLs)
-        // Ensure these files exist or are valid URLs.
         const MUSIC_TRACKS = {
             track1: 'path/to/music1.mp3', 
             track2: 'path/to/music2.mp3',
@@ -317,6 +354,27 @@
             }
         }
 
+        // --- CAPTION GENERATOR ---
+        function generateCaption() {
+            let caption = `Check out our latest learning resources! 📚\n\n🌐 Visit: ${WEBSITE_URL}\n\n`;
+            
+            if(SOCIAL_HANDLES.fb) caption += `Facebook: ${SOCIAL_HANDLES.fb}\n`;
+            if(SOCIAL_HANDLES.ig) caption += `Instagram: ${SOCIAL_HANDLES.ig}\n`;
+            if(SOCIAL_HANDLES.tiktok) caption += `TikTok: ${SOCIAL_HANDLES.tiktok}\n`;
+            if(SOCIAL_HANDLES.yt) caption += `YouTube: ${SOCIAL_HANDLES.yt}\n`;
+            
+            caption += `\n#Education #Flashcards #StudyTips #EptOnline #Learning #EdTech`;
+
+            const box = document.getElementById('captionBox');
+            box.value = caption;
+            
+            // Copy
+            box.select();
+            navigator.clipboard.writeText(caption)
+                .then(() => alert("Caption copied to clipboard!"))
+                .catch(() => alert("Caption generated (Manual copy required)"));
+        }
+
         async function startGeneration() {
             if (playlist.length === 0) return alert("Please upload images first.");
 
@@ -348,6 +406,7 @@
             assets.icons.fb = await safeLoad(ICONS.fb);
             assets.icons.ig = await safeLoad(ICONS.ig);
             assets.icons.yt = await safeLoad(ICONS.yt);
+            assets.icons.tiktok = await safeLoad(ICONS.tiktok);
             
             assets.slides = [];
             let slidesTotalTime = 0;
@@ -376,10 +435,9 @@
             if (musicChoice !== 'none') {
                 try {
                     status.innerText = "Loading Music...";
-                    // Check if URL is valid or dummy
                     const trackUrl = MUSIC_TRACKS[musicChoice];
                     if(trackUrl.includes('path/to/')) {
-                        console.warn("Using dummy music path. Audio might fail if file missing.");
+                        console.warn("Using dummy music path.");
                     }
 
                     const response = await fetch(trackUrl);
@@ -397,13 +455,12 @@
                     src.loop = true;
                     src.connect(audioDest);
                     src.start(0);
-                    // Stop audio slightly after video ends
                     setTimeout(() => {
                         try { src.stop(); audioCtx.close(); } catch(e){}
                     }, finalDuration * 1000 + 500); 
                 } catch(e) { 
                     console.error("Audio Load Error:", e);
-                    alert("Could not load music file. Check console/paths. Proceeding mute.");
+                    // Continue without music if fail
                 }
             }
 
@@ -465,7 +522,7 @@
                     if (currentImg) renderMainFrame(currentImg, bgColor, format);
                 } else {
                     // OUTRO PHASE
-                    if (useOutro) renderOutroFrame(bgColor);
+                    if (useOutro) renderOutroFrame(bgColor, format);
                 }
                 
                 requestAnimationFrame(draw);
@@ -502,7 +559,7 @@
         }
 
         // --- 2. Outro Frame (Centered) ---
-        function renderOutroFrame(bgColor) {
+        function renderOutroFrame(bgColor, format) {
             const w = canvas.width;
             const h = canvas.height;
 
@@ -514,10 +571,18 @@
             ctx.fillStyle = "white";
             ctx.textAlign = "center";
             
-            // Calculate Centered Positions based on height percentages
-            const logoY = h * 0.3;
-            const textY = h * 0.5;
-            const socialY = h * 0.65;
+            // Adjust vertical positions based on layout
+            let logoY, textY, socialY;
+            
+            if (format === 'story') { // Vertical
+                logoY = h * 0.35;
+                textY = h * 0.5;
+                socialY = h * 0.6; 
+            } else { // Square or Landscape
+                logoY = h * 0.25;
+                textY = h * 0.5;
+                socialY = h * 0.65;
+            }
 
             // 1. Logo
             if(assets.logo) {
@@ -527,24 +592,22 @@
             }
 
             // 2. Website Text
-            ctx.font = `bold ${w * 0.06}px Arial`;
+            ctx.font = `bold ${w * 0.05}px Arial`;
             ctx.fillText(WEBSITE_URL, w/2, textY);
 
             // 3. "Follow Us"
-            ctx.font = `${w * 0.04}px Arial`;
-            ctx.fillText("Follow us for more!", w/2, textY + (w * 0.07));
+            ctx.font = `${w * 0.035}px Arial`;
+            ctx.fillText("Follow us for more!", w/2, textY + (w * 0.06));
 
-            // 4. Centered Socials (No Bar, just icons and text in middle)
+            // 4. Centered Socials
             drawCenteredSocials(ctx, w, h, socialY);
         }
 
         // --- 3. Footer Bar (Dynamic Resizing) ---
         function drawSocialBar(ctx, w, h, format) {
-            // Case 1: Dynamic Height based on Width (Fixes the resize issue)
-            // Using 8% of width guarantees it looks proportionate on all screens
-            // But we clamp it so it doesn't get too small on Landscape
             let barHeight = w * 0.08; 
-            if (format === 'youtube') barHeight = h * 0.12; // Slightly taller for landscape
+            // Clamp min/max for extreme aspect ratios
+            if (format === 'youtube') barHeight = h * 0.12; 
             
             const fontSize = barHeight * 0.35;
             const iconSize = barHeight * 0.5;
@@ -555,39 +618,66 @@
 
             // Draw Items
             const startY = h - (barHeight/2);
-            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize);
+            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize, true);
         }
 
         // --- 4. Centered Socials (For Outro) ---
         function drawCenteredSocials(ctx, w, h, startY) {
-            const iconSize = w * 0.08; // Bigger icons for outro
-            const fontSize = w * 0.05; // Bigger text
+            const iconSize = w * 0.08; 
+            const fontSize = w * 0.05; 
             
-            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize);
+            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize, false);
         }
 
-        // Helper to draw handles horizontally centered at a specific Y
-        function drawHorizontalHandles(ctx, w, centerY, iconSize, fontSize) {
-            ctx.fillStyle = "white";
-            ctx.font = `bold ${fontSize}px Arial`;
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-
-            // Prepare items
-            const items = [];
-            if (SOCIAL_HANDLES.fb) items.push({ icon: assets.icons.fb, text: SOCIAL_HANDLES.fb });
-            if (SOCIAL_HANDLES.ig) items.push({ icon: assets.icons.ig, text: SOCIAL_HANDLES.ig });
-            if (SOCIAL_HANDLES.yt) items.push({ icon: assets.icons.yt, text: SOCIAL_HANDLES.yt });
-
-            const gap = w * 0.04;
+        // Helper to draw handles horizontally with Auto-Scaling
+        function drawHorizontalHandles(ctx, w, centerY, iconSize, fontSize, isFooter) {
             
-            // Calculate total width to center the group
+            // Prepare active items
+            const items = [];
+            const hList = SOCIAL_HANDLES;
+            if (hList.fb) items.push({ icon: assets.icons.fb, text: hList.fb });
+            if (hList.ig) items.push({ icon: assets.icons.ig, text: hList.ig });
+            if (hList.tiktok) items.push({ icon: assets.icons.tiktok, text: hList.tiktok });
+            if (hList.yt) items.push({ icon: assets.icons.yt, text: hList.yt });
+
+            if(items.length === 0) return;
+
+            // 1. Calculate ideal width
+            let gap = w * 0.04;
+            ctx.font = `bold ${fontSize}px Arial`;
+            
             let totalWidth = 0;
             items.forEach(item => {
                 const textW = ctx.measureText(item.text).width;
                 totalWidth += iconSize + (gap/2) + textW;
             });
             totalWidth += (items.length - 1) * gap;
+
+            // 2. SCALE TO FIT (Crucial for Reels/Stories)
+            // If totalWidth > 90% of screen, scale everything down
+            const safeWidth = w * 0.95; 
+            let scale = 1;
+
+            if (totalWidth > safeWidth) {
+                scale = safeWidth / totalWidth;
+                // Apply scale
+                iconSize *= scale;
+                fontSize *= scale;
+                gap *= scale;
+                // Recalculate total width with new scale to center correctly
+                ctx.font = `bold ${fontSize}px Arial`; // Reset font with new size
+                totalWidth = 0;
+                items.forEach(item => {
+                    const textW = ctx.measureText(item.text).width;
+                    totalWidth += iconSize + (gap/2) + textW;
+                });
+                totalWidth += (items.length - 1) * gap;
+            }
+
+            // 3. Draw
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "white";
 
             let currentX = (w - totalWidth) / 2;
 
@@ -611,7 +701,7 @@
             if(!src) return null;
             return new Promise(resolve => {
                 const img = new Image();
-                img.crossOrigin = "anonymous"; // Important for external PNGs
+                img.crossOrigin = "anonymous"; 
                 img.onload = () => resolve(img);
                 img.onerror = () => {
                     console.warn("Failed to load image:", src);
