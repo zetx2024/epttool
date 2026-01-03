@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed Flashcard Video Maker</title>
+    <title>Flashcard Video Studio (Stable)</title>
     <style>
         :root {
             --primary: #f97316; /* Orange */
@@ -145,7 +145,7 @@
 </head>
 <body>
 
-    <h1>Flashcard Video Studio Pro (Fixed)</h1>
+    <h1>Flashcard Video Studio (Robust)</h1>
 
     <div class="container">
         
@@ -160,7 +160,7 @@
             </div>
 
             <div style="background: #fff3e0; padding: 10px; border-radius: 6px; font-size: 0.9rem;">
-                <strong>Fixed Settings (In Code):</strong><br>
+                <strong>Fixed Settings:</strong><br>
                 Brand: <span id="displayBrand">Loading...</span><br>
                 Watermark: <span id="displayWatermark">Loading...</span>
             </div>
@@ -206,24 +206,24 @@
         //  USER CONFIGURATION (EDIT HERE)
         // ==========================================
         const CONFIG = {
-            socialHandle: "@MyStudyChannel",     // CHANGE THIS
-            watermarkText: "PREVIEW VERSION",    // CHANGE THIS
-            
-            // This is a Base64 Placeholder Logo (Yellow Star). 
-            // To use your own, replace this long string with your image's Base64 string.
+            socialHandle: "@MyStudyChannel",     
+            watermarkText: "PREVIEW VERSION",
+            // Base64 Placeholder Logo (Star). Replace with your own Base64 string if needed.
             logoBase64: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTIgMiAxNS4wOSA4LjI2IDIyIDkuMjcgMTcgMTQuMTQgMTguMTggMjEuMDIgMTIgMTcuNzcgNS44MiAyMS4wMiA3IDE0LjE0IDIgOS4yNyA4LjkxIDguMjYgMTIgMiIvPjwvc3ZnPg=="
         };
 
-        // Display config in UI for confirmation
         document.getElementById('displayBrand').innerText = CONFIG.socialHandle;
         document.getElementById('displayWatermark').innerText = CONFIG.watermarkText;
 
         // ==========================================
-        //  ASSETS (Icons)
+        //  FIXED ASSETS (Simpler SVG Strings)
         // ==========================================
         const iconSources = {
-            fb: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTkuMSA4LjhoMi44djIuOWgtMi44djMuMmgzLjJ2M2gtMy4ydi02LjJoLTIuOHYtMi45aDIuOHYtMy4yYzAtMi41IDEuNi00LjMgNC4zLTQuMyAxLjMgMCAyLjUuMSAyLjUuMXYyLjhoLTEuNWMtMS4yIDAtMS42LjctMS42IDEuNnYyLjF6Ii8+PC9zdmc+',
+            // Facebook (White 'f' on transparent)
+            fb: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTE4IDJoLTNhNSA1IDAgMCAwLTUgNXYzaC0zdjRoM3Y4aDR2LThoM2wxLTRoLTRWN2ExIDEgMCAwIDEgMS0xaDNyeiIvPjwvc3ZnPg==',
+            // Instagram (White Outline)
             ig: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNSIgcnk9IjUiPjwvcmVjdD48cGF0aCBkPSJNMTYgMTEuMzdBNCADIDAgMSAxIDEyLjYzIDggNCA0IDAgMCAxIDE2IDExLjM3eiI+PC9wYXRoPjxsaW5lIHgxPSIxNy41IiB5MT0iNi41IiB4Mj0iMTcuNTEiIHkyPSI2LjUiPjwvbGluZT48L3N2Zz4=',
+            // YouTube (White Play Button)
             yt: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTIyLjU0IDYuNDJjLS4zNi0xLjUzLTEuNTMtMi43My0zLjA2LTMuMDZDMTYuNzYgMyAxMiAzIDEyIDNzLTQuNzYgMC03LjQ4LjM2Yy0xLjUzLjMzLTIuNyAxLjUzLTMuMDYgMy4wNkMwIDEwLjA2IDAgMTIgMCAxMnMwIDEuOTQuMjUgNC41OGMuMzYgMS41MyAxLjUzIDIuNzMgMy4wNiAzLjA2QzcuMjQgMjAgMTIgMjAgMTIgMjBzNC43NiAwIDcuNDgtLjM2YzEuNTMtLjMzIDIuNy0xLjUzIDMuMDYtMy4wNi4yNS0yLjY0LjI1LTQuNTguMjUtNC41OHMwLTEuOTQtLjI1LTQuNTh6TTkuNTQgMTV2LTZsNS43IDN6Ii8+PC9zdmc+'
         };
 
@@ -234,7 +234,6 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        // This object will hold the loaded Image objects
         const loadedAssets = {
             brandLogo: null,
             icons: {},
@@ -242,7 +241,7 @@
         };
 
         // ==========================================
-        //  1. UI & PLAYLIST LOGIC
+        //  UI & PLAYLIST
         // ==========================================
         async function handleImageUpload() {
             const input = document.getElementById('imageInput');
@@ -294,7 +293,7 @@
         }
 
         // ==========================================
-        //  2. GENERATION LOGIC
+        //  GENERATION LOGIC
         // ==========================================
         async function startGeneration() {
             if (playlist.length === 0) return alert("Please upload images first.");
@@ -318,32 +317,42 @@
             canvas.width = dims[format].w;
             canvas.height = dims[format].h;
 
-            // --- CRITICAL FIX: PRELOAD ALL ASSETS ---
-            statusText.innerText = "Loading assets (fixing broken images)...";
+            // --- SAFE ASSET LOADING ---
+            statusText.innerText = "Loading assets...";
             
-            try {
-                // 1. Load Fixed Logo
-                loadedAssets.brandLogo = await loadImage(CONFIG.logoBase64);
+            // Helper to load safely without crashing
+            const safeLoad = async (src, name) => {
+                try {
+                    return await loadImage(src);
+                } catch (e) {
+                    console.warn(`Warning: Could not load ${name}. Skipping.`);
+                    return null; // Return null so we can check later
+                }
+            };
 
-                // 2. Load Social Icons
-                loadedAssets.icons.fb = await loadImage(iconSources.fb);
-                loadedAssets.icons.ig = await loadImage(iconSources.ig);
-                loadedAssets.icons.yt = await loadImage(iconSources.yt);
+            // 1. Load Fixed Assets
+            loadedAssets.brandLogo = await safeLoad(CONFIG.logoBase64, "Brand Logo");
+            loadedAssets.icons.fb = await safeLoad(iconSources.fb, "Facebook Icon");
+            loadedAssets.icons.ig = await safeLoad(iconSources.ig, "Instagram Icon");
+            loadedAssets.icons.yt = await safeLoad(iconSources.yt, "YouTube Icon");
 
-                // 3. Load All User Slides
-                loadedAssets.slides = [];
-                let totalDuration = 0;
-                for (let item of playlist) {
-                    const imgObj = await loadImage(item.file);
+            // 2. Load User Slides
+            loadedAssets.slides = [];
+            let totalDuration = 0;
+            
+            for (let item of playlist) {
+                const imgObj = await safeLoad(item.file, item.file.name);
+                if (imgObj) {
                     loadedAssets.slides.push({
                         img: imgObj,
                         duration: item.duration
                     });
                     totalDuration += item.duration;
                 }
-            } catch (err) {
-                console.error(err);
-                alert("Error loading images. Please try again.");
+            }
+
+            if (loadedAssets.slides.length === 0) {
+                alert("No valid images could be loaded.");
                 btn.disabled = false;
                 return;
             }
@@ -351,26 +360,29 @@
             // --- AUDIO SETUP ---
             let audioCtx, destNode, audioStream;
             if (audioInput.files.length > 0) {
-                statusText.innerText = "Processing Audio...";
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const arrayBuf = await audioInput.files[0].arrayBuffer();
-                const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
-                destNode = audioCtx.createMediaStreamDestination();
-                audioStream = destNode.stream;
-                
-                const source = audioCtx.createBufferSource();
-                source.buffer = audioBuf;
-                source.loop = true;
-                source.connect(destNode);
-                source.start(0);
-                setTimeout(() => source.stop(), totalDuration * 1000 + 1000); 
+                try {
+                    statusText.innerText = "Processing Audio...";
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const arrayBuf = await audioInput.files[0].arrayBuffer();
+                    const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
+                    destNode = audioCtx.createMediaStreamDestination();
+                    audioStream = destNode.stream;
+                    
+                    const source = audioCtx.createBufferSource();
+                    source.buffer = audioBuf;
+                    source.loop = true;
+                    source.connect(destNode);
+                    source.start(0);
+                    setTimeout(() => source.stop(), totalDuration * 1000 + 1000); 
+                } catch (e) {
+                    console.error("Audio failed", e);
+                }
             }
 
             // --- RECORDING SETUP ---
-            const stream = canvas.captureStream(30); // 30 FPS
+            const stream = canvas.captureStream(30); 
             if (audioStream) audioStream.getAudioTracks().forEach(t => stream.addTrack(t));
 
-            // Browser Compatibility Check
             let mimeType = 'video/mp4';
             if (!MediaRecorder.isTypeSupported(mimeType)) {
                 mimeType = 'video/webm;codecs=vp9';
@@ -407,7 +419,7 @@
                 const progress = Math.min((elapsed / totalDuration) * 100, 100);
                 
                 document.getElementById('progressFill').style.width = `${progress}%`;
-                statusText.innerText = `Rendering frame: ${Math.round(elapsed)}s / ${totalDuration}s`;
+                statusText.innerText = `Rendering: ${Math.round(elapsed)}s / ${totalDuration}s`;
 
                 if (elapsed >= totalDuration) {
                     recorder.stop();
@@ -437,7 +449,7 @@
         }
 
         // ==========================================
-        //  3. RENDER FRAME (Fixes InvalidStateError)
+        //  RENDER FRAME
         // ==========================================
         function renderFrame(img) {
             const w = canvas.width;
@@ -448,11 +460,11 @@
             ctx.fillRect(0, 0, w, h);
 
             // 2. Draw Main Image (Contain)
-            if (img && img.complete && img.naturalHeight !== 0) {
+            if (img && img.complete) {
                 drawImageContain(ctx, img, w, h);
             }
 
-            // 3. Watermark (Fixed Config)
+            // 3. Watermark
             if (CONFIG.watermarkText) {
                 ctx.save();
                 ctx.translate(w/2, h/2);
@@ -464,14 +476,14 @@
                 ctx.restore();
             }
 
-            // 4. Logo (Fixed Asset)
-            if (loadedAssets.brandLogo && loadedAssets.brandLogo.complete) {
+            // 4. Logo (Only if loaded)
+            if (loadedAssets.brandLogo) {
                 const logoSize = w * 0.15; 
                 const padding = 20;
                 ctx.drawImage(loadedAssets.brandLogo, w - logoSize - padding, padding, logoSize, logoSize);
             }
 
-            // 5. Social Media Bar (Fixed Config)
+            // 5. Social Media Bar
             if (CONFIG.socialHandle) {
                 const barHeight = h * 0.08;
                 const iconSize = barHeight * 0.6;
@@ -492,7 +504,7 @@
                 const centerY = h - (barHeight / 2);
                 const iconY = centerY - (iconSize/2);
                 
-                // Draw preloaded icons
+                // Only draw icons that successfully loaded
                 if(loadedAssets.icons.fb) ctx.drawImage(loadedAssets.icons.fb, startX, iconY, iconSize, iconSize);
                 startX += iconSize + gap;
                 
@@ -512,12 +524,9 @@
         function loadImage(srcOrFile) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.crossOrigin = "anonymous"; // Important for some external images
+                img.crossOrigin = "anonymous";
                 img.onload = () => resolve(img);
-                img.onerror = (e) => {
-                    console.error("Failed to load image:", srcOrFile);
-                    reject(e);
-                };
+                img.onerror = (e) => reject(e); // This triggers the catch block in safeLoad
                 
                 if (srcOrFile instanceof Blob) {
                     img.src = URL.createObjectURL(srcOrFile);
