@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grammar Spot the Mistake Generator</title>
+  <title>Vocabulary Flashcard & Caption Generator</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,23 +12,25 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
       margin: 0;
       padding: 20px;
     }
 
-    h2 { margin-bottom: 10px; color: #ddd; }
+    h2 { margin-bottom: 10px; color: #f0f0f0; text-align: center; }
 
+    /* Canvas Styles */
     canvas {
-      max-width: 100%;
-      height: auto;
+      max-width: 100%; /* Responsive width */
+      height: auto;    /* Maintain aspect ratio */
+      max-height: 80vh; /* Keep it visible on screen */
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
       margin-bottom: 20px;
       border: 1px solid #333;
     }
 
+    /* Controls Container */
     .controls {
       display: flex;
       gap: 15px;
@@ -37,9 +39,9 @@
       background: #1e1e1e;
       padding: 15px;
       border-radius: 12px;
-      margin-bottom: 20px;
       width: 100%;
       max-width: 800px;
+      margin-bottom: 20px;
     }
 
     button {
@@ -58,6 +60,9 @@
     .btn-dl { background: #457b9d; color: white; }
     .btn-dl:hover { background: #1d3557; }
 
+    .btn-copy { background: #2a9d8f; color: white; }
+    .btn-copy:hover { background: #21867a; }
+
     .toggle-container {
       display: flex;
       align-items: center;
@@ -72,76 +77,66 @@
       cursor: pointer;
     }
 
-    /* --- Caption Styles --- */
-    .caption-container {
-      background: #252525;
+    /* Caption Box Styles */
+    .caption-box {
+      background: #1e1e1e;
       padding: 20px;
       border-radius: 12px;
       width: 100%;
       max-width: 800px;
       border: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .caption-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .caption-label {
-      color: #FFD700;
-      font-weight: bold;
-      font-size: 1.1em;
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
     }
 
     textarea {
       width: 100%;
-      height: 200px; /* Increased height for more links */
-      background: #121212;
+      height: 200px;
+      background: #2b2b2b;
+      color: #e0e0e0;
       border: 1px solid #444;
-      color: #ddd;
-      padding: 10px;
       border-radius: 8px;
-      font-family: 'Segoe UI', monospace;
+      padding: 10px;
+      font-family: monospace;
       font-size: 14px;
       resize: vertical;
-      box-sizing: border-box;
+      box-sizing: border-box; /* Fix padding issue */
     }
 
-    .btn-copy {
-      background: #2a9d8f;
-      color: white;
-      padding: 8px 16px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-    }
-    .btn-copy:hover { background: #21867a; }
+    textarea:focus { outline: 2px solid #457b9d; }
 
   </style>
 </head>
 <body>
 
-  <h2>Spot the Mistake Generator</h2>
+  <h2>Vocabulary Challenge Generator</h2>
+  
   <canvas id="flashcard" width="1080" height="1080"></canvas>
 
   <div class="controls">
     <div class="toggle-container">
       <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
-      <label for="showAnswer">Show Correct Answer</label>
+      <label for="showAnswer">Show Answer</label>
     </div>
-    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Sentence</button>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 New Word</button>
     <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
   </div>
 
-  <div class="caption-container">
+  <div class="caption-box">
     <div class="caption-header">
-      <span class="caption-label">📱 Social Media Caption</span>
-      <button class="btn-copy" onclick="copyCaption()" id="copyBtn">📋 Copy Caption</button>
+      📝 Social Media Caption (Ready to Paste)
     </div>
-    <textarea id="socialCaption" readonly></textarea>
+    <textarea id="captionText" readonly></textarea>
+    <button class="btn-copy" onclick="copyCaption()">📋 Copy Caption</button>
   </div>
 
   <script>
@@ -155,270 +150,40 @@
     const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
     const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
 
-    // --- DATA: Spot the Mistake ---
+    // --- DATA: Vocabulary Challenge ---
     const questions = [
-      {
-        incorrect: "I have finished my work two hours ago.",
-        correct: "I finished my work two hours ago.",
-        explanation: "(Past time থাকলে Past Indefinite হয়)।"
-      },
-      {
-        incorrect: "She don't like to drink coffee.",
-        correct: "She doesn't like to drink coffee.",
-        explanation: "(Third person singular number-এর সাথে doesn't হয়)।" 
-      },
-      {
-        incorrect: "Every students must attend the exam.",
-        correct: "Every student must attend the exam.",
-        explanation: "(Every-র পর singular noun হয়)।"
-      },
-      {
-        incorrect: "I am looking forward to meet you.",
-        correct: "I am looking forward to meeting you.",
-        explanation: "(To-র পর সাধারণত base form বসলেও 'looking forward to' এর পর ing হয়)।"
-      },
-      {
-        incorrect: "He is more taller than his brother.",
-        correct: "He is taller than his brother.",
-        explanation: "(Double comparative হয় না)।"
-      }
+      { word: "Abundant", options: ["Scarcity", "Plentiful", "Rare"], correctIndex: 1 },
+      { word: "Meticulous", options: ["Careful", "Lazy", "Messy"], correctIndex: 0 },
+      { word: "Mitigate", options: ["Increase", "Reduce", "Ignore"], correctIndex: 1 },
+      { word: "Formidable", options: ["Weak", "Impressive", "Simple"], correctIndex: 1 },
+      { word: "Ambiguous", options: ["Clear", "Unclear", "Fast"], correctIndex: 1 },
+      { word: "Benevolent", options: ["Kind", "Cruel", "Greedy"], correctIndex: 0 },
+      { word: "Ephemeral", options: ["Lasting", "Short-lived", "Heavy"], correctIndex: 1 },
+      { word: "Candid", options: ["Secretive", "Honest", "Shy"], correctIndex: 1 }
     ];
+
+    // --- DATA: Hashtag Pools ---
+    const requiredTags = ["#eptonline", "#English", "#Vocabulary", "#SynonymChallenge"];
+    const examTags = ["#IELTS", "#TOEFL", "#DET", "#PTE", "#StudyAbroad", "#DuolingoEnglishTest", "#IELTSPreparation"];
+    const engagementTags = ["#DailyEnglish", "#LearnEnglish", "#WordOfTheDay", "#EnglishQuiz", "#Grammar"];
 
     let currentQuestion = null;
 
+    // --- HELPER FUNCTIONS ---
+
     function getRandomColor() {
-      const colors = ["#c7aa85", "#c7aa85", "#c7aa85"]; 
+      const colors = ["#faf339", "#ffd700", "#ffec8b"];
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
     async function loadImage(url) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => resolve(img);
-        img.onerror = () => {
-            console.warn("Failed to load image:", url);
-            resolve(null);
-        };
+        img.onerror = () => { console.warn("Failed:", url); resolve(null); };
         img.src = url;
       });
-    }
-
-    // --- CAPTION GENERATION LOGIC ---
-    function generateSocialCaption(questionData) {
-        const headline = "🧠 Grammar Challenge! Can you spot the mistake? 🧐";
-        
-        // Contextual hashtags
-        let specificTags = [];
-        const expl = questionData.explanation.toLowerCase();
-        
-        if(expl.includes("past") || expl.includes("ago")) specificTags.push("#PastTense");
-        if(expl.includes("singular") || expl.includes("plural")) specificTags.push("#SingularPlural");
-        if(expl.includes("comparative")) specificTags.push("#Adjectives");
-        if(expl.includes("verb") || expl.includes("ing")) specificTags.push("#Verbs");
-        if(expl.includes("preposition")) specificTags.push("#Prepositions");
-        if(specificTags.length === 0) specificTags.push("#GrammarRules");
-
-        // Expanded Random pool hashtags
-        const pool = [
-            "#IELTS", "#TOEFL", "#DET", "#PTE", "#English", "#EnglishLearning", "#StudyAbroad", 
-            "#Grammar", "#Vocabulary", "#ESL", "#EnglishTeacher", "#LearnEnglish", 
-            "#Education", "#EnglishTips", "#DailyEnglish", "#EnglishClass", "#LanguageLearning",
-            "#OnlineEducation", "#EnglishSkills", "#StudyEnglish", "#ImproveEnglish"
-        ];
-        
-        // Shuffle and pick 6 tags
-        const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
-        
-        const allTags = [...specificTags, "#eptonline", ...shuffled].join(" ");
-
-        const caption = `${headline}
-
-❌ Incorrect: "${questionData.incorrect}"
-
-✅ What is the correct sentence? Comment your answer below! 👇
-
----------------------------------
-🔗 Practice More: https://eptonline.org
-👍 Facebook: https://www.facebook.com/eptonline.org
-📸 Instagram: https://www.instagram.com/eptonline_org
-📺 YouTube: https://www.youtube.com/@eptonlineOrg
----------------------------------
-
-${allTags}`;
-
-        document.getElementById("socialCaption").value = caption;
-        
-        // Reset copy button
-        const btn = document.getElementById("copyBtn");
-        btn.innerHTML = "📋 Copy Caption";
-        btn.style.background = "#2a9d8f";
-    }
-
-    function copyCaption() {
-        const copyText = document.getElementById("socialCaption");
-        copyText.select();
-        copyText.setSelectionRange(0, 99999);
-        navigator.clipboard.writeText(copyText.value).then(() => {
-            const btn = document.getElementById("copyBtn");
-            btn.innerHTML = "✅ Copied!";
-            btn.style.background = "#27ae60";
-        });
-    }
-
-    async function generateFlashcard() {
-      const showAnswer = document.getElementById("showAnswer").checked;
-
-      if (!currentQuestion || (window.event && window.event.type === 'click' && window.event.target.classList.contains('btn-gen'))) {
-         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-      }
-
-      const q = currentQuestion;
-      generateSocialCaption(q);
-
-      // Clear Canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // --- Background ---
-      const color1 = getRandomColor();
-      const color2 = "#c76e08"; 
-      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
-      gradient.addColorStop(0, color1);
-      gradient.addColorStop(1, color2);
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // --- Header Logo ---
-      const logo = await loadImage(logoUrl);
-      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
-
-      // --- Main Title ---
-      ctx.fillStyle = "#FFD700"; // Gold
-      ctx.font = "bold 50px 'Segoe UI'";
-      ctx.textAlign = "center";
-      ctx.fillText("SPOT THE MISTAKE", canvas.width / 2, 230);
-      
-      ctx.fillStyle = "#cccccc";
-      ctx.font = "italic 30px 'Segoe UI'";
-      ctx.fillText("(Grammar Challenge)", canvas.width / 2, 280);
-
-      // --- Draw Question ---
-      // Label
-      ctx.fillStyle = "#ff4d4d"; 
-      ctx.font = "bold 35px 'Arial'";
-      ctx.fillText("INCORRECT?", canvas.width / 2, 380);
-
-      // Box
-      ctx.fillStyle = "#222";
-      ctx.strokeStyle = "#ff4d4d";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.roundRect(140, 410, 800, 200, 20); 
-      ctx.fill();
-      ctx.stroke();
-
-      // Text
-      ctx.fillStyle = "white";
-      ctx.font = "50px 'Segoe UI'";
-      ctx.textAlign = "center"; 
-      
-      const words = q.incorrect.split(" ");
-      if (ctx.measureText(q.incorrect).width > 750) {
-          const mid = Math.floor(words.length / 2);
-          const line1 = words.slice(0, mid).join(" ");
-          const line2 = words.slice(mid).join(" ");
-          ctx.fillText(`"${line1}`, canvas.width / 2, 490);
-          ctx.fillText(`${line2}"`, canvas.width / 2, 550);
-      } else {
-          ctx.fillText(`"${q.incorrect}"`, canvas.width / 2, 520);
-      }
-
-      // --- Draw Answer ---
-      if (showAnswer) {
-        // Label
-        ctx.fillStyle = "#4ecdc4"; 
-        ctx.font = "bold 35px 'Arial'";
-        ctx.fillText("CORRECT:", canvas.width / 2, 680);
-
-        // Box
-        ctx.fillStyle = "#222";
-        ctx.strokeStyle = "#4ecdc4";
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.roundRect(140, 710, 800, 200, 20); 
-        ctx.fill();
-        ctx.stroke();
-
-        // Text
-        ctx.fillStyle = "white";
-        ctx.font = "bold 50px 'Segoe UI'";
-        
-        if (ctx.measureText(q.correct).width > 750) {
-            const wordsC = q.correct.split(" ");
-            const midC = Math.floor(wordsC.length / 2);
-            ctx.fillText(`"${wordsC.slice(0, midC).join(" ")}`, canvas.width / 2, 790);
-            ctx.fillText(`${wordsC.slice(midC).join(" ")}"`, canvas.width / 2, 850);
-        } else {
-            ctx.fillText(`"${q.correct}"`, canvas.width / 2, 820);
-        }
-
-        // Explanation
-        ctx.fillStyle = "#f1c40f"; 
-        ctx.font = "italic 30px 'Segoe UI'"; 
-        ctx.fillText(q.explanation, canvas.width / 2, 950);
-
-      } else {
-        ctx.fillStyle = "white";
-        ctx.font = "bold 40px 'Segoe UI'";
-        ctx.fillText("?", canvas.width / 2, 800);
-        ctx.font = "40px 'Segoe UI'";
-        ctx.fillText("(Comment Down the 'Right Answer')", canvas.width / 2, 840);
-      }
-
-      // --- Footer Section ---
-      const fb = await loadImage(fbLogo);
-      const insta = await loadImage(instaLogo);
-      const yt = await loadImage(ytLogo);
-      const webIcon = await loadImage(webLogoUrl);
-      
-      // Website Display (Left Side)
-      if (webIcon) {
-          ctx.drawImage(webIcon, 50, 1018, 28, 28);
-          
-          ctx.textAlign = "left";
-          ctx.font = "18px Arial"; 
-          ctx.fillStyle = "#ddd"; 
-          ctx.fillText("Practice more at:", 85, 1025);
-          
-          ctx.font = "bold 22px Arial";
-          ctx.fillStyle = "white";
-          ctx.fillText("https://eptonline.org", 85, 1048); 
-      }
-      
-      // Social Icons (Right Side)
-      if(fb) {
-          ctx.drawImage(fb, 880, 990, 18, 18);
-          ctx.textAlign = "left";
-          ctx.font = "bold 16px Arial"; 
-          ctx.fillStyle = "white"; 
-          ctx.fillText("@eptonline.org", 905, 1005); 
-      }
-
-      if(insta) {
-          ctx.drawImage(insta, 880, 1014, 18, 18);
-          ctx.textAlign = "left";
-          ctx.font = "bold 16px Arial"; 
-          ctx.fillStyle = "white"; 
-          ctx.fillText("@eptonline_org", 905, 1029);
-      }
-
-      if(yt) {
-          ctx.drawImage(yt, 880, 1038, 18, 18);
-          ctx.textAlign = "left";
-          ctx.font = "bold 16px Arial"; 
-          ctx.fillStyle = "white"; 
-          ctx.fillText("@eptonlineOrg", 905, 1053);
-      }
     }
 
     // Helper for rounded rectangles
@@ -435,16 +200,217 @@ ${allTags}`;
         return this;
     }
 
+    // --- CAPTION GENERATOR ---
+    function generateCaptionText(question) {
+        const optionLabels = ["A", "B", "C"];
+        
+        // 1. Headline
+        let text = `🧠 DAILY VOCABULARY CHALLENGE 🧠\n\n`;
+        
+        // 2. Question
+        text += `Can you find the synonym for: "${question.word}"?\n\n`;
+        
+        // 3. Options
+        question.options.forEach((opt, i) => {
+            text += `${optionLabels[i]}) ${opt}\n`;
+        });
+
+        // 4. CTA & Links
+        text += `\n👇 Drop your answer in the comments! 👇\n\n`;
+        text += `Practice more at: https://eptonline.org\n`;
+        text += `Follow us for daily updates:\n`;
+        text += `🌐 Website: https://eptonline.org\n`;
+        text += `📘 FB: @eptonline.org\n`;
+        text += `📸 IG: @eptonline_org\n`;
+        text += `📺 YT: @eptonlineOrg\n\n`;
+
+        // 5. Hashtags
+        // Start with required tags
+        let tags = [...requiredTags];
+        
+        // Add 3 Random Exam Tags
+        const shuffledExams = examTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledExams.slice(0, 3));
+
+        // Add 2 Random Engagement Tags
+        const shuffledEngage = engagementTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledEngage.slice(0, 2));
+
+        text += tags.join(" ");
+
+        return text;
+    }
+
+    function copyCaption() {
+        const copyText = document.getElementById("captionText");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+        navigator.clipboard.writeText(copyText.value);
+        
+        // Visual feedback on button
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        btn.style.background = "#21867a";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#2a9d8f";
+        }, 2000);
+    }
+
+    // --- MAIN GENERATOR FUNCTION ---
+    async function generateFlashcard() {
+      const showAnswer = document.getElementById("showAnswer").checked;
+
+      // Logic to pick a new question or keep current one
+      if (!currentQuestion || (event && event.type === 'click' && event.target.classList.contains('btn-gen'))) {
+         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+         
+         // Only generate new caption if we picked a new question
+         const caption = generateCaptionText(currentQuestion);
+         document.getElementById('captionText').value = caption;
+      }
+
+      const q = currentQuestion;
+
+      // Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Background ---
+      const color1 = getRandomColor();
+      const color2 = "#c76e08"; // Fade to orange/black
+      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // --- Header Logo ---
+      const logo = await loadImage(logoUrl);
+      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
+
+      // --- Title ---
+      ctx.fillStyle = "#0a0a0a";
+      ctx.font = "bold 40px 'Segoe UI'";
+      ctx.textAlign = "center";
+      ctx.fillText("VOCABULARY CHALLENGE", canvas.width / 2, 220);
+      
+      ctx.fillStyle = "#615c56";
+      ctx.font = "italic 30px 'Segoe UI'";
+      ctx.fillText("(Find the Synonym)", canvas.width / 2, 270);
+
+      // --- The Target Word ---
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 110px 'Arial'"; 
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 10;
+      ctx.fillText(`"${q.word}"`, canvas.width / 2, 420);
+      ctx.shadowBlur = 0; 
+
+      // --- Options ---
+      ctx.font = "bold 45px 'Segoe UI'";
+      const startY = 580;
+      const optionLabels = ["A", "B", "C"];
+
+      q.options.forEach((opt, i) => {
+        const y = startY + i * 140;
+        const x = 140;
+        const width = 800;
+        const height = 100;
+
+        // Logic for highlighting answer
+        let strokeColor = "white";
+        let fillColor = "transparent";
+        let textColor = "white";
+
+        if (showAnswer) {
+            if (i === q.correctIndex) {
+                strokeColor = "#2a9d8f"; // Green
+                fillColor = "rgba(42, 157, 143, 0.2)";
+                textColor = "#4ecdc4";
+            } else {
+                strokeColor = "#555"; // Dim others
+                textColor = "#aaa";
+            }
+        }
+
+        // Draw Box
+        ctx.strokeStyle = strokeColor;
+        ctx.fillStyle = fillColor;
+        ctx.lineWidth = 4;
+        
+        ctx.roundRect(x, y, width, height, 20);
+        ctx.stroke();
+        ctx.fill();
+
+        // Draw Text
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "left";
+        ctx.fillText(`${optionLabels[i]})  ${opt}`, x + 40, y + 65);
+      });
+
+      // --- Footer Section ---
+      
+      // Footer Line
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(50, 980);
+      ctx.lineTo(1030, 980);
+      ctx.stroke();
+
+      // Social Icons
+      const fb = await loadImage(fbLogo);
+      const insta = await loadImage(instaLogo);
+      const yt = await loadImage(ytLogo);
+      const webIcon = await loadImage(webLogoUrl);
+
+      // 1. Website (Bottom Left)
+      if (webIcon) {
+          ctx.drawImage(webIcon, 50, 1015, 30, 30); 
+          
+          ctx.font = "bold 24px Arial";
+          ctx.fillStyle = "white"; 
+          ctx.textAlign = "left";
+          ctx.fillText("https://eptonline.org", 90, 1038); 
+      }
+
+      // 2. Social Handles (Bottom Right)
+      const rightStart = 750; // Starting X position for handles area
+
+      if(fb) {
+          ctx.drawImage(fb, 850, 1000, 20, 20);
+          ctx.font = "18px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline.org", 880, 1017); 
+      }
+
+      if(insta) {
+          ctx.drawImage(insta, 850, 1025, 20, 20);
+          ctx.font = "18px Arial"; 
+          ctx.fillText("@eptonline_org", 880, 1042);
+      }
+
+      if(yt) {
+          ctx.drawImage(yt, 850, 1050, 20, 20);
+          ctx.font = "18px Arial"; 
+          ctx.fillText("@eptonlineOrg", 880, 1067);
+      }
+    }
+
     function downloadFlashcard() {
       const link = document.createElement("a");
-      const name = currentQuestion ? currentQuestion.incorrect.substring(0, 10).replace(/ /g, "_") : "grammar";
-      link.download = `Grammar_${name}_${Date.now()}.png`;
+      const word = currentQuestion ? currentQuestion.word : "flashcard";
+      link.download = `EPT_Vocab_${word}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
 
-    // Initialize
-    generateFlashcard();
+    // Initialize on load
+    window.onload = function() {
+        // Trigger a click to set initial question properly
+        document.querySelector('.btn-gen').click();
+    };
   </script>
 </body>
 </html>
