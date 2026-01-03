@@ -244,7 +244,7 @@
       ctx.font = "30px Arial";
       ctx.textAlign = "left";
       ctx.fillText("eptonline.org", 60, 1020);
-
+      const webLogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Logo_Sitio_Web.png/960px-Logo_Sitio_Web.png";
       // Social Icons
       const fb = await loadImage(fbLogo);
       const insta = await loadImage(instaLogo);
@@ -255,7 +255,17 @@
  // Configure Font for all handles
       ctx.font = "bold 16px Arial"; 
       ctx.fillStyle = "white"; // Ensure text is white
-
+      // 1. Website Link (Bottom Left)
+      const webIcon = await loadImage(webLogoUrl);
+      
+      if (webIcon) {
+          ctx.drawImage(webIcon, 50, 1020, 24, 24); // Icon size 24x24
+          
+          ctx.font = "bold 20px Arial";
+          ctx.fillStyle = "white"; 
+          ctx.textAlign = "left";
+          ctx.fillText("eptonline.org", 80, 1040); // Text next to icon
+      }
       // 1. Facebook (Starts at 990)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
