@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vocabulary Flashcard & Caption Generator</title>
+  <title>Vocabulary Flashcard Generator</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,20 +17,18 @@
       padding: 20px;
     }
 
-    h2 { margin-bottom: 10px; color: #f0f0f0; text-align: center; }
+    h2 { margin-bottom: 10px; color: #ddd; text-align: center; }
 
-    /* Canvas Styles */
     canvas {
-      max-width: 100%; /* Responsive width */
-      height: auto;    /* Maintain aspect ratio */
-      max-height: 80vh; /* Keep it visible on screen */
+      max-width: 100%;
+      height: auto;
+      max-height: 80vh;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
       margin-bottom: 20px;
       border: 1px solid #333;
     }
 
-    /* Controls Container */
     .controls {
       display: flex;
       gap: 15px;
@@ -100,7 +98,7 @@
 
     textarea {
       width: 100%;
-      height: 200px;
+      height: 220px;
       background: #2b2b2b;
       color: #e0e0e0;
       border: 1px solid #444;
@@ -109,31 +107,29 @@
       font-family: monospace;
       font-size: 14px;
       resize: vertical;
-      box-sizing: border-box; /* Fix padding issue */
+      box-sizing: border-box;
     }
 
     textarea:focus { outline: 2px solid #457b9d; }
-
   </style>
 </head>
 <body>
 
   <h2>Vocabulary Challenge Generator</h2>
-  
   <canvas id="flashcard" width="1080" height="1080"></canvas>
 
   <div class="controls">
     <div class="toggle-container">
       <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
-      <label for="showAnswer">Show Answer</label>
+      <label for="showAnswer">Show Correct Answer</label>
     </div>
-    <button class="btn-gen" onclick="generateFlashcard()">🔄 New Word</button>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Word</button>
     <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
   </div>
 
   <div class="caption-box">
     <div class="caption-header">
-      📝 Social Media Caption (Ready to Paste)
+      📝 Social Media Caption (Full Links Included)
     </div>
     <textarea id="captionText" readonly></textarea>
     <button class="btn-copy" onclick="copyCaption()">📋 Copy Caption</button>
@@ -169,85 +165,61 @@
 
     let currentQuestion = null;
 
-    // --- HELPER FUNCTIONS ---
-
     function getRandomColor() {
-      const colors = ["#faf339", "#ffd700", "#ffec8b"];
+      const colors = ["#faf339", "#faf339", "#faf339"];
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
     async function loadImage(url) {
-      return new Promise((resolve) => {
+      return new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = "anonymous";
         img.onload = () => resolve(img);
-        img.onerror = () => { console.warn("Failed:", url); resolve(null); };
+        img.onerror = () => {
+            console.warn("Failed to load image:", url);
+            resolve(null);
+        };
         img.src = url;
       });
-    }
-
-    // Helper for rounded rectangles
-    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
-        if (w < 2 * r) r = w / 2;
-        if (h < 2 * r) r = h / 2;
-        this.beginPath();
-        this.moveTo(x + r, y);
-        this.arcTo(x + w, y, x + w, y + h, r);
-        this.arcTo(x + w, y + h, x, y + h, r);
-        this.arcTo(x, y + h, x, y, r);
-        this.arcTo(x, y, x + w, y, r);
-        this.closePath();
-        return this;
     }
 
     // --- CAPTION GENERATOR ---
     function generateCaptionText(question) {
         const optionLabels = ["A", "B", "C"];
         
-        // 1. Headline
         let text = `🧠 DAILY VOCABULARY CHALLENGE 🧠\n\n`;
-        
-        // 2. Question
         text += `Can you find the synonym for: "${question.word}"?\n\n`;
         
-        // 3. Options
         question.options.forEach((opt, i) => {
             text += `${optionLabels[i]}) ${opt}\n`;
         });
 
-        // 4. CTA & Links
         text += `\n👇 Drop your answer in the comments! 👇\n\n`;
         text += `Practice more at: https://eptonline.org\n`;
         text += `Follow us for daily updates:\n`;
+        // Full Links Here
         text += `🌐 Website: https://eptonline.org\n`;
-        text += `📘 FB: @eptonline.org\n`;
-        text += `📸 IG: @eptonline_org\n`;
-        text += `📺 YT: @eptonlineOrg\n\n`;
+        text += `📘 Facebook: https://www.facebook.com/eptonline.org\n`;
+        text += `📸 Instagram: https://www.instagram.com/eptonline_org\n`;
+        text += `📺 YouTube: https://www.youtube.com/@eptonlineOrg\n\n`;
 
-        // 5. Hashtags
-        // Start with required tags
+        // Hashtags
         let tags = [...requiredTags];
-        
-        // Add 3 Random Exam Tags
         const shuffledExams = examTags.sort(() => 0.5 - Math.random());
         tags.push(...shuffledExams.slice(0, 3));
-
-        // Add 2 Random Engagement Tags
         const shuffledEngage = engagementTags.sort(() => 0.5 - Math.random());
         tags.push(...shuffledEngage.slice(0, 2));
 
         text += tags.join(" ");
-
         return text;
     }
 
     function copyCaption() {
         const copyText = document.getElementById("captionText");
         copyText.select();
-        copyText.setSelectionRange(0, 99999); // For mobile devices
+        copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
         
-        // Visual feedback on button
         const btn = document.querySelector('.btn-copy');
         const originalText = btn.innerText;
         btn.innerText = "✅ Copied!";
@@ -258,27 +230,22 @@
         }, 2000);
     }
 
-    // --- MAIN GENERATOR FUNCTION ---
     async function generateFlashcard() {
       const showAnswer = document.getElementById("showAnswer").checked;
 
-      // Logic to pick a new question or keep current one
-      if (!currentQuestion || (event && event.type === 'click' && event.target.classList.contains('btn-gen'))) {
-         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-         
-         // Only generate new caption if we picked a new question
-         const caption = generateCaptionText(currentQuestion);
-         document.getElementById('captionText').value = caption;
+      if (!currentQuestion || (event && event.type === 'click' && (event.target.classList.contains('btn-gen') || event.target.innerText.includes('Random')))) {
+          currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+          const caption = generateCaptionText(currentQuestion);
+          document.getElementById('captionText').value = caption;
       }
 
       const q = currentQuestion;
 
-      // Clear Canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // --- Background ---
       const color1 = getRandomColor();
-      const color2 = "#c76e08"; // Fade to orange/black
+      const color2 = "#c76e08"; 
       const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
@@ -313,102 +280,109 @@
       const optionLabels = ["A", "B", "C"];
 
       q.options.forEach((opt, i) => {
-        const y = startY + i * 140;
+        const y = startY + i * 140; 
         const x = 140;
         const width = 800;
         const height = 100;
 
-        // Logic for highlighting answer
         let strokeColor = "white";
         let fillColor = "transparent";
         let textColor = "white";
 
         if (showAnswer) {
             if (i === q.correctIndex) {
-                strokeColor = "#2a9d8f"; // Green
+                strokeColor = "#2a9d8f"; 
                 fillColor = "rgba(42, 157, 143, 0.2)";
                 textColor = "#4ecdc4";
             } else {
-                strokeColor = "#555"; // Dim others
-                textColor = "#aaa";
+                strokeColor = "#555"; 
+                textColor = "#777";
             }
         }
 
-        // Draw Box
         ctx.strokeStyle = strokeColor;
         ctx.fillStyle = fillColor;
         ctx.lineWidth = 4;
         
-        ctx.roundRect(x, y, width, height, 20);
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, 20); 
         ctx.stroke();
         ctx.fill();
 
-        // Draw Text
         ctx.fillStyle = textColor;
         ctx.textAlign = "left";
         ctx.fillText(`${optionLabels[i]})  ${opt}`, x + 40, y + 65);
       });
 
-      // --- Footer Section ---
+      // --- Footer (REVERTED TO OLD DESIGN) ---
+      ctx.fillStyle = "#0a0a0a";
+      ctx.font = "15px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Practice More:", 70, 1020);
       
-      // Footer Line
-      ctx.strokeStyle = "rgba(255,255,255,0.3)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(50, 980);
-      ctx.lineTo(1030, 980);
-      ctx.stroke();
-
-      // Social Icons
       const fb = await loadImage(fbLogo);
       const insta = await loadImage(instaLogo);
       const yt = await loadImage(ytLogo);
       const webIcon = await loadImage(webLogoUrl);
-
-      // 1. Website (Bottom Left)
+      
+      // 1. Website Link (Bottom Left)
       if (webIcon) {
-          ctx.drawImage(webIcon, 50, 1015, 30, 30); 
+          ctx.drawImage(webIcon, 50, 1020, 24, 24); 
           
-          ctx.font = "bold 24px Arial";
+          ctx.font = "bold 20px Arial";
           ctx.fillStyle = "white"; 
           ctx.textAlign = "left";
-          ctx.fillText("https://eptonline.org", 90, 1038); 
+          ctx.fillText("eptonline.org", 80, 1040); 
       }
-
-      // 2. Social Handles (Bottom Right)
-      const rightStart = 750; // Starting X position for handles area
-
+      
+      // 2. Facebook (Starts at 990)
       if(fb) {
-          ctx.drawImage(fb, 850, 1000, 20, 20);
-          ctx.font = "18px Arial"; 
+          ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
-          ctx.fillText("@eptonline.org", 880, 1017); 
+          ctx.fillText("@eptonline.org", 905, 1005); 
       }
 
+      // 3. Instagram (Tight gap: +24px)
       if(insta) {
-          ctx.drawImage(insta, 850, 1025, 20, 20);
-          ctx.font = "18px Arial"; 
-          ctx.fillText("@eptonline_org", 880, 1042);
+          ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline_org", 905, 1029);
       }
 
+      // 4. YouTube (Tight gap: +24px)
       if(yt) {
-          ctx.drawImage(yt, 850, 1050, 20, 20);
-          ctx.font = "18px Arial"; 
-          ctx.fillText("@eptonlineOrg", 880, 1067);
+          ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonlineOrg", 905, 1053);
       }
+    }
+
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
     }
 
     function downloadFlashcard() {
       const link = document.createElement("a");
       const word = currentQuestion ? currentQuestion.word : "flashcard";
-      link.download = `EPT_Vocab_${word}.png`;
+      link.download = `Vocabulary_${word}_${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
 
-    // Initialize on load
+    // Initialize
     window.onload = function() {
-        // Trigger a click to set initial question properly
         document.querySelector('.btn-gen').click();
     };
   </script>
