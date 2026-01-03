@@ -152,28 +152,1368 @@
     const webLogoUrl = "https://gen.eptonline.orgwww.png";
 
     // --- DATA: IELTS Speaking Cue Cards + Sample Answers ---
-    const topics = [
-      {
-        question: "Describe a person who has influenced your life.",
-        answer: "My grandfather is my biggest influence. He taught me that patience and kindness are stronger than anger, and he always encouraged me to pursue my education."
-      },
-      {
-        question: "Describe a beautiful place you visited in your country.",
-        answer: "I visited Cox's Bazar last winter. The endless sandy beach and the golden sunset over the ocean were mesmerizing and incredibly peaceful."
-      },
-      {
-        question: "Describe an electronic device you find very useful.",
-        answer: "My smartphone is essential. It helps me organize my schedule, stay connected with family, and access information instantly whenever I need it."
-      },
-      {
-        question: "Describe a hobby you would like to start.",
-        answer: "I would love to start photography. Capturing moments and seeing the world through a lens seems like a creative way to appreciate nature."
-      },
-      {
-        question: "Describe a gift you received that was very special.",
-        answer: "I received a handmade watch from my father on my 18th birthday. It is special because he restored it himself, making it a unique family heirloom."
-      }
-    ];
+const topics = [
+  {
+    question: "Describe a person who has influenced your life.",
+    answer: "My grandfather is my biggest influence. He taught me that patience and kindness are stronger than anger, and he always encouraged me to pursue my education."
+  },
+  {
+    question: "Describe a beautiful place you visited in your country.",
+    answer: "I visited Cox's Bazar last winter. The endless sandy beach and the golden sunset over the ocean were mesmerizing and incredibly peaceful."
+  },
+  {
+    question: "Describe an electronic device you find very useful.",
+    answer: "My smartphone is essential. It helps me organize my schedule, stay connected with family, and access information instantly whenever I need it."
+  },
+  {
+    question: "Describe a hobby you would like to start.",
+    answer: "I would love to start photography. Capturing moments and seeing the world through a lens seems like a creative way to appreciate nature."
+  },
+  {
+    question: "Describe a gift you received that was very special.",
+    answer: "I received a handmade watch from my father on my 18th birthday. It is special because he restored it himself, making it a unique family heirloom."
+  },
+  {
+    question: "Describe a time when you helped someone.",
+    answer: "I volunteered at a local shelter last year, teaching English to refugee children. Witnessing their progress and enthusiasm was profoundly rewarding."
+  },
+  {
+    question: "Describe a book that had a major influence on you.",
+    answer: "Sapiens by Yuval Noah Harari fundamentally altered my perspective on human history. Its interdisciplinary approach showed me how biology, anthropology, and economics intertwine."
+  },
+  {
+    question: "Describe a memorable journey you have taken.",
+    answer: "Trekking through the Annapurna Circuit in Nepal was transformative. The physical challenge combined with breathtaking Himalayan views created an unparalleled sense of accomplishment."
+  },
+  {
+    question: "Describe an important decision you made.",
+    answer: "Choosing to study abroad required careful consideration. While it meant leaving my comfort zone, the cultural immersion and academic opportunities justified this calculated risk."
+  },
+  {
+    question: "Describe a skill you would like to learn.",
+    answer: "I aspire to master data visualization. In our information-saturated era, presenting complex data clearly is an invaluable skill across numerous professions."
+  },
+  {
+    question: "Describe a historical period that interests you.",
+    answer: "The Renaissance fascinates me due to its unprecedented intellectual flourishing. The synergy between art, science, and humanism during this era created foundations for modern thought."
+  },
+  {
+    question: "Describe a piece of art you admire.",
+    answer: "Van Gogh's Starry Night captivates me with its turbulent emotional expression. The swirling sky represents internal turmoil transformed into artistic brilliance."
+  },
+  {
+    question: "Describe a scientific discovery you find important.",
+    answer: "The discovery of penicillin revolutionized medicine. This accidental finding by Alexander Fleming demonstrates how serendipity can lead to paradigm-shifting scientific breakthroughs."
+  },
+  {
+    question: "Describe a change you would like to see in your community.",
+    answer: "I advocate for implementing comprehensive recycling programs. Waste management innovation could significantly reduce our environmental footprint while creating green jobs."
+  },
+  {
+    question: "Describe an ambition you have for the future.",
+    answer: "I aim to establish a social enterprise focusing on sustainable agriculture. This venture would address food security while promoting environmentally conscious farming practices."
+  },
+  {
+    question: "Describe a difficult challenge you overcame.",
+    answer: "Completing my master's thesis during the pandemic required exceptional adaptability. The experience taught me resilience and innovative problem-solving under constraints."
+  },
+  {
+    question: "Describe a tradition in your culture.",
+    answer: "The Mid-Autumn Festival in my culture symbolizes family reunion. The mooncakes and lantern displays create intergenerational connections while honoring lunar mythology."
+  },
+  {
+    question: "Describe a technological advancement you appreciate.",
+    answer: "Remote collaboration tools have revolutionized workplace dynamics. These platforms enable global teamwork while reducing carbon emissions from unnecessary travel."
+  },
+  {
+    question: "Describe an environmental issue that concerns you.",
+    answer: "Ocean acidification deeply concerns me due to its catastrophic impact on marine ecosystems. This silent crisis threatens biodiversity and global food security."
+  },
+  {
+    question: "Describe a leader you admire.",
+    answer: "Jacinda Ardern's compassionate leadership during crises demonstrates how empathy and decisive action can coexist. Her approach redefines political leadership paradigms."
+  },
+  {
+    question: "Describe an educational experience that was valuable.",
+    answer: "Participating in Model United Nations developed my diplomatic negotiation skills. The experience taught me how to build consensus among diverse stakeholders with conflicting interests."
+  },
+  {
+    question: "Describe a childhood memory that shaped you.",
+    answer: "My grandmother's storytelling sessions instilled in me a love for narrative. These oral traditions connected me to cultural heritage while developing my imagination."
+  },
+  {
+    question: "Describe a valuable lesson you learned from a mistake.",
+    answer: "Missing an important deadline taught me the critical importance of time management. This professional setback led me to implement systematic planning tools that enhanced my productivity."
+  },
+  {
+    question: "Describe an innovation that has changed daily life.",
+    answer: "Mobile payment systems have transformed financial transactions. The convenience and security of these platforms have reduced cash dependency while accelerating digital economies."
+  },
+  {
+    question: "Describe a social issue you feel passionate about.",
+    answer: "Digital literacy disparity concerns me profoundly. In our increasingly technological world, unequal access to digital skills perpetuates socioeconomic inequalities."
+  },
+  {
+    question: "Describe a work of architecture you find impressive.",
+    answer: "The Sydney Opera House exemplifies architectural audacity. Its revolutionary shell design represents a triumph of engineering imagination over conventional limitations."
+  },
+  {
+    question: "Describe an ethical dilemma you encountered.",
+    answer: "As a journalist, I faced the conflict between reporting truth and protecting vulnerable sources. This experience highlighted journalism's delicate balance between transparency and responsibility."
+  },
+  {
+    question: "Describe a cultural difference you experienced.",
+    answer: "Working in Japan revealed contrasting communication styles. The emphasis on indirect expression and group harmony contrasted sharply with my native culture's direct individualistic approach."
+  },
+  {
+    question: "Describe a personal achievement you're proud of.",
+    answer: "Completing a marathon after six months of disciplined training demonstrated my perseverance. This physical accomplishment translated into mental fortitude across other life domains."
+  },
+  {
+    question: "Describe a global trend you find significant.",
+    answer: "The remote work revolution is reshaping urban demographics and work-life integration. This trend challenges traditional office paradigms while creating new opportunities for work-life balance."
+  },
+  {
+    question: "Describe a character from a film or novel you identify with.",
+    answer: "Elizabeth Bennet from Pride and Prejudice resonates with me through her intellectual independence. Her journey from prejudice to understanding mirrors universal human growth processes."
+  },
+  {
+    question: "Describe how technology affects interpersonal relationships.",
+    answer: "Digital communication tools have created paradoxical effects—enhancing global connectivity while potentially diminishing local intimacy. This duality requires conscious relationship navigation."
+  },
+  {
+    question: "Describe your approach to stress management.",
+    answer: "I practice mindfulness meditation combined with regular physical activity. This holistic approach builds cognitive resilience while maintaining physiological balance during demanding periods."
+  },
+  {
+    question: "Describe a major development in your field of interest.",
+    answer: "In sustainable architecture, the integration of biomimetic design represents a breakthrough. Structures modeled on natural systems achieve unprecedented energy efficiency while harmonizing with ecosystems."
+  },
+  {
+    question: "Describe an experience that changed your perspective.",
+    answer: "Volunteering in a developing nation revealed privilege's invisible dimensions. This exposure transformed my understanding of global inequality and personal responsibility."
+  },
+  {
+    question: "Describe a quality you admire in others.",
+    answer: "Intellectual humility—the ability to acknowledge knowledge limitations while remaining curious—strikes me as particularly admirable. This quality enables continuous learning and collaborative growth."
+  },
+  {
+    question: "Describe an important invention before the computer.",
+    answer: "The printing press democratized knowledge dissemination, fundamentally reshaping European society. This technological breakthrough accelerated the Renaissance and Reformation movements."
+  },
+  {
+    question: "Describe how urban planning affects quality of life.",
+    answer: "Thoughtful urban design incorporating green spaces and pedestrian zones significantly enhances community wellbeing. These elements promote social interaction while reducing environmental stressors."
+  },
+  {
+    question: "Describe a memorable learning experience outside school.",
+    answer: "Learning navigation through wilderness backpacking taught me self-reliance and observation skills. This experiential education translated into enhanced problem-solving abilities in professional contexts."
+  },
+  {
+    question: "Describe how globalization affects local cultures.",
+    answer: "Globalization creates cultural hybridization—blending global influences with local traditions. While threatening cultural homogenization, this process also generates innovative cultural expressions."
+  },
+  {
+    question: "Describe a public figure who inspires you.",
+    answer: "Malala Yousafzai's courageous advocacy for education demonstrates how youth voices can drive global change. Her resilience transforms personal trauma into universal empowerment."
+  },
+  {
+    question: "Describe an effective method for language learning.",
+    answer: "Immersive contextual learning combined with consistent practice yields optimal results. Engaging with authentic materials while receiving corrective feedback accelerates linguistic acquisition."
+  },
+  {
+    question: "Describe an important aspect of workplace culture.",
+    answer: "Psychological safety—where team members feel comfortable taking risks—significantly enhances innovation. This environment encourages creative experimentation without fear of negative consequences."
+  },
+  {
+    question: "Describe a natural phenomenon you find fascinating.",
+    answer: "Bioluminescence in deep-sea creatures represents nature's chemical artistry. These organisms' ability to generate light through biochemical reactions demonstrates evolutionary adaptation's creativity."
+  },
+  {
+    question: "Describe how artificial intelligence impacts society.",
+    answer: "AI presents both unprecedented opportunities and ethical challenges. While enhancing efficiency across sectors, it necessitates careful consideration of algorithmic bias and employment displacement."
+  },
+  {
+    question: "Describe a historical event that interests you.",
+    answer: "The Scientific Revolution's paradigm shift from Aristotelian to empirical thinking fundamentally transformed human understanding. This intellectual upheaval established modern scientific methodology."
+  },
+  {
+    question: "Describe how social media influences public opinion.",
+    answer: "Social media algorithms create echo chambers that reinforce existing beliefs while polarizing discourse. This phenomenon challenges democratic deliberation by fragmenting shared information environments."
+  },
+  {
+    question: "Describe a strategy for environmental conservation.",
+    answer: "Implementing circular economy principles minimizes waste through continuous resource reuse. This systemic approach transforms linear production models into sustainable regenerative cycles."
+  },
+  {
+    question: "Describe an aspect of modern education that needs improvement.",
+    answer: "Overemphasis on standardized testing diminishes critical thinking development. Education should prioritize cultivating curiosity and complex problem-solving over rote memorization."
+  },
+  {
+    question: "Describe how travel broadens perspectives.",
+    answer: "Cultural immersion through travel fosters cognitive flexibility by exposing individuals to alternative worldviews. This experiential learning challenges ethnocentric assumptions while building intercultural competence."
+  },
+  {
+    question: "Describe a medical advancement you find significant.",
+    answer: "CRISPR gene editing represents a revolutionary breakthrough with profound ethical implications. This technology offers unprecedented disease treatment potential while raising complex moral questions."
+  },
+  {
+    question: "Describe how climate change affects your region.",
+    answer: "Increasingly unpredictable monsoon patterns disrupt agricultural cycles in my region. These climatic shifts threaten food security while exacerbating rural-to-urban migration pressures."
+  },
+  {
+    question: "Describe a quality that leads to success.",
+    answer: "Grit—perseverance combined with passion for long-term goals—consistently predicts achievement across domains. This quality enables individuals to overcome obstacles through sustained effort."
+  },
+  {
+    question: "Describe how family structures have changed.",
+    answer: "Nuclear family predominance has diversified into various household configurations. These evolving structures reflect changing social norms regarding marriage, gender roles, and intergenerational living."
+  },
+  {
+    question: "Describe an important economic concept.",
+    answer: "Opportunity cost—the value of the next best alternative forgone—fundamentally shapes decision-making. Understanding this concept enables more informed personal and policy choices."
+  },
+  {
+    question: "Describe how cities can become more sustainable.",
+    answer: "Implementing integrated public transit systems reduces carbon emissions while enhancing mobility. Combined with mixed-use zoning, this approach creates vibrant, environmentally conscious urban spaces."
+  },
+  {
+    question: "Describe a scientific theory you find compelling.",
+    answer: "Quantum entanglement challenges classical intuition about locality and separability. This phenomenon's philosophical implications continue to revolutionize our understanding of physical reality."
+  },
+  {
+    question: "Describe how music influences mood and cognition.",
+    answer: "Music engages multiple neural networks, affecting emotional regulation and cognitive performance. Certain compositions can enhance concentration while others facilitate emotional processing."
+  },
+  {
+    question: "Describe an ethical consideration in technology development.",
+    answer: "Algorithmic transparency in artificial intelligence systems represents a critical ethical imperative. Understanding decision-making processes ensures accountability while preventing discriminatory outcomes."
+  },
+  {
+    question: "Describe how literature reflects society.",
+    answer: "Literary works serve as cultural mirrors, capturing societal values, conflicts, and transformations. Through narrative, authors both reflect and critique the historical moments they inhabit."
+  },
+  {
+    question: "Describe a psychological concept that interests you.",
+    answer: "Cognitive dissonance theory explains how individuals reconcile conflicting beliefs. This psychological mechanism significantly influences decision-making and belief perseverance."
+  },
+  {
+    question: "Describe how renewable energy can be implemented effectively.",
+    answer: "Integrating solar and wind power through smart grid technology creates resilient energy systems. This approach requires both technological innovation and supportive policy frameworks."
+  },
+  {
+    question: "Describe a philosophical idea that resonates with you.",
+    answer: "Stoicism's emphasis on focusing on controllable factors while accepting external circumstances provides practical wisdom. This philosophy offers resilience strategies for navigating uncertainty."
+  },
+  {
+    question: "Describe how data privacy concerns affect technology use.",
+    answer: "Increasing data collection creates tension between personalized services and individual autonomy. This dilemma requires balancing innovation with robust privacy protections."
+  },
+  {
+    question: "Describe an important development in renewable energy.",
+    answer: "Perovskite solar cells represent a breakthrough in photovoltaic efficiency. This emerging technology promises more affordable and versatile solar energy applications."
+  },
+  {
+    question: "Describe how cultural heritage should be preserved.",
+    answer: "Digital archiving combined with community engagement ensures cultural preservation. This approach maintains tangible artifacts while sustaining intangible traditions through intergenerational transmission."
+  },
+  {
+    question: "Describe a mathematical concept with real-world applications.",
+    answer: "Fractal geometry describes complex natural patterns from coastlines to cloud formations. This mathematical framework enables modeling intricate systems across scientific disciplines."
+  },
+  {
+    question: "Describe how workplace diversity enhances performance.",
+    answer: "Cognitive diversity in teams produces more innovative solutions through varied perspectives. Heterogeneous groups outperform homogeneous ones in complex problem-solving scenarios."
+  },
+  {
+    question: "Describe an important archaeological discovery.",
+    answer: "The Rosetta Stone's decipherment unlocked understanding of ancient Egyptian civilization. This artifact demonstrates how linguistic breakthroughs can illuminate historical mysteries."
+  },
+  {
+    question: "Describe how nutrition affects cognitive function.",
+    answer: "Omega-3 fatty acids support neuronal membrane integrity and neurotransmitter function. Nutritional psychiatry increasingly recognizes diet's profound impact on mental health and cognitive performance."
+  },
+  {
+    question: "Describe a business innovation that transformed an industry.",
+    answer: "Blockchain technology is revolutionizing financial transactions through decentralized verification. This innovation enhances security while reducing intermediary dependency in various sectors."
+  },
+  {
+    question: "Describe how language shapes thought processes.",
+    answer: "Linguistic relativity suggests language influences but doesn't determine cognitive patterns. Different grammatical structures predispose speakers to particular conceptual frameworks while maintaining cognitive flexibility."
+  },
+  {
+    question: "Describe an engineering marvel that impresses you.",
+    answer: "The Panama Canal's expansion demonstrates unprecedented hydraulic engineering. This megaproject's innovative lock system revolutionized global maritime trade routes."
+  },
+  {
+    question: "Describe how virtual reality impacts various fields.",
+    answer: "VR technology enables immersive training simulations across medical, military, and industrial sectors. These applications enhance skill acquisition while reducing real-world risks."
+  },
+  {
+    question: "Describe a political system you find effective.",
+    answer: "Nordic social democracy balances market efficiency with robust social welfare. This model demonstrates how economic productivity and social equity can coexist synergistically."
+  },
+  {
+    question: "Describe how biotechnology affects agriculture.",
+    answer: "Genetically modified crops increase yield resilience while reducing pesticide requirements. This technology addresses food security challenges though requiring careful environmental impact assessment."
+  },
+  {
+    question: "Describe an astronomical phenomenon that fascinates you.",
+    answer: "Black holes represent spacetime's ultimate curvature, challenging our understanding of physics. These cosmic phenomena continue to revolutionize astrophysical theories."
+  },
+  {
+    question: "Describe how immigration affects host countries.",
+    answer: "Immigration generates demographic vitality and economic dynamism through labor force expansion. Successful integration requires balancing cultural preservation with societal cohesion."
+  },
+  {
+    question: "Describe a musical genre that reflects cultural identity.",
+    answer: "Flamenco embodies Spanish Romani heritage through its passionate synthesis of music, dance, and poetry. This art form expresses historical resilience and cultural fusion."
+  },
+  {
+    question: "Describe how quantum computing differs from classical computing.",
+    answer: "Quantum computing utilizes qubits that exist in superposition states, enabling parallel computation. This paradigm promises exponential speed increases for specific complex calculations."
+  },
+  {
+    question: "Describe an important diplomatic achievement.",
+    answer: "The Paris Climate Agreement represents unprecedented global cooperation on environmental action. This accord demonstrates multilateral diplomacy's potential for addressing transnational challenges."
+  },
+  {
+    question: "Describe how neuroscience advances understanding of consciousness.",
+    answer: "Neuroimaging technologies reveal neural correlates of conscious experience without fully explaining subjective awareness. This research frontier bridges empirical observation with philosophical inquiry."
+  },
+  {
+    question: "Describe a sustainable transportation solution.",
+    answer: "Electric vehicle integration with renewable energy grids reduces transportation emissions. Combined with autonomous technology, this approach promises safer, cleaner mobility systems."
+  },
+  {
+    question: "Describe how social entrepreneurship addresses community issues.",
+    answer: "Social enterprises apply market mechanisms to solve societal problems through innovative business models. This approach creates sustainable impact while maintaining financial viability."
+  },
+  {
+    question: "Describe a geological process that shapes landscapes.",
+    answer: "Plate tectonics continuously reshapes Earth's surface through continental drift and mountain formation. This gradual process fundamentally influences climate patterns and biodiversity distribution."
+  },
+  {
+    question: "Describe how augmented reality enhances user experience.",
+    answer: "AR overlays digital information onto physical environments, creating interactive learning and retail experiences. This technology bridges virtual and real-world interactions seamlessly."
+  },
+  {
+    question: "Describe an effective conflict resolution strategy.",
+    answer: "Interest-based negotiation focuses on underlying needs rather than positional demands. This approach facilitates mutually beneficial solutions while preserving relationships."
+  },
+  {
+    question: "Describe how marine ecosystems maintain planetary health.",
+    answer: "Oceanic phytoplankton produce approximately 50% of atmospheric oxygen while sequestering carbon. These microscopic organisms constitute Earth's vital respiratory system."
+  },
+  {
+    question: "Describe a linguistic feature that distinguishes languages.",
+    answer: "Tonal variation in languages like Mandarin conveys lexical meaning through pitch patterns. This phonological characteristic demonstrates language's diverse acoustic dimensions."
+  },
+  {
+    question: "Describe how 3D printing revolutionizes manufacturing.",
+    answer: "Additive manufacturing enables complex geometric production with minimal material waste. This technology democratizes prototyping while allowing unprecedented customization."
+  },
+  {
+    question: "Describe an important feminist movement achievement.",
+    answer: "Reproductive rights advocacy has transformed women's autonomy across numerous societies. This ongoing struggle illustrates the intersection of bodily autonomy and social equality."
+  },
+  {
+    question: "Describe how satellite technology benefits humanity.",
+    answer: "Earth observation satellites monitor climate change, disaster response, and agricultural productivity. These orbital platforms provide crucial data for informed decision-making."
+  },
+  {
+    question: "Describe a behavioral economics insight.",
+    answer: "Loss aversion demonstrates how potential losses psychologically outweigh equivalent gains. This cognitive bias significantly influences financial decision-making and risk assessment."
+  },
+  {
+    question: "Describe how organic farming practices differ from conventional methods.",
+    answer: "Organic agriculture emphasizes soil health through natural fertilizers and biological pest control. This approach prioritizes long-term ecosystem sustainability over short-term yield maximization."
+  },
+  {
+    question: "Describe a space exploration milestone.",
+    answer: "The Mars rover Perseverance represents robotic exploration's pinnacle, searching for extraterrestrial life while testing technologies for human missions. This endeavor expands our cosmic perspective."
+  },
+  {
+    question: "Describe how digital currencies challenge traditional banking.",
+    answer: "Cryptocurrencies enable decentralized financial transactions without intermediary institutions. This innovation challenges conventional monetary systems while raising regulatory questions."
+  },
+  {
+    question: "Describe an important human rights development.",
+    answer: "The recognition of LGBTQ+ rights represents significant social progress in numerous countries. This evolution demonstrates how legal frameworks adapt to changing cultural understandings of equality."
+  },
+  {
+    question: "Describe how nanotechnology impacts medicine.",
+    answer: "Nanoparticle drug delivery enables targeted treatment with reduced side effects. This precision medicine approach revolutionizes therapeutic interventions at molecular scales."
+  },
+  {
+    question: "Describe a significant literary movement.",
+    answer: "Modernism's experimental forms responded to industrialization's dislocation. This movement's fragmentation reflected twentieth-century uncertainty while innovating narrative techniques."
+  },
+  {
+    question: "Describe how smart cities improve urban living.",
+    answer: "Integrated sensor networks optimize traffic flow, energy usage, and public safety. These data-driven systems enhance urban efficiency while responding dynamically to resident needs."
+  },
+  {
+    question: "Describe a psychological therapy approach.",
+    answer: "Cognitive Behavioral Therapy identifies and modifies maladaptive thought patterns. This evidence-based approach effectively treats various mental health conditions through structured intervention."
+  },
+  {
+    question: "Describe how international trade agreements affect economies.",
+    answer: "Trade agreements create complex interdependencies that can boost efficiency while risking economic vulnerability. These arrangements require careful balance between openness and strategic autonomy."
+  },
+  {
+    question: "Describe a significant paleontological discovery.",
+    answer: "The Burgess Shale fossils revealed the Cambrian explosion's extraordinary biodiversity. These preserved specimens illuminate evolutionary history's pivotal diversification moment."
+  },
+  {
+    question: "Describe how biometric authentication enhances security.",
+    answer: "Biometric systems utilize unique physiological characteristics for identity verification. While improving security convenience, these technologies raise significant privacy considerations."
+  },
+  {
+    question: "Describe an important development in materials science.",
+    answer: "Graphene's exceptional strength and conductivity promise revolutionary applications across industries. This two-dimensional material represents nanotechnology's transformative potential."
+  },
+  {
+    question: "Describe how documentary filmmaking raises awareness.",
+    answer: "Documentaries humanize abstract issues through personal narratives and visual evidence. This medium powerfully influences public opinion by making complex topics accessible and emotionally resonant."
+  },
+  {
+    question: "Describe a significant peacekeeping achievement.",
+    answer: "UN peacekeeping operations in post-conflict regions facilitate political transitions while protecting civilians. These multinational efforts demonstrate international cooperation's conflict resolution potential."
+  },
+  {
+    question: "Describe how machine learning algorithms improve predictions.",
+    answer: "Machine learning identifies complex patterns in large datasets, enhancing forecasting accuracy across fields. These algorithms continuously refine predictions through iterative learning processes."
+  },
+  {
+    question: "Describe an important architectural sustainability principle.",
+    answer: "Passive house design minimizes energy consumption through strategic orientation and insulation. This approach demonstrates how building design can significantly reduce environmental impact."
+  },
+  {
+    question: "Describe how social psychology explains group behavior.",
+    answer: "Social identity theory explains how group membership influences individual behavior and intergroup relations. This framework illuminates phenomena from organizational dynamics to societal conflicts."
+  },
+  {
+    question: "Describe a significant development in public health.",
+    answer: "Vaccine development represents public health's most impactful achievement, preventing millions of deaths annually. This medical advancement demonstrates preventive medicine's profound effectiveness."
+  },
+  {
+    question: "Describe how blockchain ensures data integrity.",
+    answer: "Blockchain's decentralized ledger creates immutable records through cryptographic linking. This technology enables transparent verification without centralized authority."
+  },
+  {
+    question: "Describe an important anthropological insight about human societies.",
+    answer: "Cultural relativism emphasizes understanding societies within their own contexts rather than external judgments. This anthropological approach facilitates cross-cultural understanding while challenging ethnocentrism."
+  },
+  {
+    question: "Describe how remote sensing monitors environmental changes.",
+    answer: "Satellite imagery detects deforestation, glacial retreat, and urban expansion over time. This technology provides crucial data for environmental policy and conservation efforts."
+  },
+  {
+    question: "Describe a significant development in cognitive science.",
+    answer: "The embodied cognition paradigm recognizes how physical experience shapes mental processes. This approach challenges traditional mind-body dualism in understanding intelligence."
+  },
+  {
+    question: "Describe how international humanitarian aid operates.",
+    answer: "Humanitarian organizations coordinate complex logistics to deliver assistance during crises. These efforts balance immediate relief with long-term capacity building in vulnerable regions."
+  },
+  {
+    question: "Describe an important principle in ecological economics.",
+    answer: "The precautionary principle advocates for preventive action despite scientific uncertainty about environmental risks. This approach prioritizes ecosystem protection over potential economic gains."
+  },
+  {
+    question: "Describe how virtual teams collaborate effectively.",
+    answer: "Successful virtual collaboration requires clear communication protocols and trust-building mechanisms. Digital tools facilitate coordination while cultural intelligence bridges geographical distances."
+  },
+  {
+    question: "Describe a significant development in renewable energy storage.",
+    answer: "Lithium-ion battery advancements enable efficient renewable energy storage, addressing intermittency challenges. This technology is crucial for transitioning to sustainable energy systems."
+  },
+  {
+    question: "Describe how cultural appropriation differs from appreciation.",
+    answer: "Cultural appreciation involves respectful engagement with understanding, while appropriation extracts elements without context or permission. This distinction highlights power dynamics in cultural exchange."
+  },
+  {
+    question: "Describe an important development in synthetic biology.",
+    answer: "CRISPR-Cas9 enables precise genetic editing with unprecedented accuracy. This technology revolutionizes biotechnology while raising profound ethical questions about genetic modification."
+  },
+  {
+    question: "Describe how meditation affects brain structure and function.",
+    answer: "Regular meditation practice increases prefrontal cortex activity while reducing amygdala reactivity. These neural changes correlate with improved emotional regulation and attentional control."
+  },
+  {
+    question: "Describe a significant development in oceanography.",
+    answer: "Deep-sea exploration technologies reveal previously unknown ecosystems at hydrothermal vents. These discoveries expand our understanding of life's adaptability in extreme environments."
+  },
+  {
+    question: "Describe how microfinance empowers marginalized communities.",
+    answer: "Microcredit provides small loans to entrepreneurs lacking traditional collateral. This financial innovation demonstrates how accessible capital can stimulate local economic development."
+  },
+  {
+    question: "Describe an important principle in conflict mediation.",
+    answer: "The principle of impartiality ensures mediators remain neutral while facilitating dialogue. This approach builds trust among conflicting parties without imposing solutions."
+  },
+  {
+    question: "Describe how citizen science contributes to research.",
+    answer: "Public participation in data collection expands scientific projects' scale and scope. This collaborative approach democratizes research while increasing public engagement with science."
+  },
+  {
+    question: "Describe a significant development in prosthetics technology.",
+    answer: "Bionic limbs with neural integration restore natural movement through brain-computer interfaces. These advances dramatically improve amputees' quality of life and mobility."
+  },
+  {
+    question: "Describe how sustainable tourism balances preservation and visitation.",
+    answer: "Ecotourism models prioritize environmental conservation while providing economic benefits to local communities. This approach demonstrates how tourism can support rather than exploit natural areas."
+  },
+  {
+    question: "Describe an important development in earthquake engineering.",
+    answer: "Base isolation systems protect structures by decoupling buildings from ground motion. This engineering innovation significantly reduces seismic damage in earthquake-prone regions."
+  },
+  {
+    question: "Describe how social norms evolve over time.",
+    answer: "Normative change occurs through complex interactions between grassroots movements, media representation, and institutional reforms. This social evolution reflects shifting cultural values and power structures."
+  },
+  {
+    question: "Describe a significant development in atmospheric science.",
+    answer: "Climate modeling improvements enable more accurate predictions of global warming impacts. These computational advances inform mitigation and adaptation strategies."
+  },
+  {
+    question: "Describe how participatory democracy enhances governance.",
+    answer: "Citizen assemblies and participatory budgeting increase public engagement in decision-making. These mechanisms strengthen democratic legitimacy while incorporating diverse perspectives."
+  },
+  {
+    question: "Describe an important development in food science.",
+    answer: "Plant-based meat alternatives replicate animal product experiences through innovative food technology. These products address environmental and ethical concerns associated with conventional meat production."
+  },
+  {
+    question: "Describe how digital archives preserve historical records.",
+    answer: "Digitization enables widespread access to historical materials while protecting fragile originals. This technological preservation democratizes historical research across geographical boundaries."
+  },
+  {
+    question: "Describe a significant development in veterinary medicine.",
+    answer: "Cross-species vaccine development protects both animal and human health through One Health approaches. This interdisciplinary strategy addresses zoonotic disease transmission."
+  },
+  {
+    question: "Describe how urban agriculture addresses food security.",
+    answer: "Vertical farming maximizes food production in limited urban spaces using controlled environments. This innovative approach reduces transportation emissions while increasing local food resilience."
+  },
+  {
+    question: "Describe an important development in forensic science.",
+    answer: "DNA phenotyping predicts physical appearance from genetic material, aiding criminal investigations. This technology demonstrates genetics' expanding applications in law enforcement."
+  },
+  {
+    question: "Describe how cooperative business models differ from traditional corporations.",
+    answer: "Worker cooperatives distribute ownership and decision-making among employees rather than external shareholders. This model prioritizes democratic workplace governance and equitable profit distribution."
+  },
+  {
+    question: "Describe a significant development in pediatric medicine.",
+    answer: "Advances in neonatal intensive care have dramatically improved survival rates for premature infants. These medical innovations represent profound progress in early life healthcare."
+  },
+  {
+    question: "Describe how geotagging impacts environmental monitoring.",
+    answer: "Geographic information systems integrate spatial data for comprehensive environmental analysis. This technology enables precise tracking of ecological changes across landscapes."
+  },
+  {
+    question: "Describe an important development in disability rights.",
+    answer: "The social model of disability distinguishes impairment from socially created barriers. This conceptual shift focuses on accessibility rather than individual limitations."
+  },
+  {
+    question: "Describe how mycological research benefits various fields.",
+    answer: "Fungal studies reveal applications in medicine, environmental remediation, and sustainable materials. These organisms demonstrate remarkable biochemical diversity with numerous practical uses."
+  },
+  {
+    question: "Describe a significant development in space medicine.",
+    answer: "Research on microgravity's physiological effects informs both astronaut health and terrestrial medicine. These studies reveal how space environments affect human biology."
+  },
+  {
+    question: "Describe how community-based conservation protects biodiversity.",
+    answer: "Local stewardship programs combine traditional ecological knowledge with scientific management. This approach demonstrates how community engagement enhances conservation effectiveness."
+  },
+  {
+    question: "Describe an important development in sleep science.",
+    answer: "Understanding sleep's role in memory consolidation and metabolic regulation reveals its crucial health importance. This research highlights sleep's multifaceted biological functions."
+  },
+  {
+    question: "Describe how predictive analytics improves decision-making.",
+    answer: "Statistical models forecast future trends based on historical data patterns. These analytical tools enhance strategic planning across business, healthcare, and policy domains."
+  },
+  {
+    question: "Describe a significant development in renewable energy policy.",
+    answer: "Feed-in tariffs incentivize renewable energy adoption by guaranteeing fixed payments for generated electricity. This policy mechanism has accelerated clean energy transitions in numerous countries."
+  },
+  {
+    question: "Describe how contemplative practices enhance professional performance.",
+    answer: "Mindfulness training improves attentional control and emotional intelligence in workplace settings. These practices demonstrate how mental training enhances cognitive and interpersonal skills."
+  },
+  {
+    question: "Describe an important development in materials recycling.",
+    answer: "Chemical recycling breaks down plastics to molecular components for repurposing. This advanced recycling approach addresses limitations of traditional mechanical recycling methods."
+  },
+  {
+    question: "Describe how epigenetic research transforms understanding of inheritance.",
+    answer: "Epigenetics reveals how environmental factors influence gene expression across generations. This research demonstrates that inheritance extends beyond DNA sequence alone."
+  },
+  {
+    question: "Describe a significant development in disaster preparedness.",
+    answer: "Early warning systems utilize sensor networks and communication technologies to alert populations about impending hazards. These systems dramatically reduce disaster-related casualties."
+  },
+  {
+    question: "Describe how platform cooperatives challenge digital monopolies.",
+    answer: "User-owned digital platforms distribute value more equitably than traditional shareholder models. This emerging business structure addresses concerns about platform capitalism's concentration of power."
+  },
+  {
+    question: "Describe an important development in geriatric medicine.",
+    answer: "Comprehensive geriatric assessment addresses older adults' complex medical, functional, and social needs. This holistic approach improves quality of life while reducing unnecessary hospitalizations."
+  },
+  {
+    question: "Describe how biophilic design enhances built environments.",
+    answer: "Incorporating natural elements into architecture reduces stress and improves cognitive function. This design philosophy recognizes humans' innate connection to nature."
+  },
+  {
+    question: "Describe a significant development in water purification technology.",
+    answer: "Graphene oxide membranes enable more efficient desalination with lower energy requirements. This nanotechnology advancement addresses global freshwater scarcity challenges."
+  },
+  {
+    question: "Describe how social impact bonds finance public projects.",
+    answer: "Outcome-based financing aligns investor returns with measurable social improvements. This innovative funding mechanism transfers performance risk from governments to private investors."
+  },
+  {
+    question: "Describe an important development in precision agriculture.",
+    answer: "Drone technology monitors crop health and applies targeted treatments. This approach optimizes resource use while minimizing environmental impact."
+  },
+  {
+    question: "Describe how neurodiversity frameworks reconceptualize cognitive differences.",
+    answer: "The neurodiversity paradigm views conditions like autism as natural variations rather than deficits. This perspective emphasizes accommodation rather than normalization."
+  },
+  {
+    question: "Describe a significant development in carbon capture technology.",
+    answer: "Direct air capture systems remove CO2 from the atmosphere for storage or utilization. This negative emissions technology may complement emission reduction strategies."
+  },
+  {
+    question: "Describe how restorative justice differs from punitive approaches.",
+    answer: "Restorative justice focuses on repairing harm through dialogue rather than punishment. This approach emphasizes accountability, victim healing, and community reconciliation."
+  },
+  {
+    question: "Describe an important development in assistive technology.",
+    answer: "Eye-tracking devices enable computer control for individuals with severe physical disabilities. This technology dramatically enhances communication and environmental control capabilities."
+  },
+  {
+    question: "Describe how blue economy principles guide ocean resource use.",
+    answer: "Sustainable ocean economic activities balance ecological health with economic benefits. This framework promotes responsible marine resource management for long-term prosperity."
+  },
+  {
+    question: "Describe a significant development in transplant medicine.",
+    answer: "Organ preservation techniques extend transplantation windows through advanced perfusion systems. These innovations increase donor organ availability and transplant success rates."
+  },
+  {
+    question: "Describe how digital twins optimize complex systems.",
+    answer: "Virtual replicas of physical assets enable simulation and analysis before implementation. This technology improves efficiency and reduces risks in engineering and urban planning."
+  },
+  {
+    question: "Describe an important development in indigenous knowledge recognition.",
+    answer: "Formal integration of traditional ecological knowledge with scientific research enhances environmental understanding. This collaborative approach acknowledges diverse knowledge systems' value."
+  },
+  {
+    question: "Describe how metabolic research informs personalized nutrition.",
+    answer: "Individual metabolic profiling enables tailored dietary recommendations based on unique physiological responses. This precision nutrition approach moves beyond one-size-fits-all dietary guidelines."
+  },
+  {
+    question: "Describe a significant development in wave energy technology.",
+    answer: "Advanced wave energy converters harness ocean motion more efficiently through innovative designs. This renewable energy source offers consistent power generation potential."
+  },
+  {
+    question: "Describe how community land trusts preserve affordable housing.",
+    answer: "Separating land ownership from building ownership maintains long-term housing affordability. This model prevents displacement while promoting community stability."
+  },
+  {
+    question: "Describe an important development in autoimmune disease treatment.",
+    answer: "Biologic therapies target specific immune system components with unprecedented precision. These treatments represent a paradigm shift in managing previously difficult-to-treat conditions."
+  },
+  {
+    question: "Describe how ecological footprint accounting measures sustainability.",
+    answer: "This metric compares human demand with Earth's regenerative capacity. Footprint analysis informs policies for living within planetary boundaries."
+  },
+  {
+    question: "Describe a significant development in acoustic engineering.",
+    answer: "Active noise cancellation technology generates inverse sound waves to reduce unwanted noise. This innovation improves auditory environments in various settings."
+  },
+  {
+    question: "Describe how deliberative polling measures informed public opinion.",
+    answer: "Participants receive balanced information before discussing and voting on policy issues. This method reveals what citizens would think with adequate knowledge and reflection time."
+  },
+  {
+    question: "Describe an important development in regenerative medicine.",
+    answer: "Stem cell therapies promote tissue repair and regeneration for various conditions. This emerging field offers potential treatments for previously incurable diseases."
+  },
+  {
+    question: "Describe how circular design principles reduce waste.",
+    answer: "Products are designed for disassembly, repair, and material recovery at end-of-life. This approach transforms linear production models into closed-loop systems."
+  },
+  {
+    question: "Describe a significant development in exoplanet research.",
+    answer: "The discovery of Earth-like planets in habitable zones expands possibilities for extraterrestrial life. These findings revolutionize our understanding of planetary system diversity."
+  },
+  {
+    question: "Describe how time banking facilitates community exchange.",
+    answer: "Participants exchange services based on time rather than monetary value. This alternative economic system builds social capital while meeting community needs."
+  },
+  {
+    question: "Describe an important development in pain management.",
+    answer: "Multimodal analgesia combines different medication classes for enhanced pain relief with reduced side effects. This approach represents a significant advance in pain treatment protocols."
+  },
+  {
+    question: "Describe how green infrastructure manages stormwater.",
+    answer: "Natural systems like rain gardens and permeable pavements absorb and filter rainwater. This approach reduces flooding while improving water quality compared to traditional infrastructure."
+  },
+  {
+    question: "Describe a significant development in computational linguistics.",
+    answer: "Transformer models enable more nuanced natural language processing through attention mechanisms. These advances power increasingly sophisticated language technologies."
+  },
+  {
+    question: "Describe how community-supported agriculture connects consumers with producers.",
+    answer: "Members purchase seasonal shares of farm harvests in advance, sharing production risks. This model builds direct relationships while supporting sustainable farming practices."
+  },
+  {
+    question: "Describe an important development in microbiome research.",
+    answer: "Understanding gut-brain axis communication reveals microbiome's influence on mental health. This research transforms our conception of human biology as a superorganism."
+  },
+  {
+    question: "Describe how passive cooling techniques reduce energy consumption.",
+    answer: "Architectural strategies like thermal mass and natural ventilation maintain comfort without mechanical systems. These ancient techniques remain relevant for sustainable design."
+  },
+  {
+    question: "Describe a significant development in marine conservation.",
+    answer: "Marine protected areas preserve biodiversity and enhance fisheries through spillover effects. These designated zones demonstrate how spatial management supports ocean health."
+  },
+  {
+    question: "Describe how social prescribing addresses non-medical health determinants.",
+    answer: "Healthcare providers refer patients to community activities and support services. This holistic approach recognizes social connection's crucial role in wellbeing."
+  },
+  {
+    question: "Describe an important development in battery technology.",
+    answer: "Solid-state batteries offer higher energy density and safety compared to liquid electrolyte batteries. This advancement may accelerate electric vehicle adoption and renewable energy integration."
+  },
+  {
+    question: "Describe how indigenous fire management practices prevent catastrophic wildfires.",
+    answer: "Controlled cultural burning reduces fuel loads and maintains ecosystem health. These traditional practices offer valuable insights for modern wildfire management."
+  },
+  {
+    question: "Describe a significant development in telehealth.",
+    answer: "Remote patient monitoring enables continuous care outside clinical settings. This technology expands healthcare access while reducing hospitalization needs."
+  },
+  {
+    question: "Describe how material passporting facilitates circular economy.",
+    answer: "Digital documentation of building materials enables future reuse and recycling. This information management approach supports sustainable construction practices."
+  },
+  {
+    question: "Describe an important development in concussion management.",
+    answer: "Gradual return-to-learn protocols address cognitive symptoms alongside physical recovery. This comprehensive approach recognizes concussion's multifaceted impacts."
+  },
+  {
+    question: "Describe how urban forestry mitigates heat island effects.",
+    answer: "Strategic tree planting reduces temperatures through shade and evapotranspiration. This natural cooling approach enhances urban resilience to climate change."
+  },
+  {
+    question: "Describe a significant development in neutrino astronomy.",
+    answer: "Detecting astrophysical neutrinos provides unique insights into cosmic phenomena. These nearly massless particles travel unaffected through matter, offering unobstructed views of distant events."
+  },
+  {
+    question: "Describe how participatory action research empowers communities.",
+    answer: "Community members collaborate with researchers to investigate and address local issues. This approach ensures research relevance while building local capacity."
+  },
+  {
+    question: "Describe an important development in robotic surgery.",
+    answer: "Augmented reality overlays enhance surgical precision by visualizing underlying anatomy. This technology enables minimally invasive procedures with improved outcomes."
+  },
+  {
+    question: "Describe how community currencies strengthen local economies.",
+    answer: "Complementary currencies encourage spending within defined geographic areas. These alternative monetary systems retain economic value locally while building community connections."
+  },
+  {
+    question: "Describe a significant development in malaria prevention.",
+    answer: "The RTS,S vaccine represents the first immunization against a parasitic disease. This breakthrough complements existing prevention strategies like bed nets and antimalarial drugs."
+  },
+  {
+    question: "Describe how daylight harvesting reduces building energy use.",
+    answer: "Automated shading and lighting systems optimize natural light utilization. This strategy significantly decreases artificial lighting requirements while maintaining visual comfort."
+  },
+  {
+    question: "Describe an important development in atmospheric water generation.",
+    answer: "Solar-powered devices extract moisture from air even in low-humidity environments. This technology provides drinking water solutions for water-scarce regions."
+  },
+  {
+    question: "Describe how trauma-informed care transforms service provision.",
+    answer: "Recognizing trauma's widespread impact guides organizational policies and practices. This approach creates safer environments that promote healing and prevent retraumatization."
+  },
+  {
+    question: "Describe a significant development in carbon farming.",
+    answer: "Agricultural practices that sequester soil carbon while maintaining productivity. These regenerative techniques offer climate mitigation benefits alongside food production."
+  },
+  {
+    question: "Describe how slow fashion challenges fast fashion models.",
+    answer: "Emphasis on quality, durability, and ethical production over rapid consumption. This movement promotes more sustainable clothing industry practices."
+  },
+  {
+    question: "Describe an important development in fetal surgery.",
+    answer: "Minimally invasive procedures correct certain birth defects before delivery. These innovative interventions improve outcomes for conditions previously untreatable until after birth."
+  },
+  {
+    question: "Describe how living shorelines protect coastal areas.",
+    answer: "Natural vegetation stabilizes coastlines while providing habitat benefits. This approach offers sustainable erosion control compared to hard engineering structures."
+  },
+  {
+    question: "Describe a significant development in quantum cryptography.",
+    answer: "Quantum key distribution enables theoretically unbreakable encryption through quantum mechanics principles. This technology addresses growing cybersecurity challenges."
+  },
+  {
+    question: "Describe how food forests create sustainable edible landscapes.",
+    answer: "Multilayered perennial planting mimics natural forest ecosystems while producing food. This agroforestry approach builds resilient food systems with minimal maintenance."
+  },
+  {
+    question: "Describe an important development in addiction treatment.",
+    answer: "Medication-assisted treatment combines pharmacological and psychosocial interventions. This comprehensive approach addresses addiction's biological and behavioral dimensions."
+  },
+  {
+    question: "Describe how cool roofs reduce building energy demand.",
+    answer: "Highly reflective roofing materials minimize heat absorption, lowering cooling requirements. This simple design intervention significantly impacts urban energy consumption patterns."
+  },
+  {
+    question: "Describe a significant development in exoskeleton technology.",
+    answer: "Wearable robotic devices enhance mobility for both rehabilitation and occupational applications. These advances restore movement capabilities and prevent workplace injuries."
+  },
+  {
+    question: "Describe how community science initiatives monitor environmental health.",
+    answer: "Local residents collect data on air quality, water pollution, and biodiversity. These efforts generate valuable information while increasing environmental awareness and advocacy."
+  },
+  {
+    question: "Describe an important development in precision oncology.",
+    answer: "Tumor sequencing guides targeted therapies based on specific genetic mutations. This personalized approach represents a paradigm shift in cancer treatment strategies."
+  },
+  {
+    question: "Describe how green roofs provide multiple urban benefits.",
+    answer: "Vegetated roof systems manage stormwater, reduce temperatures, and create habitats. These multifunctional spaces address several urban environmental challenges simultaneously."
+  },
+  {
+    question: "Describe a significant development in marine biotechnology.",
+    answer: "Marine organisms provide novel compounds with pharmaceutical and industrial applications. This biodiscovery field taps into ocean biodiversity for sustainable product development."
+  },
+  {
+    question: "Describe how guaranteed basic income experiments reduce poverty.",
+    answer: "Unconditional cash transfers provide financial security while preserving autonomy. These pilot programs demonstrate how direct economic support can transform wellbeing."
+  },
+  {
+    question: "Describe an important development in wireless power transfer.",
+    answer: "Resonant inductive coupling enables efficient energy transmission over distance. This technology may eliminate charging cables for various electronic devices."
+  },
+  {
+    question: "Describe how natural language generation creates human-like text.",
+    answer: "Advanced algorithms produce coherent written content based on input data and parameters. This technology automates content creation while raising questions about authorship and authenticity."
+  },
+  {
+    question: "Describe a significant development in tissue engineering.",
+    answer: "3D bioprinting creates functional tissue constructs for transplantation and research. This technology promises to address organ shortage challenges through engineered alternatives."
+  },
+  {
+    question: "Describe how agroecological practices enhance farm resilience.",
+    answer: "Biodiversity integration and natural process utilization reduce external input dependency. These approaches create more sustainable and climate-resilient agricultural systems."
+  },
+  {
+    question: "Describe an important development in magnetoreception research.",
+    answer: "Discovering cryptochrome proteins that may enable animal navigation using Earth's magnetic field. This research illuminates how organisms perceive and utilize magnetic information."
+  },
+  {
+    question: "Describe how time-restricted eating affects metabolic health.",
+    answer: "Limiting daily eating window aligns with circadian rhythms, improving various health markers. This dietary pattern demonstrates timing's importance alongside nutritional composition."
+  },
+  {
+    question: "Describe a significant development in ocean thermal energy conversion.",
+    answer: "Harnessing temperature differences between surface and deep ocean waters for power generation. This renewable energy technology offers consistent baseload electricity in tropical regions."
+  },
+  {
+    question: "Describe how community development financial institutions increase access to capital.",
+    answer: "Mission-driven lenders provide financing in underserved markets overlooked by traditional banks. These institutions demonstrate how targeted financial services can promote equitable development."
+  },
+  {
+    question: "Describe an important development in optogenetics.",
+    answer: "Using light to control genetically modified neurons with millisecond precision. This technique revolutionizes neuroscience research by enabling precise manipulation of neural circuits."
+  },
+  {
+    question: "Describe how mycelium-based materials replace conventional plastics.",
+    answer: "Fungal networks create biodegradable alternatives with similar functional properties. These sustainable materials address plastic pollution through circular biological processes."
+  },
+  {
+    question: "Describe a significant development in prenatal genetic testing.",
+    answer: "Non-invasive methods analyze fetal DNA from maternal blood samples. These advances provide early genetic information without procedure-related risks."
+  },
+  {
+    question: "Describe how blue carbon ecosystems mitigate climate change.",
+    answer: "Coastal wetlands sequester carbon at rates exceeding terrestrial forests. Protecting and restoring these ecosystems offers significant climate benefits alongside biodiversity conservation."
+  },
+  {
+    question: "Describe an important development in brain-computer interfaces.",
+    answer: "Neural implants enable direct communication between brain and external devices. This technology restores function for individuals with paralysis while raising ethical considerations."
+  },
+  {
+    question: "Describe how aquaponics integrates fish and plant cultivation.",
+    answer: "Recirculating systems create symbiotic relationships between aquatic animals and plants. This efficient food production method conserves water while generating multiple harvests."
+  },
+  {
+    question: "Describe a significant development in wildfire prediction modeling.",
+    answer: "Machine learning algorithms analyze multiple variables to forecast fire risk and behavior. These predictive tools enable more proactive and targeted wildfire management strategies."
+  },
+  {
+    question: "Describe how cooperative housing models provide affordable homeownership.",
+    answer: "Residents collectively own their building while holding individual occupancy rights. This housing approach maintains affordability through shared equity and decision-making."
+  },
+  {
+    question: "Describe an important development in mitochondrial replacement therapy.",
+    answer: "Preventing transmission of mitochondrial diseases through specialized IVF techniques. This innovative reproductive technology enables women with mitochondrial mutations to have genetically related healthy children."
+  },
+  {
+    question: "Describe how vertical axis wind turbines expand renewable energy options.",
+    answer: "Omnidirectional designs capture wind from any direction in urban environments. These compact turbines enable decentralized wind power generation where traditional turbines are impractical."
+  },
+  {
+    question: "Describe a significant development in the study of animal cognition.",
+    answer: "Research demonstrating complex problem-solving and emotional intelligence across species. These findings challenge human exceptionalism while revealing cognitive continuities in the animal kingdom."
+  },
+  {
+    question: "Describe how phytoremediation cleans contaminated sites.",
+    answer: "Plants extract, degrade, or immobilize pollutants from soil and water. This natural remediation approach offers sustainable alternatives to energy-intensive engineering methods."
+  },
+  {
+    question: "Describe an important development in multi-omics research.",
+    answer: "Integrating genomics, proteomics, and metabolomics data provides comprehensive biological understanding. This systems biology approach reveals complex interactions within living organisms."
+  },
+  {
+    question: "Describe how passive house standards transform building efficiency.",
+    answer: "Rigorous certification requires minimal energy for heating and cooling through superior insulation and airtightness. This performance-based approach demonstrates ultra-low energy building feasibility."
+  },
+  {
+    question: "Describe a significant development in coral reef restoration.",
+    answer: "Microfragmentation accelerates coral growth rates for large-scale reef rehabilitation. This technique offers hope for critically endangered reef ecosystems worldwide."
+  },
+  {
+    question: "Describe how social network analysis maps relationship patterns.",
+    answer: "Mathematical modeling reveals how connections influence information flow and behavior. This analytical approach provides insights across sociology, epidemiology, and organizational studies."
+  },
+  {
+    question: "Describe an important development in geothermal energy technology.",
+    answer: "Enhanced geothermal systems create reservoirs in hot dry rock through hydraulic stimulation. This innovation expands geothermal potential beyond naturally occurring hydrothermal resources."
+  },
+  {
+    question: "Describe how food sovereignty movements reclaim agricultural control.",
+    answer: "Communities assert rights to define their own food systems based on ecological and cultural values. This approach challenges industrialized agriculture's dominance while promoting local resilience."
+  },
+  {
+    question: "Describe a significant development in the study of consciousness.",
+    answer: "Integrated information theory provides a mathematical framework for measuring consciousness. This theoretical approach offers testable predictions about subjective experience's physical basis."
+  },
+  {
+    question: "Describe how constructed wetlands treat wastewater naturally.",
+    answer: "Engineered ecosystems utilize plants and microbial communities to remove contaminants. This nature-based solution provides effective wastewater treatment with lower energy requirements."
+  },
+  {
+    question: "Describe an important development in placental research.",
+    answer: "Understanding placental development and function reveals origins of various pregnancy complications. This once-overlooked organ is now recognized as crucial for lifelong health."
+  },
+  {
+    question: "Describe how agrovoltaics optimize land use for energy and food production.",
+    answer: "Solar panels and agriculture coexist on the same land, creating synergistic benefits. This integrated approach addresses land competition between renewable energy and food security."
+  },
+  {
+    question: "Describe a significant development in the study of human microbiome.",
+    answer: "Recognizing how microbial communities influence development, immunity, and metabolism. This research transforms understanding of human biology as a multispecies collective."
+  },
+  {
+    question: "Describe how rainwater harvesting addresses water scarcity.",
+    answer: "Collecting and storing rainfall for domestic and agricultural use reduces municipal water demand. This ancient practice remains relevant for sustainable water management."
+  },
+  {
+    question: "Describe an important development in cancer immunotherapy.",
+    answer: "CAR-T cell engineering reprograms patients' immune cells to target specific cancers. This personalized treatment approach demonstrates remarkable efficacy for certain blood cancers."
+  },
+  {
+    question: "Describe how green walls improve urban air quality.",
+    answer: "Vertical vegetation systems filter pollutants and particulates from ambient air. These living installations provide environmental benefits in space-constrained urban settings."
+  },
+  {
+    question: "Describe a significant development in astrobiology.",
+    answer: "Discovering extremophiles in Earth's harshest environments expands possibilities for extraterrestrial life. These resilient organisms redefine conditions necessary for biological existence."
+  },
+  {
+    question: "Describe how community land banks revitalize vacant properties.",
+    answer: "Acquiring and managing abandoned lots for community-determined uses. This strategic approach prevents speculation while enabling neighborhood-driven development."
+  },
+  {
+    question: "Describe an important development in fetal alcohol spectrum disorder prevention.",
+    answer: "Screening and brief intervention protocols identify at-risk pregnancies for timely support. This public health approach addresses a completely preventable developmental disability."
+  },
+  {
+    question: "Describe how piezoelectric energy harvesting captures ambient energy.",
+    answer: "Materials that generate electricity from mechanical stress like footsteps or vibrations. This technology enables self-powering sensors and devices for various applications."
+  },
+  {
+    question: "Describe a significant development in the study of plant communication.",
+    answer: "Discovering chemical and electrical signaling networks between plants and associated organisms. These findings reveal complex interspecies interactions within ecosystems."
+  },
+  {
+    question: "Describe how daylighting strategies enhance building interiors.",
+    answer: "Architectural design that maximizes natural light penetration while minimizing glare. This approach improves occupant wellbeing while reducing artificial lighting energy use."
+  },
+  {
+    question: "Describe an important development in the study of chronobiology.",
+    answer: "Understanding circadian rhythms' molecular mechanisms reveals their profound health impacts. This research explains how timing affects everything from medication efficacy to disease susceptibility."
+  },
+  {
+    question: "Describe how anaerobic digestion converts waste to energy.",
+    answer: "Microbial decomposition of organic matter produces biogas for electricity generation. This waste-to-energy technology addresses both waste management and renewable energy production."
+  },
+  {
+    question: "Describe a significant development in the study of biomineralization.",
+    answer: "Understanding how organisms create complex mineral structures inspires advanced materials. This interdisciplinary research bridges biology, chemistry, and materials science."
+  },
+  {
+    question: "Describe how community renewable energy projects increase local benefits.",
+    answer: "Collectively owned renewable installations keep economic benefits within communities. This decentralized energy model enhances energy democracy while accelerating clean energy transitions."
+  },
+  {
+    question: "Describe an important development in the study of synesthesia.",
+    answer: "Neural imaging reveals cross-activation between sensory processing brain regions. This condition provides unique insights into perception and cognitive development."
+  },
+  {
+    question: "Describe how permeable pavements manage urban stormwater.",
+    answer: "Porous surfaces allow rainwater infiltration, reducing runoff volume and filtering pollutants. This green infrastructure approach mimics natural hydrological processes in developed areas."
+  },
+  {
+    question: "Describe a significant development in the study of animal culture.",
+    answer: "Documenting socially transmitted behaviors across numerous species challenges human cultural uniqueness. These findings reveal evolutionary foundations of cultural transmission."
+  },
+  {
+    question: "Describe how building information modeling improves construction efficiency.",
+    answer: "Digital representations of physical and functional characteristics enable collaborative project management. This technology reduces errors and waste throughout building lifecycles."
+  },
+  {
+    question: "Describe an important development in the study of prion diseases.",
+    answer: "Understanding protein misfolding mechanisms reveals commonalities with neurodegenerative disorders. This research provides insights into fundamental biological processes gone awry."
+  },
+  {
+    question: "Describe how floating wetlands treat polluted water bodies.",
+    answer: "Artificial islands with vegetation remove nutrients and contaminants through natural processes. This innovative approach rehabilitates degraded aquatic ecosystems."
+  },
+  {
+    question: "Describe a significant development in the study of human evolution.",
+    answer: "Ancient DNA analysis reveals complex interbreeding between Homo sapiens and other hominins. This genetic evidence transforms our understanding of human origins and migration."
+  },
+  {
+    question: "Describe how thermal energy storage addresses renewable intermittency.",
+    answer: "Storing excess energy as heat for later electricity generation or direct use. This technology enables greater renewable energy penetration by providing dispatchable power."
+  },
+  {
+    question: "Describe an important development in the study of placebo effects.",
+    answer: "Neurobiological mechanisms demonstrate how expectations influence physiological outcomes. This research reveals mind-body interactions with implications for treatment design."
+  },
+  {
+    question: "Describe how wildlife corridors connect fragmented habitats.",
+    answer: "Protected pathways enable animal movement between isolated natural areas. This conservation strategy maintains genetic diversity and ecosystem resilience."
+  },
+  {
+    question: "Describe a significant development in the study of cellular senescence.",
+    answer: "Understanding senescent cells' dual roles in aging and cancer reveals therapeutic targets. This research transforms our approach to age-related diseases."
+  },
+  {
+    question: "Describe how district energy systems improve urban efficiency.",
+    answer: "Centralized heating and cooling distribution serves multiple buildings through shared infrastructure. This approach achieves economies of scale while integrating diverse energy sources."
+  },
+  {
+    question: "Describe an important development in the study of mirror neurons.",
+    answer: "Brain cells that fire during both action execution and observation provide neural basis for empathy. This discovery illuminates mechanisms underlying social cognition and learning."
+  },
+  {
+    question: "Describe how bioswales manage stormwater runoff.",
+    answer: "Vegetated channels with porous soils slow, infiltrate, and filter rainwater. This green infrastructure element addresses urban flooding while improving water quality."
+  },
+  {
+    question: "Describe a significant development in the study of epigenetics and trauma.",
+    answer: "Evidence that traumatic experiences can alter gene expression across generations. This research reveals how historical events continue to affect descendants biologically."
+  },
+  {
+    question: "Describe how shared mobility services reduce private vehicle dependency.",
+    answer: "Car-sharing, bike-sharing, and ride-hailing provide transportation without ownership requirements. These services optimize vehicle utilization while decreasing traffic congestion and emissions."
+  },
+  {
+    question: "Describe an important development in the study of quantum biology.",
+    answer: "Evidence that quantum effects influence biological processes like photosynthesis and navigation. This emerging field bridges quantum physics and life sciences."
+  },
+  {
+    question: "Describe how green bonds finance environmental projects.",
+    answer: "Fixed-income instruments specifically earmarked for climate and environmental initiatives. This financial innovation channels capital toward sustainable development."
+  },
+  {
+    question: "Describe a significant development in the study of the gut-brain axis.",
+    answer: "Bidirectional communication between gastrointestinal and central nervous systems influences mood and behavior. This research transforms understanding of mental health and neurological disorders."
+  },
+  {
+    question: "Describe how cool pavements reduce urban heat island effects.",
+    answer: "Reflective materials and permeable designs lower surface temperatures in paved areas. This mitigation strategy enhances urban thermal comfort while reducing energy demand."
+  },
+  {
+    question: "Describe an important development in the study of collective intelligence.",
+    answer: "Understanding how groups solve problems more effectively than individuals through diverse perspectives. This research informs organizational design and collaborative technologies."
+  },
+  {
+    question: "Describe how agroforestry integrates trees with agricultural systems.",
+    answer: "Strategic tree planting provides shade, wind protection, and additional income sources. This multifunctional approach enhances farm resilience while delivering environmental benefits."
+  },
+  {
+    question: "Describe a significant development in the study of language acquisition.",
+    answer: "Evidence for critical periods in language learning with implications for education policy. This research reveals how timing affects second language acquisition success."
+  },
+  {
+    question: "Describe how net-zero energy buildings produce as much energy as they consume.",
+    answer: "Advanced design strategies and renewable generation achieve annual energy balance. This building standard demonstrates feasibility of carbon-neutral built environments."
+  },
+  {
+    question: "Describe an important development in the study of moral psychology.",
+    answer: "Dual-process theory explaining intuitive and deliberative moral judgment mechanisms. This framework illuminates how emotions and reasoning interact in ethical decision-making."
+  },
+  {
+    question: "Describe how constructed reefs enhance marine ecosystems.",
+    answer: "Artificial structures provide habitat where natural reefs have been degraded or lost. These installations support biodiversity while protecting coastlines from erosion."
+  },
+  {
+    question: "Describe a significant development in the study of metacognition.",
+    answer: "Understanding how individuals monitor and regulate their own thinking processes. This research informs educational strategies and cognitive enhancement techniques."
+  },
+  {
+    question: "Describe how energy performance contracting finances efficiency upgrades.",
+    answer: "Savings from reduced energy consumption pay for improvement costs over time. This innovative financing model removes upfront cost barriers to building efficiency."
+  },
+  {
+    question: "Describe an important development in the study of neuroplasticity.",
+    answer: "Evidence that adult brains continue forming new neural connections throughout life. This finding revolutionized rehabilitation approaches and learning theory."
+  },
+  {
+    question: "Describe how marine permaculture regenerates ocean ecosystems.",
+    answer: "Underwater gardening techniques restore kelp forests and associated marine life. This approach addresses ocean desertification while sequestering carbon and producing food."
+  },
+  {
+    question: "Describe a significant development in the study of decision fatigue.",
+    answer: "Understanding how repeated decision-making depletes cognitive resources affects choice architecture. This research informs everything from courtroom scheduling to consumer interface design."
+  },
+  {
+    question: "Describe how passive solar design harnesses natural heating.",
+    answer: "Strategic building orientation and material selection capture and store solar energy. This ancient principle remains foundational for sustainable architecture."
+  },
+  {
+    question: "Describe an important development in the study of interoception.",
+    answer: "Understanding how the brain perceives internal bodily states influences emotional experience. This research illuminates connections between physical sensations and psychological wellbeing."
+  },
+  {
+    question: "Describe how floating solar farms optimize land and water use.",
+    answer: "Photovoltaic panels installed on water bodies reduce evaporation while generating electricity. This dual-use approach addresses land constraints for large-scale solar deployment."
+  },
+  {
+    question: "Describe a significant development in the study of default mode network.",
+    answer: "Brain activity patterns during rest states reveal importance of mind-wandering for creativity. This research challenges notions that productive thinking only occurs during focused attention."
+  },
+  {
+    question: "Describe how green schools enhance student performance and sustainability.",
+    answer: "Educational facilities designed with natural lighting, improved air quality, and energy efficiency. These environments demonstrate how building design supports both learning outcomes and environmental goals."
+  },
+  {
+    question: "Describe an important development in the study of cultural evolution.",
+    answer: "Applying evolutionary theory to understand how ideas, behaviors, and technologies spread. This interdisciplinary approach reveals patterns in human cultural change."
+  },
+  {
+    question: "Describe how living buildings produce more energy than they consume.",
+    answer: "Regenerative design that creates positive environmental impacts through net water and energy benefits. This certification represents the pinnacle of sustainable architecture."
+  },
+  {
+    question: "Describe a significant development in the study of awe and wonder.",
+    answer: "Research demonstrating how experiences of vastness promote prosocial behavior and wellbeing. This emotional state appears to have important psychological and social functions."
+  },
+  {
+    question: "Describe how blue infrastructure manages urban water cycles.",
+    answer: "Integrating water systems into urban design for flood management and habitat creation. This approach treats water as valuable resource rather than waste product."
+  },
+  {
+    question: "Describe an important development in the study of bilingual advantages.",
+    answer: "Evidence that bilingualism enhances executive function and cognitive reserve. This research informs language education policies and cognitive aging interventions."
+  },
+  {
+    question: "Describe how regenerative agriculture restores degraded soils.",
+    answer: "Farming practices that rebuild organic matter and biodiversity while producing food. This approach addresses both climate change and agricultural sustainability."
+  },
+  {
+    question: "Describe a significant development in the study of music cognition.",
+    answer: "Understanding how musical training affects brain development and cognitive abilities. This research reveals music's unique role in human development and culture."
+  },
+  {
+    question: "Describe how district cooling systems reduce urban energy demand.",
+    answer: "Centralized chilled water production distributes cooling more efficiently than individual systems. This infrastructure approach significantly decreases electricity consumption during peak periods."
+  },
+  {
+    question: "Describe an important development in the study of emotional intelligence.",
+    answer: "Evidence that emotion recognition and regulation abilities predict various life outcomes. This research validates the importance of non-cognitive skills for personal and professional success."
+  },
+  {
+    question: "Describe how green infrastructure supports urban biodiversity.",
+    answer: "Network of natural and semi-natural spaces providing habitat connectivity within cities. This approach addresses habitat fragmentation while enhancing urban ecosystem services."
+  },
+  {
+    question: "Describe a significant development in the study of growth mindset.",
+    answer: "Evidence that beliefs about intelligence malleability affect academic achievement. This research has transformed educational practices by emphasizing learning process over innate ability."
+  },
+  {
+    question: "Describe how net-positive water buildings replenish freshwater sources.",
+    answer: "Structures that collect, purify, and return more water than they consume to watersheds. This regenerative approach addresses water scarcity through built environment design."
+  },
+  {
+    question: "Describe an important development in the study of purpose in life.",
+    answer: "Research demonstrating how sense of meaning affects health outcomes and longevity. This psychological factor appears to have significant physiological consequences."
+  },
+  {
+    question: "Describe how community-scale renewable microgrids enhance energy resilience.",
+    answer: "Localized energy generation and distribution systems continue operating during grid outages. This approach increases community self-reliance while integrating diverse renewable sources."
+  },
+  {
+    question: "Describe a significant development in the study of humility.",
+    answer: "Evidence that intellectual humility correlates with better learning and decision-making. This character strength appears particularly valuable in complex, uncertain environments."
+  },
+  {
+    question: "Describe how circular water systems minimize freshwater consumption.",
+    answer: "Closed-loop designs that continuously treat and reuse water within buildings or districts. This approach dramatically reduces water extraction from natural sources."
+  },
+  {
+    question: "Describe an important development in the study of curiosity.",
+    answer: "Understanding how curiosity enhances learning and memory through dopamine release. This research reveals biological mechanisms underlying knowledge-seeking behavior."
+  },
+  {
+    question: "Describe how regenerative design principles restore ecosystems.",
+    answer: "Approaches that create buildings and communities with net-positive environmental impacts. This philosophy moves beyond sustainability toward active ecological restoration."
+  },
+  {
+    question: "Describe a significant development in the study of wisdom.",
+    answer: "Empirical research identifying cognitive, reflective, and compassionate dimensions of wisdom. This once-philosophical concept is now studied as a psychological construct with measurable components."
+  },
+  {
+    question: "Describe how living shorelines protect coastal communities naturally.",
+    answer: "Natural vegetation and oyster reefs buffer wave energy while creating habitat. This approach provides sustainable coastal protection compared to hardened structures."
+  },
+  {
+    question: "Describe an important development in the study of gratitude.",
+    answer: "Evidence that gratitude practices improve mental health and relationship satisfaction. This research validates ancient wisdom about thankfulness through modern scientific methods."
+  },
+  {
+    question: "Describe how biomimetic design solves engineering challenges.",
+    answer: "Innovations inspired by biological adaptations observed in nature. This approach has led to breakthroughs from Velcro to high-efficiency wind turbine blades."
+  },
+  {
+    question: "Describe a significant development in the study of self-compassion.",
+    answer: "Research demonstrating how kindness toward oneself enhances resilience and wellbeing. This psychological approach offers an alternative to self-critical achievement motivation."
+  },
+  {
+    question: "Describe how regenerative tourism benefits destinations and visitors.",
+    answer: "Travel practices that actively improve environmental and social conditions in host communities. This approach transforms tourism from extractive to restorative industry."
+  },
+  {
+    question: "Describe an important development in the study of flow states.",
+    answer: "Understanding optimal experience conditions where skill level matches challenge intensity. This research reveals how complete engagement enhances performance and satisfaction."
+  },
+  {
+    question: "Describe how nature-based solutions address climate adaptation.",
+    answer: "Ecosystem restoration and protection strategies that increase community resilience. These approaches often provide multiple benefits compared to engineered alternatives."
+  },
+  {
+    question: "Describe a significant development in the study of positive psychology.",
+    answer: "Empirical identification of character strengths that contribute to human flourishing. This research moves psychology beyond pathology toward understanding optimal functioning."
+  },
+  {
+    question: "Describe how circular economy principles transform industrial systems.",
+    answer: "Designing out waste through continuous material cycles and regenerative production. This economic model represents a fundamental shift from linear take-make-dispose approaches."
+  },
+  {
+    question: "Describe an important development in the study of mindfulness.",
+    answer: "Neuroscientific evidence that meditation practice changes brain structure and function. This research validates ancient contemplative practices through modern imaging technology."
+  },
+  {
+    question: "Describe how ecosystem services valuation informs policy decisions.",
+    answer: "Quantifying nature's economic benefits to justify conservation and restoration investments. This approach makes environmental protection economically visible to decision-makers."
+  },
+  {
+    question: "Describe a significant development in the study of altruism.",
+    answer: "Understanding biological and psychological bases of selfless behavior across species. This research addresses fundamental questions about human nature and social organization."
+  },
+  {
+    question: "Describe how green chemistry reduces hazardous substance production.",
+    answer: "Designing chemical products and processes that minimize environmental and health impacts. This approach represents a paradigm shift in materials science and manufacturing."
+  },
+  {
+    question: "Describe an important development in the study of post-traumatic growth.",
+    answer: "Evidence that adversity can lead to positive psychological transformation. This research challenges assumptions about trauma's exclusively negative consequences."
+  },
+  {
+    question: "Describe how industrial symbiosis creates resource efficiency networks.",
+    answer: "Exchanging materials, energy, and byproducts between traditionally separate industries. This collaborative approach transforms waste streams into valuable inputs."
+  },
+  {
+    question: "Describe a significant development in the study of vulnerability.",
+    answer: "Research demonstrating how emotional openness enhances connection and creativity. This counterintuitive finding challenges cultural assumptions about strength and weakness."
+  },
+  {
+    question: "Describe how product-as-a-service models reduce consumption.",
+    answer: "Accessing products through leasing rather than ownership decreases material throughput. This business model innovation supports circular economy transitions."
+  },
+  {
+    question: "Describe an important development in the study of forgiveness.",
+    answer: "Evidence that forgiveness processes improve physical and mental health outcomes. This research reveals the physiological costs of holding grudges and resentment."
+  },
+  {
+    question: "Describe how urban mining recovers materials from existing infrastructure.",
+    answer: "Systematic recovery of valuable materials from buildings and products at end-of-life. This approach transforms waste management into resource supply strategy."
+  },
+  {
+    question: "Describe a significant development in the study of hope.",
+    answer: "Understanding how hopeful thinking enhances goal attainment and stress coping. This psychological resource appears particularly important during challenging circumstances."
+  },
+  {
+    question: "Describe how extended producer responsibility shifts waste management burden.",
+    answer: "Manufacturers assuming responsibility for product disposal encourages sustainable design. This policy approach internalizes environmental costs currently borne by society."
+  },
+  {
+    question: "Describe an important development in the study of resilience.",
+    answer: "Identifying factors that enable individuals and communities to thrive despite adversity. This research informs interventions across psychology, education, and community development."
+  },
+  {
+    question: "Describe how sharing economy platforms optimize resource utilization.",
+    answer: "Digital platforms enabling temporary access to underutilized assets across communities. This economic model increases efficiency while potentially reducing overall consumption."
+  },
+  {
+    question: "Describe a significant development in the study of meaning-making.",
+    answer: "Understanding how narratives help individuals integrate challenging life experiences. This psychological process appears crucial for maintaining coherence and purpose."
+  },
+  {
+    question: "Describe how cradle-to-cradle certification guides product design.",
+    answer: "Rigorous standards ensuring materials remain in continuous cycles of use. This certification represents the gold standard for circular economy implementation."
+  },
+  {
+    question: "Describe an important development in the study of authenticity.",
+    answer: "Research demonstrating how self-congruent living enhances wellbeing and relationships. This psychological construct bridges philosophical concepts with empirical investigation."
+  },
+  {
+    question: "Describe how industrial ecology models optimize resource flows.",
+    answer: "Analyzing industrial systems as interdependent networks mimicking natural ecosystems. This interdisciplinary approach identifies opportunities for symbiotic resource exchange."
+  },
+  {
+    question: "Describe a significant development in the study of belonging.",
+    answer: "Evidence that social connection needs represent fundamental human motivation. This research explains various psychological and health consequences of inclusion versus exclusion."
+  },
+  {
+    question: "Describe how material flow analysis identifies waste reduction opportunities.",
+    answer: "Tracking substance movements through economic systems to pinpoint improvement areas. This analytical tool provides evidence-based guidance for circular economy transitions."
+  }
+];
 
     // --- DATA: Hashtag Pools ---
     const requiredTags = ["#eptonline", "#IELTS", "#Speaking", "#CueCard"];
