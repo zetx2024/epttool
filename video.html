@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Flashcard Video Maker</title>
+    <title>Fixed Flashcard Video Maker</title>
     <style>
         :root {
-            --primary: #f97316; /* Orange theme */
+            --primary: #f97316; /* Orange */
             --bg: #fff7ed;
             --surface: #ffffff;
             --text: #1e293b;
@@ -50,7 +50,7 @@
             color: #431407;
         }
 
-        input[type="file"], input[type="text"], select {
+        input[type="file"], select {
             width: 100%;
             padding: 0.6rem;
             border: 1px solid #fdba74;
@@ -86,6 +86,8 @@
         .playlist-item input {
             width: 70px;
             padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
 
         button {
@@ -143,7 +145,7 @@
 </head>
 <body>
 
-    <h1>Flashcard Video Studio Pro</h1>
+    <h1>Flashcard Video Studio Pro (Fixed)</h1>
 
     <div class="container">
         
@@ -157,33 +159,25 @@
                 </select>
             </div>
 
-            <div>
-                <label>2. Branding (Logo & Watermark)</label>
-                <input type="text" id="watermarkText" placeholder="Center Watermark Text (e.g. Preview)">
-                <div style="margin-top: 5px;"></div>
-                <label style="font-weight: normal; font-size: 0.8rem;">Upload Logo (Top Right):</label>
-                <input type="file" id="logoInput" accept="image/*">
+            <div style="background: #fff3e0; padding: 10px; border-radius: 6px; font-size: 0.9rem;">
+                <strong>Fixed Settings (In Code):</strong><br>
+                Brand: <span id="displayBrand">Loading...</span><br>
+                Watermark: <span id="displayWatermark">Loading...</span>
             </div>
 
             <div>
-                <label>3. Social Media Handle (@username)</label>
-                <input type="text" id="socialHandle" placeholder="@MyChannelName">
-                <small style="color:#666">Adds FB, Insta, YT icons automatically.</small>
-            </div>
-
-            <div>
-                <label>4. Background Music (Optional)</label>
+                <label>2. Background Music (Optional)</label>
                 <input type="file" id="audioInput" accept="audio/*">
             </div>
         </div>
 
         <div class="col">
             <div>
-                <label>5. Upload Images (Multiple)</label>
+                <label>3. Upload Images</label>
                 <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageUpload()">
             </div>
 
-            <label>6. Playlist & Duration</label>
+            <label>4. Playlist & Duration</label>
             <div class="playlist-container" id="playlistContainer">
                 <p style="text-align: center; color: #999; margin-top: 50px;">Upload images to see them here.</p>
             </div>
@@ -192,7 +186,7 @@
         <div class="status-bar" id="progressBar"><div class="status-fill" id="progressFill"></div></div>
         <p id="statusText" style="grid-column: 1/-1; text-align: center;"></p>
         
-        <button id="generateBtn" onclick="startGeneration()" style="grid-column: 1/-1;">Generate MP4 Video</button>
+        <button id="generateBtn" onclick="startGeneration()" style="grid-column: 1/-1;">Generate Video</button>
 
         <div class="preview-area" id="resultArea">
             <h3>Video Ready!</h3>
@@ -208,29 +202,52 @@
     <canvas id="canvas"></canvas>
 
     <script>
-        // --- ASSETS (Social Icons as SVG Strings) ---
-        const icons = {
-            fb: new Image(),
-            ig: new Image(),
-            yt: new Image()
+        // ==========================================
+        //  USER CONFIGURATION (EDIT HERE)
+        // ==========================================
+        const CONFIG = {
+            socialHandle: "@MyStudyChannel",     // CHANGE THIS
+            watermarkText: "PREVIEW VERSION",    // CHANGE THIS
+            
+            // This is a Base64 Placeholder Logo (Yellow Star). 
+            // To use your own, replace this long string with your image's Base64 string.
+            logoBase64: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTIgMiAxNS4wOSA4LjI2IDIyIDkuMjcgMTcgMTQuMTQgMTguMTggMjEuMDIgMTIgMTcuNzcgNS44MiAyMS4wMiA3IDE0LjE0IDIgOS4yNyA4LjkxIDguMjYgMTIgMiIvPjwvc3ZnPg=="
         };
-        // Base64 SVGs for icons (White color)
-        icons.fb.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTkuMSA4LjhoMi44djIuOWgtMi44djMuMmgzLjJ2M2gtMy4ydi02LjJoLTIuOHYtMi45aDIuOHYtMy4yYzAtMi41IDEuNi00LjMgNC4zLTQuMyAxLjMgMCAyLjUuMSAyLjUuMXYyLjhoLTEuNWMtMS4yIDAtMS42LjctMS42IDEuNnYyLjF6Ii8+PC9zdmc+';
-        icons.ig.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNSIgcnk9IjUiPjwvcmVjdD48cGF0aCBkPSJNMTYgMTEuMzdBNCADIDAgMSAxIDEyLjYzIDggNCA0IDAgMCAxIDE2IDExLjM3eiI+PC9wYXRoPjxsaW5lIHgxPSIxNy41IiB5MT0iNi41IiB4Mj0iMTcuNTEiIHkyPSI2LjUiPjwvbGluZT48L3N2Zz4=';
-        icons.yt.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTIyLjU0IDYuNDJjLS4zNi0xLjUzLTEuNTMtMi43My0zLjA2LTMuMDZDMTYuNzYgMyAxMiAzIDEyIDNzLTQuNzYgMC03LjQ4LjM2Yy0xLjUzLjMzLTIuNyAxLjUzLTMuMDYgMy4wNkMwIDEwLjA2IDAgMTIgMCAxMnMwIDEuOTQuMjUgNC41OGMuMzYgMS41MyAxLjUzIDIuNzMgMy4wNiAzLjA2QzcuMjQgMjAgMTIgMjAgMTIgMjBzNC43NiAwIDcuNDgtLjM2YzEuNTMtLjMzIDIuNy0xLjUzIDMuMDYtMy4wNi4yNS0yLjY0LjI1LTQuNTguMjUtNC41OHMwLTEuOTQtLjI1LTQuNTh6TTkuNTQgMTV2LTZsNS43IDN6Ii8+PC9zdmc+';
 
-        // --- GLOBAL VARIABLES ---
-        let playlist = []; // Stores { file, duration, id }
+        // Display config in UI for confirmation
+        document.getElementById('displayBrand').innerText = CONFIG.socialHandle;
+        document.getElementById('displayWatermark').innerText = CONFIG.watermarkText;
+
+        // ==========================================
+        //  ASSETS (Icons)
+        // ==========================================
+        const iconSources = {
+            fb: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTkuMSA4LjhoMi44djIuOWgtMi44djMuMmgzLjJ2M2gtMy4ydi02LjJoLTIuOHYtMi45aDIuOHYtMy4yYzAtMi41IDEuNi00LjMgNC4zLTQuMyAxLjMgMCAyLjUuMSAyLjUuMXYyLjhoLTEuNWMtMS4yIDAtMS42LjctMS42IDEuNnYyLjF6Ii8+PC9zdmc+',
+            ig: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNSIgcnk9IjUiPjwvcmVjdD48cGF0aCBkPSJNMTYgMTEuMzdBNCADIDAgMSAxIDEyLjYzIDggNCA0IDAgMCAxIDE2IDExLjM3eiI+PC9wYXRoPjxsaW5lIHgxPSIxNy41IiB5MT0iNi41IiB4Mj0iMTcuNTEiIHkyPSI2LjUiPjwvbGluZT48L3N2Zz4=',
+            yt: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTIyLjU0IDYuNDJjLS4zNi0xLjUzLTEuNTMtMi43My0zLjA2LTMuMDZDMTYuNzYgMyAxMiAzIDEyIDNzLTQuNzYgMC03LjQ4LjM2Yy0xLjUzLjMzLTIuNyAxLjUzLTMuMDYgMy4wNkMwIDEwLjA2IDAgMTIgMCAxMnMwIDEuOTQuMjUgNC41OGMuMzYgMS41MyAxLjUzIDIuNzMgMy4wNiAzLjA2QzcuMjQgMjAgMTIgMjAgMTIgMjBzNC43NiAwIDcuNDgtLjM2YzEuNTMtLjMzIDIuNy0xLjUzIDMuMDYtMy4wNi4yNS0yLjY0LjI1LTQuNTguMjUtNC41OHMwLTEuOTQtLjI1LTQuNTh6TTkuNTQgMTV2LTZsNS43IDN6Ii8+PC9zdmc+'
+        };
+
+        // ==========================================
+        //  GLOBAL VARIABLES
+        // ==========================================
+        let playlist = []; 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let logoImage = null;
+        
+        // This object will hold the loaded Image objects
+        const loadedAssets = {
+            brandLogo: null,
+            icons: {},
+            slides: []
+        };
 
-        // --- 1. HANDLE UPLOADS & PLAYLIST UI ---
+        // ==========================================
+        //  1. UI & PLAYLIST LOGIC
+        // ==========================================
         async function handleImageUpload() {
             const input = document.getElementById('imageInput');
             const container = document.getElementById('playlistContainer');
             
-            // Clear current (append mode logic could be added here, but simpler to reset)
             if(input.files.length > 0) {
                 container.innerHTML = ''; 
                 playlist = [];
@@ -240,28 +257,20 @@
                 const file = input.files[i];
                 const id = `img_${i}`;
                 
-                // Add to data structure
-                playlist.push({
-                    file: file,
-                    duration: 3, // default
-                    id: id
-                });
+                playlist.push({ file: file, duration: 3, id: id });
 
-                // Create UI Element
+                // Create UI
                 const div = document.createElement('div');
                 div.className = 'playlist-item';
                 
-                // Thumbnail
                 const img = document.createElement('img');
                 img.src = URL.createObjectURL(file);
                 
-                // Name
                 const name = document.createElement('span');
                 name.innerText = file.name.substring(0, 15) + "...";
                 name.style.flexGrow = 1;
                 name.style.fontSize = "0.9rem";
 
-                // Duration Input
                 const durLabel = document.createElement('span');
                 durLabel.innerText = "Secs:";
                 durLabel.style.fontSize = "0.8rem";
@@ -284,23 +293,23 @@
             }
         }
 
-        // --- 2. GENERATION LOGIC ---
+        // ==========================================
+        //  2. GENERATION LOGIC
+        // ==========================================
         async function startGeneration() {
             if (playlist.length === 0) return alert("Please upload images first.");
 
             const format = document.getElementById('format').value;
-            const watermarkText = document.getElementById('watermarkText').value;
-            const socialHandle = document.getElementById('socialHandle').value;
-            const logoInput = document.getElementById('logoInput');
             const audioInput = document.getElementById('audioInput');
-
-            // UI Setup
             const btn = document.getElementById('generateBtn');
+            const statusText = document.getElementById('statusText');
+
+            // Reset UI
             btn.disabled = true;
             document.getElementById('resultArea').style.display = 'none';
             document.getElementById('progressBar').style.display = 'block';
 
-            // Set Canvas Size
+            // Set Canvas Dimensions
             const dims = {
                 feed: { w: 1080, h: 1080 },
                 story: { w: 1080, h: 1920 },
@@ -309,51 +318,61 @@
             canvas.width = dims[format].w;
             canvas.height = dims[format].h;
 
-            // Load Logo if exists
-            if (logoInput.files.length > 0) {
-                logoImage = await loadImage(logoInput.files[0]);
+            // --- CRITICAL FIX: PRELOAD ALL ASSETS ---
+            statusText.innerText = "Loading assets (fixing broken images)...";
+            
+            try {
+                // 1. Load Fixed Logo
+                loadedAssets.brandLogo = await loadImage(CONFIG.logoBase64);
+
+                // 2. Load Social Icons
+                loadedAssets.icons.fb = await loadImage(iconSources.fb);
+                loadedAssets.icons.ig = await loadImage(iconSources.ig);
+                loadedAssets.icons.yt = await loadImage(iconSources.yt);
+
+                // 3. Load All User Slides
+                loadedAssets.slides = [];
+                let totalDuration = 0;
+                for (let item of playlist) {
+                    const imgObj = await loadImage(item.file);
+                    loadedAssets.slides.push({
+                        img: imgObj,
+                        duration: item.duration
+                    });
+                    totalDuration += item.duration;
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error loading images. Please try again.");
+                btn.disabled = false;
+                return;
             }
 
-            // Load all playlist images into memory
-            document.getElementById('statusText').innerText = "Pre-loading images...";
-            const loadedImages = [];
-            let totalDuration = 0;
-
-            for (let item of playlist) {
-                const imgObj = await loadImage(item.file);
-                loadedImages.push({
-                    img: imgObj,
-                    duration: item.duration
-                });
-                totalDuration += item.duration;
-            }
-
-            // Setup Audio
+            // --- AUDIO SETUP ---
             let audioCtx, destNode, audioStream;
             if (audioInput.files.length > 0) {
+                statusText.innerText = "Processing Audio...";
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const arrayBuf = await audioInput.files[0].arrayBuffer();
                 const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
                 destNode = audioCtx.createMediaStreamDestination();
                 audioStream = destNode.stream;
                 
-                // Play Audio Loop
                 const source = audioCtx.createBufferSource();
                 source.buffer = audioBuf;
                 source.loop = true;
                 source.connect(destNode);
                 source.start(0);
-                setTimeout(() => source.stop(), totalDuration * 1000 + 1000); // Stop slightly after
+                setTimeout(() => source.stop(), totalDuration * 1000 + 1000); 
             }
 
-            // Setup Recorder
-            const stream = canvas.captureStream(30);
+            // --- RECORDING SETUP ---
+            const stream = canvas.captureStream(30); // 30 FPS
             if (audioStream) audioStream.getAudioTracks().forEach(t => stream.addTrack(t));
 
-            // Try MP4, Fallback to WebM
+            // Browser Compatibility Check
             let mimeType = 'video/mp4';
             if (!MediaRecorder.isTypeSupported(mimeType)) {
-                console.warn("MP4 not supported natively, falling back to WebM");
                 mimeType = 'video/webm;codecs=vp9';
             }
 
@@ -369,36 +388,37 @@
                 
                 video.src = url;
                 dl.href = url;
-                // If we fell back to webm, we still name it .mp4 for user convenience (players handle it)
                 dl.download = `flashcards_${format}.mp4`; 
 
                 document.getElementById('resultArea').style.display = 'block';
-                document.getElementById('statusText').innerText = "Done!";
+                statusText.innerText = "Done!";
                 btn.disabled = false;
                 if(audioCtx) audioCtx.close();
             };
 
             recorder.start();
+            statusText.innerText = "Recording...";
             
-            // Animation Loop
+            // --- ANIMATION LOOP ---
             const startTime = Date.now();
             
             function draw() {
                 const elapsed = (Date.now() - startTime) / 1000;
                 const progress = Math.min((elapsed / totalDuration) * 100, 100);
+                
                 document.getElementById('progressFill').style.width = `${progress}%`;
-                document.getElementById('statusText').innerText = `Rendering... ${Math.round(elapsed)}s / ${totalDuration}s`;
+                statusText.innerText = `Rendering frame: ${Math.round(elapsed)}s / ${totalDuration}s`;
 
                 if (elapsed >= totalDuration) {
                     recorder.stop();
                     return;
                 }
 
-                // Determine current image based on variable durations
+                // Determine current image
                 let timePointer = 0;
                 let currentImg = null;
 
-                for (let item of loadedImages) {
+                for (let item of loadedAssets.slides) {
                     if (elapsed >= timePointer && elapsed < timePointer + item.duration) {
                         currentImg = item.img;
                         break;
@@ -407,7 +427,7 @@
                 }
 
                 if (currentImg) {
-                    renderFrame(currentImg, watermarkText, socialHandle);
+                    renderFrame(currentImg);
                 }
                 
                 requestAnimationFrame(draw);
@@ -416,86 +436,94 @@
             draw();
         }
 
-        // --- 3. RENDERING (Draws everything to canvas) ---
-        function renderFrame(img, watermark, handle) {
+        // ==========================================
+        //  3. RENDER FRAME (Fixes InvalidStateError)
+        // ==========================================
+        function renderFrame(img) {
             const w = canvas.width;
             const h = canvas.height;
 
             // 1. Background (Orange)
-            ctx.fillStyle = '#FFA500'; // Orange
+            ctx.fillStyle = '#FFA500'; 
             ctx.fillRect(0, 0, w, h);
 
-            // 2. Draw Image (Contain)
-            drawImageContain(ctx, img, w, h);
+            // 2. Draw Main Image (Contain)
+            if (img && img.complete && img.naturalHeight !== 0) {
+                drawImageContain(ctx, img, w, h);
+            }
 
-            // 3. Watermark (Center)
-            if (watermark) {
+            // 3. Watermark (Fixed Config)
+            if (CONFIG.watermarkText) {
                 ctx.save();
                 ctx.translate(w/2, h/2);
-                ctx.rotate(-Math.PI / 6); // Slant 30 degrees
-                ctx.font = `bold ${w/10}px Arial`; // Dynamic size
-                ctx.fillStyle = "rgba(255, 255, 255, 0.3)";
+                ctx.rotate(-Math.PI / 6); 
+                ctx.font = `bold ${w/10}px Arial`; 
+                ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
                 ctx.textAlign = "center";
-                ctx.fillText(watermark, 0, 0);
+                ctx.fillText(CONFIG.watermarkText, 0, 0);
                 ctx.restore();
             }
 
-            // 4. Logo (Top Right)
-            if (logoImage) {
-                const logoSize = w * 0.15; // 15% of width
+            // 4. Logo (Fixed Asset)
+            if (loadedAssets.brandLogo && loadedAssets.brandLogo.complete) {
+                const logoSize = w * 0.15; 
                 const padding = 20;
-                ctx.drawImage(logoImage, w - logoSize - padding, padding, logoSize, logoSize);
+                ctx.drawImage(loadedAssets.brandLogo, w - logoSize - padding, padding, logoSize, logoSize);
             }
 
-            // 5. Social Media Bar (Bottom)
-            if (handle) {
+            // 5. Social Media Bar (Fixed Config)
+            if (CONFIG.socialHandle) {
                 const barHeight = h * 0.08;
                 const iconSize = barHeight * 0.6;
-                const padding = 20;
                 
-                // Semi-transparent black bar
-                ctx.fillStyle = "rgba(0,0,0,0.7)";
+                ctx.fillStyle = "rgba(0,0,0,0.8)";
                 ctx.fillRect(0, h - barHeight, w, barHeight);
 
-                // Settings
                 ctx.fillStyle = "white";
-                ctx.font = `bold ${barHeight * 0.4}px Arial`;
+                ctx.font = `bold ${barHeight * 0.35}px Arial`;
                 ctx.textBaseline = "middle";
                 ctx.textAlign = "left";
 
-                // Calculate positions to center content
-                const textWidth = ctx.measureText(handle).width;
+                const textWidth = ctx.measureText(CONFIG.socialHandle).width;
                 const gap = 15;
-                const totalContentWidth = (iconSize * 3) + (gap * 3) + textWidth;
-                let startX = (w - totalContentWidth) / 2;
+                const totalWidth = (iconSize * 3) + (gap * 3) + textWidth;
+                
+                let startX = (w - totalWidth) / 2;
                 const centerY = h - (barHeight / 2);
-
-                // Draw Icons & Text
                 const iconY = centerY - (iconSize/2);
                 
-                // FB
-                ctx.drawImage(icons.fb, startX, iconY, iconSize, iconSize);
+                // Draw preloaded icons
+                if(loadedAssets.icons.fb) ctx.drawImage(loadedAssets.icons.fb, startX, iconY, iconSize, iconSize);
                 startX += iconSize + gap;
                 
-                // IG
-                ctx.drawImage(icons.ig, startX, iconY, iconSize, iconSize);
+                if(loadedAssets.icons.ig) ctx.drawImage(loadedAssets.icons.ig, startX, iconY, iconSize, iconSize);
                 startX += iconSize + gap;
                 
-                // YT
-                ctx.drawImage(icons.yt, startX, iconY, iconSize, iconSize);
+                if(loadedAssets.icons.yt) ctx.drawImage(loadedAssets.icons.yt, startX, iconY, iconSize, iconSize);
                 startX += iconSize + gap;
 
-                // Handle Text
-                ctx.fillText(handle, startX, centerY);
+                ctx.fillText(CONFIG.socialHandle, startX, centerY);
             }
         }
 
-        // --- HELPERS ---
-        function loadImage(fileOrBlob) {
-            return new Promise((resolve) => {
+        // ==========================================
+        //  HELPERS
+        // ==========================================
+        function loadImage(srcOrFile) {
+            return new Promise((resolve, reject) => {
                 const img = new Image();
+                img.crossOrigin = "anonymous"; // Important for some external images
                 img.onload = () => resolve(img);
-                img.src = fileOrBlob instanceof Blob ? URL.createObjectURL(fileOrBlob) : fileOrBlob;
+                img.onerror = (e) => {
+                    console.error("Failed to load image:", srcOrFile);
+                    reject(e);
+                };
+                
+                if (srcOrFile instanceof Blob) {
+                    img.src = URL.createObjectURL(srcOrFile);
+                } else {
+                    img.src = srcOrFile;
+                }
             });
         }
 
