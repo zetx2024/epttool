@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocabulary Flashcard Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 { margin-bottom: 10px; color: #ddd; }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      margin-bottom: 20px;
+      border: 1px solid #333;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .btn-gen { background: #e63946; color: white; }
+    .btn-gen:hover { background: #d62839; }
+
+    .btn-dl { background: #457b9d; color: white; }
+    .btn-dl:hover { background: #1d3557; }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      gap: 10px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Vocabulary Challenge Generator</h2>
+  <canvas id="flashcard" width="1080" height="1080"></canvas>
+
+  <div class="controls">
+    <div class="toggle-container">
+      <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
+      <label for="showAnswer">Show Correct Answer</label>
+    </div>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Word</button>
+    <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("flashcard");
+    const ctx = canvas.getContext("2d");
+
+    // --- ASSETS ---
+    const logoUrl = "https://eptonline.org/img/favicon.png";
+    const fbLogo = "https://upload.wikimedia.org/wikipedia/commons/1/16/Facebook-icon-1.png";
+    // Using a generic placeholder for Insta to prevent load errors if the wiki link breaks
+    // You can replace this with your specific uploaded icon
+    const instaLogo = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"; 
+
+    // --- DATA: Vocabulary Challenge ---
+    // Correct index: 0=A, 1=B, 2=C
+    const questions = [
+      {
+        word: "Abundant",
+        options: ["Scarcity", "Plentiful", "Rare"],
+        correctIndex: 1 
+      },
+      {
+        word: "Meticulous",
+        options: ["Careful", "Lazy", "Messy"],
+        correctIndex: 0
+      },
+      {
+        word: "Mitigate",
+        options: ["Increase", "Reduce", "Ignore"],
+        correctIndex: 1
+      },
+      {
+        word: "Formidable",
+        options: ["Weak", "Impressive", "Simple"],
+        correctIndex: 1
+      },
+      {
+        word: "Ambiguous",
+        options: ["Clear", "Unclear", "Fast"],
+        correctIndex: 1
+      }
+    ];
+
+    let currentQuestion = null;
+
+    function getRandomColor() {
+      // Darker, richer gradients for a "Pro" look
+      const colors = ["#2b2d42", "#0f4c5c", "#5f0f40", "#3a0ca3", "#386641", "#bc4749"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.warn("Failed to load image:", url);
+            resolve(null); // Resolve null to prevent crashing
+        };
+        img.src = url;
+      });
+    }
+
+    async function generateFlashcard() {
+      const showAnswer = document.getElementById("showAnswer").checked;
+
+      // Select a random question only if we haven't selected one yet, 
+      // OR if this function was triggered by the "Generate" button (not the checkbox)
+      // Note: For simplicity in this script, we just pick random every time button is clicked.
+      // If checkbox is clicked, we redraw the current question.
+      
+      // Determine if we need a new random question or redraw existing
+      if (!currentQuestion || event && event.type === 'click' && event.target.tagName === 'BUTTON') {
+         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+      }
+
+      const q = currentQuestion;
+
+      // Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Background ---
+      const color1 = getRandomColor();
+      const color2 = "#111111"; // Fade to black at bottom
+      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // --- Header Logo ---
+      const logo = await loadImage(logoUrl);
+      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
+
+      // --- Title ---
+      ctx.fillStyle = "#FFD700"; // Gold color for title
+      ctx.font = "bold 40px 'Segoe UI'";
+      ctx.textAlign = "center";
+      ctx.fillText("VOCABULARY CHALLENGE", canvas.width / 2, 220);
+      
+      ctx.fillStyle = "#aaa";
+      ctx.font = "italic 30px 'Segoe UI'";
+      ctx.fillText("(Find the Synonym)", canvas.width / 2, 270);
+
+      // --- The Target Word ---
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 110px 'Arial'"; // Big Bold Font
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 10;
+      ctx.fillText(`"${q.word}"`, canvas.width / 2, 420);
+      ctx.shadowBlur = 0; // Reset shadow
+
+      // --- Options ---
+      ctx.font = "bold 45px 'Segoe UI'";
+      const startY = 580;
+      const optionLabels = ["A", "B", "C"];
+
+      q.options.forEach((opt, i) => {
+        const y = startY + i * 140; // Spacing
+        const x = 140;
+        const width = 800;
+        const height = 100;
+
+        // Logic for highlighting answer
+        let strokeColor = "white";
+        let fillColor = "transparent";
+        let textColor = "white";
+
+        if (showAnswer) {
+            if (i === q.correctIndex) {
+                strokeColor = "#2a9d8f"; // Green
+                fillColor = "rgba(42, 157, 143, 0.2)";
+                textColor = "#4ecdc4";
+            } else {
+                strokeColor = "#555"; // Dim others
+                textColor = "#777";
+            }
+        }
+
+        // Draw Box
+        ctx.strokeStyle = strokeColor;
+        ctx.fillStyle = fillColor;
+        ctx.lineWidth = 4;
+        
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, 20); // Rounded corners
+        ctx.stroke();
+        ctx.fill();
+
+        // Draw Text (Label + Option)
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "left";
+        ctx.fillText(`${optionLabels[i]})  ${opt}`, x + 40, y + 65);
+      });
+
+      // --- Footer ---
+      ctx.fillStyle = "#fff";
+      ctx.font = "30px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("eptonline.org", 60, 1020);
+
+      // Social Icons
+      const fb = await loadImage(fbLogo);
+      const insta = await loadImage(instaLogo);
+
+      if(fb) {
+          ctx.drawImage(fb, 700, 985, 40, 40);
+          ctx.fillText("@eptonline.org", 750, 1015);
+      }
+      
+      // Removed the Instagram text logic for now as requested layout, 
+      // but if you want it back, uncomment below:
+      /*
+      if(insta) {
+          ctx.drawImage(insta, 700, 930, 40, 40);
+          ctx.fillText("@eptonline_org", 750, 960);
+      }
+      */
+    }
+
+    // Helper for rounded rectangles in canvas
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    }
+
+    function downloadFlashcard() {
+      const link = document.createElement("a");
+      // Include the word in the filename
+      const word = currentQuestion ? currentQuestion.word : "flashcard";
+      link.download = `Vocabulary_${word}_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    // Initialize
+    generateFlashcard();
+  </script>
+</body>
+</html>
