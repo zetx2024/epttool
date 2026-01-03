@@ -483,9 +483,19 @@
                 const vid = document.getElementById('outputVideo');
                 const dl = document.getElementById('downloadLink');
                 
+                // Get current date and time
+                        const now = new Date();
+                        const timestamp = now.getFullYear() + "-" + 
+                      ("0" + (now.getMonth() + 1)).slice(-2) + "-" + 
+                      ("0" + now.getDate()).slice(-2) + "_" + 
+                      ("0" + now.getHours()).slice(-2) + "-" + 
+                      ("0" + now.getMinutes()).slice(-2) + "-" + 
+                      ("0" + now.getSeconds()).slice(-2);
+
                 vid.src = url;
                 dl.href = url;
-                dl.download = `flashcard_video.mp4`; 
+                // Updated filename with timestamp
+                dl.download = `eptonline_video_${timestamp}.mp4`;
 
                 document.getElementById('resultArea').style.display = 'block';
                 status.innerText = "Done!";
