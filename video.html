@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcard Video Studio (Stable)</title>
+    <title>Pro Flashcard Studio (Final)</title>
     <style>
         :root {
-            --primary: #f97316; /* Orange */
+            --primary: #f97316; /* Brand Orange */
             --bg: #fff7ed;
             --surface: #ffffff;
             --text: #1e293b;
@@ -32,7 +32,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
@@ -40,29 +40,37 @@
 
         @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
 
-        .col { display: flex; flex-direction: column; gap: 1.5rem; }
+        .col { display: flex; flex-direction: column; gap: 1.2rem; }
 
         label {
             display: block;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             font-size: 0.9rem;
             color: #431407;
         }
 
-        input[type="file"], select {
+        input[type="file"], select, input[type="text"], input[type="color"] {
             width: 100%;
             padding: 0.6rem;
             border: 1px solid #fdba74;
             border-radius: 6px;
             box-sizing: border-box; 
+            font-family: inherit;
+        }
+
+        /* Grouping Inputs */
+        .input-group {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
         }
 
         /* Playlist Styling */
         .playlist-container {
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            max-height: 400px;
+            height: 300px;
             overflow-y: auto;
             padding: 10px;
             background: #fff;
@@ -86,11 +94,30 @@
         .playlist-item input {
             width: 70px;
             padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
         }
 
-        button {
+        /* Caption Generator Area */
+        .caption-area {
+            grid-column: 1 / -1;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.5rem;
+            box-sizing: border-box;
+            font-family: monospace;
+            margin-top: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
             background-color: var(--primary);
             color: white;
             border: none;
@@ -100,12 +127,31 @@
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 1rem;
             transition: 0.2s;
         }
+        .btn-primary:hover { background-color: #ea580c; }
+        .btn-primary:disabled { background-color: #cbd5e1; cursor: not-allowed; }
 
-        button:hover { background-color: #ea580c; }
-        button:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+        .btn-secondary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffedd5;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #fdba74;
+            cursor: pointer;
+        }
 
         /* Preview Area */
         .preview-area {
@@ -145,7 +191,7 @@
 </head>
 <body>
 
-    <h1>Flashcard Video Studio (Robust)</h1>
+    <h1>Flashcard Video Studio Pro</h1>
 
     <div class="container">
         
@@ -159,41 +205,65 @@
                 </select>
             </div>
 
-            <div style="background: #fff3e0; padding: 10px; border-radius: 6px; font-size: 0.9rem;">
-                <strong>Fixed Settings:</strong><br>
-                Brand: <span id="displayBrand">Loading...</span><br>
-                Watermark: <span id="displayWatermark">Loading...</span>
+            <div class="input-group">
+                <label>2. Design Settings</label>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <span>Background Color:</span>
+                    <input type="color" id="bgColor" value="#f97316" style="width: 50px; padding: 2px; height: 35px;">
+                </div>
+                
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="addOutro" checked> 
+                    <strong>Add "Outro" Slide (3 Secs)</strong>
+                </label>
+                <small style="display:block; margin-top:5px; color:#666;">
+                    Shows centered Logo, Social Links (FB, IG, YT, TikTok), and Website.
+                </small>
             </div>
 
             <div>
-                <label>2. Background Music (Optional)</label>
-                <input type="file" id="audioInput" accept="audio/*">
+                <label>3. Background Music</label>
+                <select id="musicSelect">
+                    <option value="none">No Music</option>
+                    <option value="track1">Dance 4x - TrackTribe (Track 1)</option>
+                    <option value="track2">Diggy - Patrick Patrikios (Track 2)</option>
+                    <option value="track3">The Truth - Anno Domini Beats (Track 3)</option>
+                    <option value="track4">What It Is - Silent Partner (Track 4)</option>
+                </select>
             </div>
         </div>
 
         <div class="col">
             <div>
-                <label>3. Upload Images</label>
+                <label>4. Upload Images</label>
                 <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageUpload()">
             </div>
 
-            <label>4. Playlist & Duration</label>
+            <label>5. Playlist & Duration (Secs per slide)</label>
             <div class="playlist-container" id="playlistContainer">
                 <p style="text-align: center; color: #999; margin-top: 50px;">Upload images to see them here.</p>
             </div>
         </div>
 
+        <div class="caption-area">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Social Media Caption Generator</label>
+                <button class="btn-secondary" onclick="generateCaption()">Generate & Copy</button>
+            </div>
+            <textarea id="captionBox" placeholder="Click 'Generate' to create a caption with your links and hashtags..."></textarea>
+        </div>
+
         <div class="status-bar" id="progressBar"><div class="status-fill" id="progressFill"></div></div>
         <p id="statusText" style="grid-column: 1/-1; text-align: center;"></p>
         
-        <button id="generateBtn" onclick="startGeneration()" style="grid-column: 1/-1;">Generate Video</button>
+        <button id="generateBtn" class="btn-primary" onclick="startGeneration()" style="grid-column: 1/-1;">Generate Video</button>
 
         <div class="preview-area" id="resultArea">
             <h3>Video Ready!</h3>
             <video id="outputVideo" controls playsinline></video>
             <br>
             <a id="downloadLink" href="#" download="video.mp4">
-                <button style="background-color: #16a34a; width: auto; padding: 10px 40px;">Download MP4</button>
+                <button style="background-color: #16a34a; width: auto; padding: 10px 40px; border:none; border-radius:6px; color:white; font-size:1rem; cursor:pointer;">Download MP4</button>
             </a>
         </div>
 
@@ -203,47 +273,50 @@
 
     <script>
         // ==========================================
-        //  USER CONFIGURATION (EDIT HERE)
+        //  1. CONFIGURATION (EDIT HERE)
         // ==========================================
-        const CONFIG = {
-            socialHandle: "@MyStudyChannel",     
-            watermarkText: "PREVIEW VERSION",
-            // Base64 Placeholder Logo (Star). Replace with your own Base64 string if needed.
-            logoBase64: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTIgMiAxNS4wOSA4LjI2IDIyIDkuMjcgMTcgMTQuMTQgMTguMTggMjEuMDIgMTIgMTcuNzcgNS44MiAyMS4wMiA3IDE0LjE0IDIgOS4yNyA4LjkxIDguMjYgMTIgMiIvPjwvc3ZnPg=="
+        
+        // 1.1 Hardcoded Social Handles (Add your real handles here)
+        const SOCIAL_HANDLES = {
+            fb: "eptonline.org",
+            ig: "@eptonline_org",
+            yt: "eptonlineOrg",
+            tiktok: "@eptonline.org" 
         };
 
-        document.getElementById('displayBrand').innerText = CONFIG.socialHandle;
-        document.getElementById('displayWatermark').innerText = CONFIG.watermarkText;
-
-        // ==========================================
-        //  FIXED ASSETS (Simpler SVG Strings)
-        // ==========================================
-        const iconSources = {
-            // Facebook (White 'f' on transparent)
-            fb: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTE4IDJoLTNhNSA1IDAgMCAwLTUgNXYzaC0zdjRoM3Y4aDR2LThoM2wxLTRoLTRWN2ExIDEgMCAwIDEgMS0xaDNyeiIvPjwvc3ZnPg==',
-            // Instagram (White Outline)
-            ig: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNSIgcnk9IjUiPjwvcmVjdD48cGF0aCBkPSJNMTYgMTEuMzdBNCADIDAgMSAxIDEyLjYzIDggNCA0IDAgMCAxIDE2IDExLjM3eiI+PC9wYXRoPjxsaW5lIHgxPSIxNy41IiB5MT0iNi41IiB4Mj0iMTcuNTEiIHkyPSI2LjUiPjwvbGluZT48L3N2Zz4=',
-            // YouTube (White Play Button)
-            yt: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTIyLjU0IDYuNDJjLS4zNi0xLjUzLTEuNTMtMi43My0zLjA2LTMuMDZDMTYuNzYgMyAxMiAzIDEyIDNzLTQuNzYgMC03LjQ4LjM2Yy0xLjUzLjMzLTIuNyAxLjUzLTMuMDYgMy4wNkMwIDEwLjA2IDAgMTIgMCAxMnMwIDEuOTQuMjUgNC41OGMuMzYgMS41MyAxLjUzIDIuNzMgMy4wNiAzLjA2QzcuMjQgMjAgMTIgMjAgMTIgMjBzNC43NiAwIDcuNDgtLjM2YzEuNTMtLjMzIDIuNy0xLjUzIDMuMDYtMy4wNi4yNS0yLjY0LjI1LTQuNTguMjUtNC41OHMwLTEuOTQtLjI1LTQuNTh6TTkuNTQgMTV2LTZsNS43IDN6Ii8+PC9zdmc+'
+        const WEBSITE_URL = "https://eptonline.org";
+        
+        // 1.2 PNG Icon Links
+        const ICONS = {
+            fb: 'https://cdn-icons-png.flaticon.com/512/5968/5968764.png',
+            ig: 'https://cdn-icons-png.flaticon.com/512/3955/3955024.png',
+            yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png',
+            tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'
         };
 
+        // 1.3 Music Tracks (Replace with your local paths or URLs)
+        const MUSIC_TRACKS = {
+            track1: 'path/music1.mp3', 
+            track2: 'path/music2.mp3',
+            track3: 'path/music3.mp3',
+            track4: 'path/music4.mp3'
+        };
+
+        // 1.4 Logo (Base64)
+        const LOGO_BASE64 = "https://zetx2024.github.io/epttool/logo.png";
+
+
         // ==========================================
-        //  GLOBAL VARIABLES
+        //  2. APP LOGIC
         // ==========================================
+
         let playlist = []; 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         
-        const loadedAssets = {
-            brandLogo: null,
-            icons: {},
-            slides: []
-        };
+        const assets = { logo: null, icons: {}, slides: [] };
 
-        // ==========================================
-        //  UI & PLAYLIST
-        // ==========================================
-        async function handleImageUpload() {
+        function handleImageUpload() {
             const input = document.getElementById('imageInput');
             const container = document.getElementById('playlistContainer');
             
@@ -254,11 +327,8 @@
 
             for (let i = 0; i < input.files.length; i++) {
                 const file = input.files[i];
-                const id = `img_${i}`;
-                
-                playlist.push({ file: file, duration: 3, id: id });
+                playlist.push({ file: file, duration: 3 });
 
-                // Create UI
                 const div = document.createElement('div');
                 div.className = 'playlist-item';
                 
@@ -270,38 +340,52 @@
                 name.style.flexGrow = 1;
                 name.style.fontSize = "0.9rem";
 
-                const durLabel = document.createElement('span');
-                durLabel.innerText = "Secs:";
-                durLabel.style.fontSize = "0.8rem";
-
                 const durInput = document.createElement('input');
                 durInput.type = 'number';
                 durInput.value = 3;
                 durInput.min = 1;
                 durInput.step = 0.5;
-                durInput.onchange = (e) => {
-                    const idx = playlist.findIndex(p => p.id === id);
-                    if(idx > -1) playlist[idx].duration = parseFloat(e.target.value);
-                };
+                durInput.addEventListener('change', (e) => {
+                    playlist[i].duration = parseFloat(e.target.value);
+                });
 
                 div.appendChild(img);
                 div.appendChild(name);
-                div.appendChild(durLabel);
                 div.appendChild(durInput);
                 container.appendChild(div);
             }
         }
 
-        // ==========================================
-        //  GENERATION LOGIC
-        // ==========================================
+        // --- CAPTION GENERATOR ---
+        function generateCaption() {
+            let caption = `Comment the right one.\n\n Check out our latest learning resources! 📚\n\n🌐 Visit: ${WEBSITE_URL}\n\n`;
+            
+            if(SOCIAL_HANDLES.fb) caption += `Facebook: ${SOCIAL_HANDLES.fb}\n`;
+            if(SOCIAL_HANDLES.ig) caption += `Instagram: ${SOCIAL_HANDLES.ig}\n`;
+            if(SOCIAL_HANDLES.tiktok) caption += `TikTok: ${SOCIAL_HANDLES.tiktok}\n`;
+            if(SOCIAL_HANDLES.yt) caption += `YouTube: ${SOCIAL_HANDLES.yt}\n`;
+            
+            caption += `\n#Education #Flashcards #StudyTips #EptOnline #Learning #EdTech`;
+
+            const box = document.getElementById('captionBox');
+            box.value = caption;
+            
+            // Copy
+            box.select();
+            navigator.clipboard.writeText(caption)
+                .then(() => alert("Caption copied to clipboard!"))
+                .catch(() => alert("Caption generated (Manual copy required)"));
+        }
+
         async function startGeneration() {
             if (playlist.length === 0) return alert("Please upload images first.");
 
             const format = document.getElementById('format').value;
-            const audioInput = document.getElementById('audioInput');
+            const bgColor = document.getElementById('bgColor').value;
+            const useOutro = document.getElementById('addOutro').checked;
+            const musicChoice = document.getElementById('musicSelect').value;
             const btn = document.getElementById('generateBtn');
-            const statusText = document.getElementById('statusText');
+            const status = document.getElementById('statusText');
 
             // Reset UI
             btn.disabled = true;
@@ -317,129 +401,130 @@
             canvas.width = dims[format].w;
             canvas.height = dims[format].h;
 
-            // --- SAFE ASSET LOADING ---
-            statusText.innerText = "Loading assets...";
+            // --- LOAD ASSETS ---
+            status.innerText = "Loading assets...";
             
-            // Helper to load safely without crashing
-            const safeLoad = async (src, name) => {
-                try {
-                    return await loadImage(src);
-                } catch (e) {
-                    console.warn(`Warning: Could not load ${name}. Skipping.`);
-                    return null; // Return null so we can check later
-                }
-            };
-
-            // 1. Load Fixed Assets
-            loadedAssets.brandLogo = await safeLoad(CONFIG.logoBase64, "Brand Logo");
-            loadedAssets.icons.fb = await safeLoad(iconSources.fb, "Facebook Icon");
-            loadedAssets.icons.ig = await safeLoad(iconSources.ig, "Instagram Icon");
-            loadedAssets.icons.yt = await safeLoad(iconSources.yt, "YouTube Icon");
-
-            // 2. Load User Slides
-            loadedAssets.slides = [];
-            let totalDuration = 0;
+            assets.logo = await safeLoad(LOGO_BASE64);
+            assets.icons.fb = await safeLoad(ICONS.fb);
+            assets.icons.ig = await safeLoad(ICONS.ig);
+            assets.icons.yt = await safeLoad(ICONS.yt);
+            assets.icons.tiktok = await safeLoad(ICONS.tiktok);
+            
+            assets.slides = [];
+            let slidesTotalTime = 0;
             
             for (let item of playlist) {
-                const imgObj = await safeLoad(item.file, item.file.name);
-                if (imgObj) {
-                    loadedAssets.slides.push({
-                        img: imgObj,
-                        duration: item.duration
-                    });
-                    totalDuration += item.duration;
+                const img = await safeLoad(item.file);
+                if (img) {
+                    assets.slides.push({ img, duration: item.duration });
+                    slidesTotalTime += item.duration;
                 }
             }
 
-            if (loadedAssets.slides.length === 0) {
-                alert("No valid images could be loaded.");
+            if(assets.slides.length === 0) {
+                alert("Error: No images loaded.");
                 btn.disabled = false;
                 return;
             }
 
+            // Calc Total Duration
+            const outroDuration = useOutro ? 3 : 0;
+            const finalDuration = slidesTotalTime + outroDuration;
+
             // --- AUDIO SETUP ---
-            let audioCtx, destNode, audioStream;
-            if (audioInput.files.length > 0) {
+            let audioCtx, audioDest, audioStream;
+            
+            if (musicChoice !== 'none') {
                 try {
-                    statusText.innerText = "Processing Audio...";
+                    status.innerText = "Loading Music...";
+                    const trackUrl = MUSIC_TRACKS[musicChoice];
+                    if(trackUrl.includes('path/to/')) {
+                        console.warn("Using dummy music path.");
+                    }
+
+                    const response = await fetch(trackUrl);
+                    if (!response.ok) throw new Error("Music file not found");
+                    const buf = await response.arrayBuffer();
+
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const arrayBuf = await audioInput.files[0].arrayBuffer();
-                    const audioBuf = await audioCtx.decodeAudioData(arrayBuf);
-                    destNode = audioCtx.createMediaStreamDestination();
-                    audioStream = destNode.stream;
+                    const audioBuf = await audioCtx.decodeAudioData(buf);
                     
-                    const source = audioCtx.createBufferSource();
-                    source.buffer = audioBuf;
-                    source.loop = true;
-                    source.connect(destNode);
-                    source.start(0);
-                    setTimeout(() => source.stop(), totalDuration * 1000 + 1000); 
-                } catch (e) {
-                    console.error("Audio failed", e);
+                    audioDest = audioCtx.createMediaStreamDestination();
+                    audioStream = audioDest.stream;
+                    
+                    const src = audioCtx.createBufferSource();
+                    src.buffer = audioBuf;
+                    src.loop = true;
+                    src.connect(audioDest);
+                    src.start(0);
+                    setTimeout(() => {
+                        try { src.stop(); audioCtx.close(); } catch(e){}
+                    }, finalDuration * 1000 + 500); 
+                } catch(e) { 
+                    console.error("Audio Load Error:", e);
+                    // Continue without music if fail
                 }
             }
 
-            // --- RECORDING SETUP ---
+            // --- RECORDING ---
             const stream = canvas.captureStream(30); 
             if (audioStream) audioStream.getAudioTracks().forEach(t => stream.addTrack(t));
 
-            let mimeType = 'video/mp4';
-            if (!MediaRecorder.isTypeSupported(mimeType)) {
-                mimeType = 'video/webm;codecs=vp9';
-            }
+            let mime = 'video/mp4';
+            if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm;codecs=vp9';
 
-            const recorder = new MediaRecorder(stream, { mimeType: mimeType });
+            const recorder = new MediaRecorder(stream, { mimeType: mime });
             const chunks = [];
             
             recorder.ondataavailable = e => chunks.push(e.data);
             recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: mimeType });
+                const blob = new Blob(chunks, { type: mime });
                 const url = URL.createObjectURL(blob);
-                const video = document.getElementById('outputVideo');
+                const vid = document.getElementById('outputVideo');
                 const dl = document.getElementById('downloadLink');
                 
-                video.src = url;
+                vid.src = url;
                 dl.href = url;
-                dl.download = `flashcards_${format}.mp4`; 
+                dl.download = `flashcard_video.mp4`; 
 
                 document.getElementById('resultArea').style.display = 'block';
-                statusText.innerText = "Done!";
+                status.innerText = "Done!";
                 btn.disabled = false;
-                if(audioCtx) audioCtx.close();
             };
 
             recorder.start();
-            statusText.innerText = "Recording...";
-            
-            // --- ANIMATION LOOP ---
+            status.innerText = "Rendering Video...";
+
+            // --- RENDER LOOP ---
             const startTime = Date.now();
             
             function draw() {
                 const elapsed = (Date.now() - startTime) / 1000;
-                const progress = Math.min((elapsed / totalDuration) * 100, 100);
+                const progress = Math.min((elapsed / finalDuration) * 100, 100);
                 
                 document.getElementById('progressFill').style.width = `${progress}%`;
-                statusText.innerText = `Rendering: ${Math.round(elapsed)}s / ${totalDuration}s`;
+                status.innerText = `Rendering: ${elapsed.toFixed(1)}s / ${finalDuration.toFixed(1)}s`;
 
-                if (elapsed >= totalDuration) {
+                if (elapsed >= finalDuration) {
                     recorder.stop();
                     return;
                 }
 
-                // Determine current image
-                let timePointer = 0;
-                let currentImg = null;
-
-                for (let item of loadedAssets.slides) {
-                    if (elapsed >= timePointer && elapsed < timePointer + item.duration) {
-                        currentImg = item.img;
-                        break;
+                if (elapsed < slidesTotalTime) {
+                    // SLIDE PHASE
+                    let timePointer = 0;
+                    let currentImg = null;
+                    for (let s of assets.slides) {
+                        if (elapsed >= timePointer && elapsed < timePointer + s.duration) {
+                            currentImg = s.img;
+                            break;
+                        }
+                        timePointer += s.duration;
                     }
-                    timePointer += item.duration;
-                }
-
-                if (currentImg) {
-                    renderFrame(currentImg);
+                    if (currentImg) renderMainFrame(currentImg, bgColor, format);
+                } else {
+                    // OUTRO PHASE
+                    if (useOutro) renderOutroFrame(bgColor, format);
                 }
                 
                 requestAnimationFrame(draw);
@@ -449,90 +534,183 @@
         }
 
         // ==========================================
-        //  RENDER FRAME
+        //  3. DRAWING FUNCTIONS
         // ==========================================
-        function renderFrame(img) {
+        
+        // --- 1. Main Slide Frame ---
+        function renderMainFrame(img, bgColor, format) {
             const w = canvas.width;
             const h = canvas.height;
 
-            // 1. Background (Orange)
-            ctx.fillStyle = '#FFA500'; 
+            // Background
+            ctx.fillStyle = bgColor; 
             ctx.fillRect(0, 0, w, h);
 
-            // 2. Draw Main Image (Contain)
-            if (img && img.complete) {
-                drawImageContain(ctx, img, w, h);
+            // Image
+            drawImageContain(ctx, img, w, h);
+
+            // Logo (Top Right)
+            if (assets.logo) {
+                const size = w * 0.15; // Scaled to Width
+                const pad = w * 0.02;
+                ctx.drawImage(assets.logo, w - size - pad, pad, size, size);
             }
 
-            // 3. Watermark
-            if (CONFIG.watermarkText) {
-                ctx.save();
-                ctx.translate(w/2, h/2);
-                ctx.rotate(-Math.PI / 6); 
-                ctx.font = `bold ${w/10}px Arial`; 
-                ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
-                ctx.textAlign = "center";
-                ctx.fillText(CONFIG.watermarkText, 0, 0);
-                ctx.restore();
+            // Footer Bar
+            drawSocialBar(ctx, w, h, format);
+        }
+
+        // --- 2. Outro Frame (Centered) ---
+        function renderOutroFrame(bgColor, format) {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, w, h);
+
+            // Setup Text
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            
+            // Adjust vertical positions based on layout
+            let logoY, textY, socialY;
+            
+            if (format === 'story') { // Vertical
+                logoY = h * 0.35;
+                textY = h * 0.5;
+                socialY = h * 0.6; 
+            } else { // Square or Landscape
+                logoY = h * 0.25;
+                textY = h * 0.5;
+                socialY = h * 0.65;
             }
 
-            // 4. Logo (Only if loaded)
-            if (loadedAssets.brandLogo) {
-                const logoSize = w * 0.15; 
-                const padding = 20;
-                ctx.drawImage(loadedAssets.brandLogo, w - logoSize - padding, padding, logoSize, logoSize);
+            // 1. Logo
+            if(assets.logo) {
+                const size = w * 0.25; // 25% of width
+                const x = (w - size) / 2;
+                ctx.drawImage(assets.logo, x, logoY - (size/2), size, size);
             }
 
-            // 5. Social Media Bar
-            if (CONFIG.socialHandle) {
-                const barHeight = h * 0.08;
-                const iconSize = barHeight * 0.6;
-                
-                ctx.fillStyle = "rgba(0,0,0,0.8)";
-                ctx.fillRect(0, h - barHeight, w, barHeight);
+            // 2. Website Text
+            ctx.font = `bold ${w * 0.05}px Arial`;
+            ctx.fillText(WEBSITE_URL, w/2, textY);
 
-                ctx.fillStyle = "white";
-                ctx.font = `bold ${barHeight * 0.35}px Arial`;
-                ctx.textBaseline = "middle";
-                ctx.textAlign = "left";
+            // 3. "Follow Us"
+            ctx.font = `${w * 0.035}px Arial`;
+            ctx.fillText("Follow us for more!", w/2, textY + (w * 0.06));
 
-                const textWidth = ctx.measureText(CONFIG.socialHandle).width;
-                const gap = 15;
-                const totalWidth = (iconSize * 3) + (gap * 3) + textWidth;
-                
-                let startX = (w - totalWidth) / 2;
-                const centerY = h - (barHeight / 2);
-                const iconY = centerY - (iconSize/2);
-                
-                // Only draw icons that successfully loaded
-                if(loadedAssets.icons.fb) ctx.drawImage(loadedAssets.icons.fb, startX, iconY, iconSize, iconSize);
-                startX += iconSize + gap;
-                
-                if(loadedAssets.icons.ig) ctx.drawImage(loadedAssets.icons.ig, startX, iconY, iconSize, iconSize);
-                startX += iconSize + gap;
-                
-                if(loadedAssets.icons.yt) ctx.drawImage(loadedAssets.icons.yt, startX, iconY, iconSize, iconSize);
-                startX += iconSize + gap;
+            // 4. Centered Socials
+            drawCenteredSocials(ctx, w, h, socialY);
+        }
 
-                ctx.fillText(CONFIG.socialHandle, startX, centerY);
+        // --- 3. Footer Bar (Dynamic Resizing) ---
+        function drawSocialBar(ctx, w, h, format) {
+            let barHeight = w * 0.08; 
+            // Clamp min/max for extreme aspect ratios
+            if (format === 'youtube') barHeight = h * 0.12; 
+            
+            const fontSize = barHeight * 0.35;
+            const iconSize = barHeight * 0.5;
+
+            // Draw Bar Background
+            ctx.fillStyle = "rgba(0,0,0,0.8)";
+            ctx.fillRect(0, h - barHeight, w, barHeight);
+
+            // Draw Items
+            const startY = h - (barHeight/2);
+            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize, true);
+        }
+
+        // --- 4. Centered Socials (For Outro) ---
+        function drawCenteredSocials(ctx, w, h, startY) {
+            const iconSize = w * 0.08; 
+            const fontSize = w * 0.05; 
+            
+            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize, false);
+        }
+
+        // Helper to draw handles horizontally with Auto-Scaling
+        function drawHorizontalHandles(ctx, w, centerY, iconSize, fontSize, isFooter) {
+            
+            // Prepare active items
+            const items = [];
+            const hList = SOCIAL_HANDLES;
+            if (hList.fb) items.push({ icon: assets.icons.fb, text: hList.fb });
+            if (hList.ig) items.push({ icon: assets.icons.ig, text: hList.ig });
+            if (hList.tiktok) items.push({ icon: assets.icons.tiktok, text: hList.tiktok });
+            if (hList.yt) items.push({ icon: assets.icons.yt, text: hList.yt });
+
+            if(items.length === 0) return;
+
+            // 1. Calculate ideal width
+            let gap = w * 0.04;
+            ctx.font = `bold ${fontSize}px Arial`;
+            
+            let totalWidth = 0;
+            items.forEach(item => {
+                const textW = ctx.measureText(item.text).width;
+                totalWidth += iconSize + (gap/2) + textW;
+            });
+            totalWidth += (items.length - 1) * gap;
+
+            // 2. SCALE TO FIT (Crucial for Reels/Stories)
+            // If totalWidth > 90% of screen, scale everything down
+            const safeWidth = w * 0.95; 
+            let scale = 1;
+
+            if (totalWidth > safeWidth) {
+                scale = safeWidth / totalWidth;
+                // Apply scale
+                iconSize *= scale;
+                fontSize *= scale;
+                gap *= scale;
+                // Recalculate total width with new scale to center correctly
+                ctx.font = `bold ${fontSize}px Arial`; // Reset font with new size
+                totalWidth = 0;
+                items.forEach(item => {
+                    const textW = ctx.measureText(item.text).width;
+                    totalWidth += iconSize + (gap/2) + textW;
+                });
+                totalWidth += (items.length - 1) * gap;
             }
+
+            // 3. Draw
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "white";
+
+            let currentX = (w - totalWidth) / 2;
+
+            items.forEach(item => {
+                // Icon
+                if (item.icon) {
+                    ctx.drawImage(item.icon, currentX, centerY - (iconSize/2), iconSize, iconSize);
+                }
+                currentX += iconSize + (gap/2);
+                
+                // Text
+                ctx.fillText(item.text, currentX, centerY);
+                currentX += ctx.measureText(item.text).width + gap;
+            });
         }
 
         // ==========================================
         //  HELPERS
         // ==========================================
-        function loadImage(srcOrFile) {
-            return new Promise((resolve, reject) => {
+        async function safeLoad(src) {
+            if(!src) return null;
+            return new Promise(resolve => {
                 const img = new Image();
-                img.crossOrigin = "anonymous";
+                img.crossOrigin = "anonymous"; 
                 img.onload = () => resolve(img);
-                img.onerror = (e) => reject(e); // This triggers the catch block in safeLoad
-                
-                if (srcOrFile instanceof Blob) {
-                    img.src = URL.createObjectURL(srcOrFile);
-                } else {
-                    img.src = srcOrFile;
+                img.onerror = () => {
+                    console.warn("Failed to load image:", src);
+                    resolve(null);
                 }
+                if (src instanceof Blob) img.src = URL.createObjectURL(src);
+                else img.src = src;
             });
         }
 
