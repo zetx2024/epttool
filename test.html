@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Flashcard Studio (Final)</title>
+    <style>
+        :root {
+            --primary: #f97316; /* Brand Orange */
+            --bg: #fff7ed;
+            --surface: #ffffff;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 { margin-bottom: 1rem; color: #c2410c; }
+
+        .container {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+
+        .col { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: #431407;
+        }
+
+        input[type="file"], select, input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #fdba74;
+            border-radius: 6px;
+            box-sizing: border-box; 
+            font-family: inherit;
+        }
+
+        /* Grouping Inputs */
+        .input-group {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        /* Playlist Styling */
+        .playlist-container {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .playlist-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .playlist-item input {
+            width: 70px;
+            padding: 5px;
+        }
+
+        /* Caption Generator Area */
+        .caption-area {
+            grid-column: 1 / -1;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.5rem;
+            box-sizing: border-box;
+            font-family: monospace;
+            margin-top: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { background-color: #ea580c; }
+        .btn-primary:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+
+        .btn-secondary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffedd5;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #fdba74;
+            cursor: pointer;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            grid-column: 1 / -1;
+            text-align: center;
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px dashed #fdba74;
+        }
+
+        video {
+            max-width: 100%;
+            max-height: 500px;
+            border: 4px solid #000;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .status-bar {
+            grid-column: 1 / -1;
+            background: #e2e8f0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+        }
+        .status-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--primary);
+            transition: width 0.1s linear;
+        }
+        
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>Flashcard Video Studio Pro</h1>
+
+    <div class="container">
+        
+        <div class="col">
+            <div>
+                <label>1. Video Format</label>
+                <select id="format">
+                    <option value="feed">Instagram Feed (1080x1080)</option>
+                    <option value="story">Story / Reels / TikTok (1080x1920)</option>
+                    <option value="youtube">YouTube Landscape (1920x1080)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>2. Social Media Handles (Leave empty to hide)</label>
+                <input type="text" id="fbHandle" placeholder="Facebook Name" style="margin-bottom:5px;">
+                <input type="text" id="igHandle" placeholder="Instagram Name" style="margin-bottom:5px;">
+                <input type="text" id="ytHandle" placeholder="YouTube Channel Name">
+            </div>
+
+            <div class="input-group">
+                <label>3. Design Settings</label>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <span>Background Color:</span>
+                    <input type="color" id="bgColor" value="#f97316" style="width: 50px; padding: 2px; height: 35px;">
+                </div>
+                
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="addOutro"> 
+                    <strong>Add "Outro" Slide (3 Secs)</strong>
+                </label>
+                <small style="display:block; margin-top:5px; color:#666;">
+                    Shows eptonline.org, Logo, and Links on solid background.
+                </small>
+            </div>
+
+            <div>
+                <label>4. Background Music (Optional)</label>
+                <input type="file" id="audioInput" accept="audio/*">
+            </div>
+        </div>
+
+        <div class="col">
+            <div>
+                <label>5. Upload Images</label>
+                <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageUpload()">
+            </div>
+
+            <label>6. Playlist & Duration (Secs per slide)</label>
+            <div class="playlist-container" id="playlistContainer">
+                <p style="text-align: center; color: #999; margin-top: 50px;">Upload images to see them here.</p>
+            </div>
+        </div>
+
+        <div class="caption-area">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Social Media Caption Generator</label>
+                <button class="btn-secondary" onclick="generateCaption()">Generate & Copy</button>
+            </div>
+            <textarea id="captionBox" placeholder="Click 'Generate' to create a caption with your links and hashtags..."></textarea>
+        </div>
+
+        <div class="status-bar" id="progressBar"><div class="status-fill" id="progressFill"></div></div>
+        <p id="statusText" style="grid-column: 1/-1; text-align: center;"></p>
+        
+        <button id="generateBtn" class="btn-primary" onclick="startGeneration()" style="grid-column: 1/-1;">Generate Video</button>
+
+        <div class="preview-area" id="resultArea">
+            <h3>Video Ready!</h3>
+            <video id="outputVideo" controls playsinline></video>
+            <br>
+            <a id="downloadLink" href="#" download="video.mp4">
+                <button style="background-color: #16a34a; width: auto; padding: 10px 40px; border:none; border-radius:6px; color:white; font-size:1rem; cursor:pointer;">Download MP4</button>
+            </a>
+        </div>
+
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // ==========================================
+        //  CONFIG & ASSETS
+        // ==========================================
+        const WEBSITE_URL = "https://eptonline.org";
+        
+        // Base64 Logo (Placeholder Star - Replace with your logo base64 if needed)
+        const LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTIgMiAxNS4wOSA4LjI2IDIyIDkuMjcgMTcgMTQuMTQgMTguMTggMjEuMDIgMTIgMTcuNzcgNS44MiAyMS4wMiA3IDE0LjE0IDIgOS4yNyA4LjkxIDguMjYgMTIgMiIvPjwvc3ZnPg==";
+
+        const ICONS = {
+            fb: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTE4IDJoLTNhNSA1IDAgMCAwLTUgNXYzaC0zdjRoM3Y4aDR2LThoM2wxLTRoLTRWN2ExIDEgMCAwIDEgMS0xaDNyeiIvPjwvc3ZnPg==',
+            ig: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiByeD0iNSIgcnk9IjUiPjwvcmVjdD48cGF0aCBkPSJNMTYgMTEuMzdBNCADIDAgMSAxIDEyLjYzIDggNCA0IDAgMCAxIDE2IDExLjM3eiI+PC9wYXRoPjxsaW5lIHgxPSIxNy41IiB5MT0iNi41IiB4Mj0iMTcuNTEiIHkyPSI2LjUiPjwvbGluZT48L3N2Zz4=',
+            yt: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+PHBhdGggZD0iTTIyLjU0IDYuNDJjLS4zNi0xLjUzLTEuNTMtMi43My0zLjA2LTMuMDZDMTYuNzYgMyAxMiAzIDEyIDNzLTQuNzYgMC03LjQ4LjM2Yy0xLjUzLjMzLTIuNyAxLjUzLTMuMDYgMy4wNkMwIDEwLjA2IDAgMTIgMCAxMnMwIDEuOTQuMjUgNC41OGMuMzYgMS41MyAxLjUzIDIuNzMgMy4wNiAzLjA2QzcuMjQgMjAgMTIgMjAgMTIgMjBzNC43NiAwIDcuNDgtLjM2YzEuNTMtLjMzIDIuNy0xLjUzIDMuMDYtMy4wNi4yNS0yLjY0LjI1LTQuNTguMjUtNC41OHMwLTEuOTQtLjI1LTQuNTh6TTkuNTQgMTV2LTZsNS43IDN6Ii8+PC9zdmc+'
+        };
+
+        let playlist = []; 
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        const assets = { logo: null, icons: {}, slides: [] };
+
+        // ==========================================
+        //  1. UI LOGIC
+        // ==========================================
+        function handleImageUpload() {
+            const input = document.getElementById('imageInput');
+            const container = document.getElementById('playlistContainer');
+            
+            if(input.files.length > 0) {
+                container.innerHTML = ''; 
+                playlist = [];
+            }
+
+            for (let i = 0; i < input.files.length; i++) {
+                const file = input.files[i];
+                playlist.push({ file: file, duration: 3 });
+
+                const div = document.createElement('div');
+                div.className = 'playlist-item';
+                
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                
+                const name = document.createElement('span');
+                name.innerText = file.name.substring(0, 15) + "...";
+                name.style.flexGrow = 1;
+                name.style.fontSize = "0.9rem";
+
+                const durInput = document.createElement('input');
+                durInput.type = 'number';
+                durInput.value = 3;
+                durInput.min = 1;
+                durInput.step = 0.5;
+                durInput.addEventListener('change', (e) => {
+                    playlist[i].duration = parseFloat(e.target.value);
+                });
+
+                div.appendChild(img);
+                div.appendChild(name);
+                div.appendChild(durInput);
+                container.appendChild(div);
+            }
+        }
+
+        function generateCaption() {
+            const fb = document.getElementById('fbHandle').value;
+            const ig = document.getElementById('igHandle').value;
+            const yt = document.getElementById('ytHandle').value;
+            
+            let caption = `Check out our latest learning resources! 📚\n\n🌐 Visit: ${WEBSITE_URL}\n\n`;
+            
+            if(fb) caption += `Facebook: ${fb}\n`;
+            if(ig) caption += `Instagram: ${ig}\n`;
+            if(yt) caption += `YouTube: ${yt}\n`;
+            
+            caption += `\n#Education #Flashcards #StudyTips #EptOnline #Learning`;
+
+            const box = document.getElementById('captionBox');
+            box.value = caption;
+            
+            // Copy to clipboard
+            box.select();
+            navigator.clipboard.writeText(caption)
+                .then(() => alert("Caption copied to clipboard!"))
+                .catch(() => alert("Caption generated (Manual copy required)"));
+        }
+
+        // ==========================================
+        //  2. GENERATION LOGIC
+        // ==========================================
+        async function startGeneration() {
+            if (playlist.length === 0) return alert("Please upload images first.");
+
+            const format = document.getElementById('format').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const useOutro = document.getElementById('addOutro').checked;
+            const audioInput = document.getElementById('audioInput');
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('statusText');
+
+            // Gather Social Handles
+            const handles = {
+                fb: document.getElementById('fbHandle').value,
+                ig: document.getElementById('igHandle').value,
+                yt: document.getElementById('ytHandle').value
+            };
+
+            // Reset UI
+            btn.disabled = true;
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+
+            // Set Canvas Dimensions
+            const dims = {
+                feed: { w: 1080, h: 1080 },
+                story: { w: 1080, h: 1920 },
+                youtube: { w: 1920, h: 1080 }
+            };
+            canvas.width = dims[format].w;
+            canvas.height = dims[format].h;
+
+            // --- LOAD ASSETS ---
+            status.innerText = "Loading assets...";
+            
+            assets.logo = await safeLoad(LOGO_BASE64);
+            assets.icons.fb = await safeLoad(ICONS.fb);
+            assets.icons.ig = await safeLoad(ICONS.ig);
+            assets.icons.yt = await safeLoad(ICONS.yt);
+            
+            assets.slides = [];
+            let slidesTotalTime = 0;
+            
+            for (let item of playlist) {
+                const img = await safeLoad(item.file);
+                if (img) {
+                    assets.slides.push({ img, duration: item.duration });
+                    slidesTotalTime += item.duration;
+                }
+            }
+
+            if(assets.slides.length === 0) {
+                alert("Error: No images loaded.");
+                btn.disabled = false;
+                return;
+            }
+
+            // Calc Total Duration (Slides + Outro)
+            const outroDuration = useOutro ? 3 : 0;
+            const finalDuration = slidesTotalTime + outroDuration;
+
+            // --- AUDIO ---
+            let audioCtx, audioDest, audioStream;
+            if (audioInput.files.length > 0) {
+                try {
+                    status.innerText = "Processing Audio...";
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const buf = await audioInput.files[0].arrayBuffer();
+                    const audioBuf = await audioCtx.decodeAudioData(buf);
+                    audioDest = audioCtx.createMediaStreamDestination();
+                    audioStream = audioDest.stream;
+                    
+                    const src = audioCtx.createBufferSource();
+                    src.buffer = audioBuf;
+                    src.loop = true;
+                    src.connect(audioDest);
+                    src.start(0);
+                    // Stop audio a bit after video ends
+                    setTimeout(() => src.stop(), finalDuration * 1000 + 500); 
+                } catch(e) { console.error(e); }
+            }
+
+            // --- RECORDING ---
+            const stream = canvas.captureStream(30); 
+            if (audioStream) audioStream.getAudioTracks().forEach(t => stream.addTrack(t));
+
+            let mime = 'video/mp4';
+            if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm;codecs=vp9';
+
+            const recorder = new MediaRecorder(stream, { mimeType: mime });
+            const chunks = [];
+            
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: mime });
+                const url = URL.createObjectURL(blob);
+                const vid = document.getElementById('outputVideo');
+                const dl = document.getElementById('downloadLink');
+                
+                vid.src = url;
+                dl.href = url;
+                dl.download = `eptonline_video.mp4`; 
+
+                document.getElementById('resultArea').style.display = 'block';
+                status.innerText = "Done!";
+                btn.disabled = false;
+                if(audioCtx) audioCtx.close();
+            };
+
+            recorder.start();
+            status.innerText = "Rendering Video...";
+
+            // --- RENDER LOOP ---
+            const startTime = Date.now();
+            
+            function draw() {
+                const elapsed = (Date.now() - startTime) / 1000;
+                const progress = Math.min((elapsed / finalDuration) * 100, 100);
+                
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                status.innerText = `Rendering: ${elapsed.toFixed(1)}s / ${finalDuration.toFixed(1)}s`;
+
+                if (elapsed >= finalDuration) {
+                    recorder.stop();
+                    return;
+                }
+
+                // Logic: Are we in Slide phase or Outro phase?
+                if (elapsed < slidesTotalTime) {
+                    // SLIDE PHASE
+                    let timePointer = 0;
+                    let currentImg = null;
+                    for (let s of assets.slides) {
+                        if (elapsed >= timePointer && elapsed < timePointer + s.duration) {
+                            currentImg = s.img;
+                            break;
+                        }
+                        timePointer += s.duration;
+                    }
+                    if (currentImg) renderMainFrame(currentImg, bgColor, handles);
+                } else {
+                    // OUTRO PHASE (Only if checked)
+                    if (useOutro) renderOutroFrame(bgColor, handles);
+                }
+                
+                requestAnimationFrame(draw);
+            }
+            
+            draw();
+        }
+
+        // ==========================================
+        //  3. DRAWING FUNCTIONS
+        // ==========================================
+        function renderMainFrame(img, bgColor, handles) {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // 1. Background (Custom Color)
+            ctx.fillStyle = bgColor; 
+            ctx.fillRect(0, 0, w, h);
+
+            // 2. Image (Contain)
+            drawImageContain(ctx, img, w, h);
+
+            // 3. Logo (Top Right)
+            if (assets.logo) {
+                const size = w * 0.15;
+                const pad = 20;
+                ctx.drawImage(assets.logo, w - size - pad, pad, size, size);
+            }
+
+            // 4. Social Bar (Only if handles exist)
+            drawSocialBar(ctx, w, h, handles);
+        }
+
+        function renderOutroFrame(bgColor, handles) {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Solid Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, w, h);
+
+            // Center Info
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            
+            // Logo Center
+            if(assets.logo) {
+                const size = w * 0.3;
+                const x = (w - size) / 2;
+                const y = h * 0.2;
+                ctx.drawImage(assets.logo, x, y, size, size);
+            }
+
+            // Website Text
+            ctx.font = `bold ${w * 0.06}px Arial`;
+            ctx.fillText(WEBSITE_URL, w/2, h * 0.55);
+
+            // "Follow Us"
+            ctx.font = `${w * 0.04}px Arial`;
+            ctx.fillText("Follow us for more!", w/2, h * 0.62);
+
+            // Socials at bottom
+            drawSocialBar(ctx, w, h, handles);
+        }
+
+        function drawSocialBar(ctx, w, h, handles) {
+            // Check if any handle exists
+            if (!handles.fb && !handles.ig && !handles.yt) return;
+
+            const barHeight = h * 0.1; // 10% of height
+            const iconSize = barHeight * 0.4; // Icons fit inside
+            
+            // Semi-transparent Bar
+            ctx.fillStyle = "rgba(0,0,0,0.8)";
+            ctx.fillRect(0, h - barHeight, w, barHeight);
+
+            // Prepare for drawing
+            ctx.fillStyle = "white";
+            ctx.font = `bold ${barHeight * 0.3}px Arial`;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+
+            // Layout Calculation: Simple horizontal stacking
+            // We'll just draw them in a row. If text is long, canvas clips it, but for social handles usually ok.
+            
+            // Calculate total width approx to center it
+            // This is hard to do perfectly dynamically without complex logic, 
+            // so we will start from a fixed left margin or center based on assumptions.
+            // Let's use a flexible flex-box style logic manually.
+            
+            const activeItems = [];
+            if(handles.fb) activeItems.push({ icon: assets.icons.fb, text: handles.fb });
+            if(handles.ig) activeItems.push({ icon: assets.icons.ig, text: handles.ig });
+            if(handles.yt) activeItems.push({ icon: assets.icons.yt, text: handles.yt });
+
+            const gap = w * 0.05; // 5% gap
+            const startY = h - (barHeight/2);
+            
+            // Calculate total width
+            let totalW = 0;
+            activeItems.forEach(item => {
+                const tw = ctx.measureText(item.text).width;
+                totalW += iconSize + 10 + tw; 
+            });
+            totalW += (activeItems.length - 1) * gap;
+
+            let currentX = (w - totalW) / 2; // Center alignment
+
+            activeItems.forEach(item => {
+                // Draw Icon
+                if(item.icon) ctx.drawImage(item.icon, currentX, startY - (iconSize/2), iconSize, iconSize);
+                
+                // Draw Text
+                currentX += iconSize + 10;
+                ctx.fillText(item.text, currentX, startY);
+                
+                // Advance
+                currentX += ctx.measureText(item.text).width + gap;
+            });
+        }
+
+        // ==========================================
+        //  HELPERS
+        // ==========================================
+        async function safeLoad(src) {
+            if(!src) return null;
+            return new Promise(resolve => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null); // Resolve null on error to prevent crash
+                if (src instanceof Blob) img.src = URL.createObjectURL(src);
+                else img.src = src;
+            });
+        }
+
+        function drawImageContain(ctx, img, targetW, targetH) {
+            const imgRatio = img.width / img.height;
+            const targetRatio = targetW / targetH;
+            let drawW, drawH;
+
+            if (imgRatio > targetRatio) {
+                drawW = targetW;
+                drawH = targetW / imgRatio;
+            } else {
+                drawW = targetH * imgRatio;
+                drawH = targetH;
+            }
+            const x = (targetW - drawW) / 2;
+            const y = (targetH - drawH) / 2;
+            ctx.drawImage(img, x, y, drawW, drawH);
+        }
+    </script>
+</body>
+</html>
