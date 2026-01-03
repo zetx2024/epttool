@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grammar Spot the Mistake Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 { margin-bottom: 10px; color: #ddd; }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      margin-bottom: 20px;
+      border: 1px solid #333;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .btn-gen { background: #e63946; color: white; }
+    .btn-gen:hover { background: #d62839; }
+
+    .btn-dl { background: #457b9d; color: white; }
+    .btn-dl:hover { background: #1d3557; }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      gap: 10px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* --- New Caption Styles --- */
+    .caption-container {
+      background: #252525;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #333;
+    }
+
+    .caption-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .caption-label {
+      color: #FFD700;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      background: #121212;
+      border: 1px solid #444;
+      color: #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: 'Segoe UI', monospace;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box; /* Fix padding issue */
+    }
+
+    .btn-copy {
+      background: #2a9d8f;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .btn-copy:hover { background: #21867a; }
+
+  </style>
+</head>
+<body>
+
+  <h2>Spot the Mistake Generator</h2>
+  <canvas id="flashcard" width="1080" height="1080"></canvas>
+
+  <div class="controls">
+    <div class="toggle-container">
+      <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
+      <label for="showAnswer">Show Correct Answer</label>
+    </div>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Sentence</button>
+    <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
+  </div>
+
+  <div class="caption-container">
+    <div class="caption-header">
+      <span class="caption-label">📱 Social Media Caption</span>
+      <button class="btn-copy" onclick="copyCaption()" id="copyBtn">📋 Copy Caption</button>
+    </div>
+    <textarea id="socialCaption" readonly></textarea>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("flashcard");
+    const ctx = canvas.getContext("2d");
+
+    // --- ASSETS ---
+    const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
+    const fbLogo = "https://zetx2024.github.io/epttool/logo/facebook.png";
+    const ytLogo = "https://zetx2024.github.io/epttool/logo/youtube.png";
+    const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
+    const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
+
+    // --- DATA: Spot the Mistake ---
+    const questions = [
+      {
+        incorrect: "I have finished my work two hours ago.",
+        correct: "I finished my work two hours ago.",
+        explanation: "(Past time থাকলে Past Indefinite হয়)।"
+      },
+      {
+        incorrect: "She don't like to drink coffee.",
+        correct: "She doesn't like to drink coffee.",
+        explanation: "(Third person singular number-এর সাথে doesn't হয়)।" 
+      },
+      {
+        incorrect: "Every students must attend the exam.",
+        correct: "Every student must attend the exam.",
+        explanation: "(Every-র পর singular noun হয়)।"
+      },
+      {
+        incorrect: "I am looking forward to meet you.",
+        correct: "I am looking forward to meeting you.",
+        explanation: "(To-র পর সাধারণত base form বসলেও 'looking forward to' এর পর ing হয়)।"
+      },
+      {
+        incorrect: "He is more taller than his brother.",
+        correct: "He is taller than his brother.",
+        explanation: "(Double comparative হয় না)।"
+      }
+    ];
+
+    let currentQuestion = null;
+
+    function getRandomColor() {
+      const colors = ["#c7aa85", "#c7aa85", "#c7aa85"]; 
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.warn("Failed to load image:", url);
+            resolve(null);
+        };
+        img.src = url;
+      });
+    }
+
+    // --- CAPTION GENERATION LOGIC ---
+    function generateSocialCaption(questionData) {
+        const headline = "🧠 Grammar Challenge! Can you spot the mistake? 🧐";
+        
+        // Contextual hashtags based on explanation content
+        let specificTags = [];
+        const expl = questionData.explanation.toLowerCase();
+        
+        if(expl.includes("past") || expl.includes("ago")) specificTags.push("#PastTense");
+        if(expl.includes("singular") || expl.includes("plural")) specificTags.push("#SingularPlural");
+        if(expl.includes("comparative")) specificTags.push("#Adjectives");
+        if(expl.includes("verb") || expl.includes("ing")) specificTags.push("#Verbs");
+        if(expl.includes("preposition")) specificTags.push("#Prepositions");
+        if(specificTags.length === 0) specificTags.push("#GrammarRules"); // Fallback
+
+        // Random pool hashtags
+        const pool = ["#IELTS", "#TOEFL", "#DET", "#PTE", "#English", "#EnglishLearning", "#StudyAbroad"];
+        // Shuffle and pick 4
+        const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 4);
+        
+        const allTags = [...specificTags, "#eptonline", ...shuffled].join(" ");
+
+        const caption = `${headline}
+
+❌ Incorrect: "${questionData.incorrect}"
+
+✅ What is the correct sentence? Comment your answer below! 👇
+
+🔗 Practice more at: eptonline.org
+Follow us: @eptonline.org
+
+${allTags}`;
+
+        document.getElementById("socialCaption").value = caption;
+        
+        // Reset copy button text
+        const btn = document.getElementById("copyBtn");
+        btn.innerHTML = "📋 Copy Caption";
+        btn.style.background = "#2a9d8f";
+    }
+
+    function copyCaption() {
+        const copyText = document.getElementById("socialCaption");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /* For mobile devices */
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            const btn = document.getElementById("copyBtn");
+            btn.innerHTML = "✅ Copied!";
+            btn.style.background = "#27ae60";
+        });
+    }
+
+    async function generateFlashcard() {
+      const showAnswer = document.getElementById("showAnswer").checked;
+
+      // Select random question logic
+      // Only pick new question if current is null OR triggered by button click
+      if (!currentQuestion || (window.event && window.event.type === 'click' && window.event.target.classList.contains('btn-gen'))) {
+         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+      }
+
+      const q = currentQuestion;
+
+      // Update the Social Media Caption
+      generateSocialCaption(q);
+
+      // Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Background ---
+      const color1 = getRandomColor();
+      const color2 = "#c76e08"; 
+      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // --- Header Logo ---
+      const logo = await loadImage(logoUrl);
+      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
+
+      // --- Main Title ---
+      ctx.fillStyle = "#FFD700"; // Gold
+      ctx.font = "bold 50px 'Segoe UI'";
+      ctx.textAlign = "center";
+      ctx.fillText("SPOT THE MISTAKE", canvas.width / 2, 230);
+      
+      ctx.fillStyle = "#cccccc";
+      ctx.font = "italic 30px 'Segoe UI'";
+      ctx.fillText("(Grammar Challenge)", canvas.width / 2, 280);
+
+      // ===========================
+      // DRAW INCORRECT SENTENCE
+      // ===========================
+      
+      // Label
+      ctx.fillStyle = "#ff4d4d"; 
+      ctx.font = "bold 35px 'Arial'";
+      ctx.fillText("INCORRECT?", canvas.width / 2, 380);
+
+      // The Sentence Box
+      ctx.fillStyle = "#222";
+      ctx.strokeStyle = "#ff4d4d";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(140, 410, 800, 200, 20); 
+      ctx.fill();
+      ctx.stroke();
+
+      // The Sentence Text
+      ctx.fillStyle = "white";
+      ctx.font = "50px 'Segoe UI'";
+      ctx.textAlign = "center"; 
+      
+      const words = q.incorrect.split(" ");
+      let line1 = "";
+      let line2 = "";
+      
+      if (ctx.measureText(q.incorrect).width > 750) {
+          const mid = Math.floor(words.length / 2);
+          line1 = words.slice(0, mid).join(" ");
+          line2 = words.slice(mid).join(" ");
+          ctx.fillText(`"${line1}`, canvas.width / 2, 490);
+          ctx.fillText(`${line2}"`, canvas.width / 2, 550);
+      } else {
+          ctx.fillText(`"${q.incorrect}"`, canvas.width / 2, 520);
+      }
+
+      // ===========================
+      // DRAW ANSWER SECTION
+      // ===========================
+
+      if (showAnswer) {
+        // Label
+        ctx.fillStyle = "#4ecdc4"; 
+        ctx.font = "bold 35px 'Arial'";
+        ctx.fillText("CORRECT:", canvas.width / 2, 680);
+
+        // The Sentence Box
+        ctx.fillStyle = "#222";
+        ctx.strokeStyle = "#4ecdc4";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(140, 710, 800, 200, 20); 
+        ctx.fill();
+        ctx.stroke();
+
+        // The Correct Sentence Text
+        ctx.fillStyle = "white";
+        ctx.font = "bold 50px 'Segoe UI'";
+        
+        if (ctx.measureText(q.correct).width > 750) {
+            const wordsC = q.correct.split(" ");
+            const midC = Math.floor(wordsC.length / 2);
+            ctx.fillText(`"${wordsC.slice(0, midC).join(" ")}`, canvas.width / 2, 790);
+            ctx.fillText(`${wordsC.slice(midC).join(" ")}"`, canvas.width / 2, 850);
+        } else {
+            ctx.fillText(`"${q.correct}"`, canvas.width / 2, 820);
+        }
+
+        // The Explanation Rule (Bangla)
+        ctx.fillStyle = "#f1c40f"; 
+        ctx.font = "italic 30px 'Segoe UI'"; 
+        ctx.fillText(q.explanation, canvas.width / 2, 950);
+
+      } else {
+        // Placeholder if answer is hidden
+        ctx.fillStyle = "white";
+        ctx.font = "bold 40px 'Segoe UI'";
+        ctx.fillText("?", canvas.width / 2, 800);
+        ctx.font = "40px 'Segoe UI'";
+        ctx.fillText("(Comment Down the 'Right Answer')", canvas.width / 2, 840);
+      }
+
+      // --- Footer ---
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "15px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Practice More:", 70, 1020);
+      
+      const fb = await loadImage(fbLogo);
+      const insta = await loadImage(instaLogo);
+      const yt = await loadImage(ytLogo);
+      const webIcon = await loadImage(webLogoUrl);
+      
+      if (webIcon) {
+          ctx.drawImage(webIcon, 50, 1020, 24, 24);
+          ctx.font = "bold 20px Arial";
+          ctx.fillStyle = "white"; 
+          ctx.fillText("eptonline.org", 80, 1040); 
+      }
+      
+      if(fb) {
+          ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline.org", 905, 1005); 
+      }
+
+      if(insta) {
+          ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline_org", 905, 1029);
+      }
+
+      if(yt) {
+          ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonlineOrg", 905, 1053);
+      }
+    }
+
+    // Helper for rounded rectangles
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    }
+
+    function downloadFlashcard() {
+      const link = document.createElement("a");
+      const name = currentQuestion ? currentQuestion.incorrect.substring(0, 10).replace(/ /g, "_") : "grammar";
+      link.download = `Grammar_${name}_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    // Initialize
+    generateFlashcard();
+  </script>
+</body>
+</html>
