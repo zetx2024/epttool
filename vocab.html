@@ -12,17 +12,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
       margin: 0;
       padding: 20px;
     }
 
-    h2 { margin-bottom: 10px; color: #ddd; }
+    h2 { margin-bottom: 10px; color: #ddd; text-align: center; }
 
     canvas {
       max-width: 100%;
       height: auto;
+      max-height: 80vh;
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
       margin-bottom: 20px;
@@ -37,6 +37,9 @@
       background: #1e1e1e;
       padding: 15px;
       border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
     }
 
     button {
@@ -55,6 +58,9 @@
     .btn-dl { background: #457b9d; color: white; }
     .btn-dl:hover { background: #1d3557; }
 
+    .btn-copy { background: #2a9d8f; color: white; }
+    .btn-copy:hover { background: #21867a; }
+
     .toggle-container {
       display: flex;
       align-items: center;
@@ -68,6 +74,43 @@
       height: 20px;
       cursor: pointer;
     }
+
+    /* Caption Box Styles */
+    .caption-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .caption-header {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 220px;
+      background: #2b2b2b;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    textarea:focus { outline: 2px solid #457b9d; }
   </style>
 </head>
 <body>
@@ -84,6 +127,14 @@
     <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
   </div>
 
+  <div class="caption-box">
+    <div class="caption-header">
+      📝 Social Media Caption (Full Links Included)
+    </div>
+    <textarea id="captionText" readonly></textarea>
+    <button class="btn-copy" onclick="copyCaption()">📋 Copy Caption</button>
+  </div>
+
   <script>
     const canvas = document.getElementById("flashcard");
     const ctx = canvas.getContext("2d");
@@ -92,45 +143,29 @@
     const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
     const fbLogo = "https://zetx2024.github.io/epttool/logo/facebook.png";
     const ytLogo = "https://zetx2024.github.io/epttool/logo/youtube.png";
-    // Using a generic placeholder for Insta to prevent load errors if the wiki link breaks
-    // You can replace this with your specific uploaded icon
     const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
     const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
 
     // --- DATA: Vocabulary Challenge ---
-    // Correct index: 0=A, 1=B, 2=C
     const questions = [
-      {
-        word: "Abundant",
-        options: ["Scarcity", "Plentiful", "Rare"],
-        correctIndex: 1 
-      },
-      {
-        word: "Meticulous",
-        options: ["Careful", "Lazy", "Messy"],
-        correctIndex: 0
-      },
-      {
-        word: "Mitigate",
-        options: ["Increase", "Reduce", "Ignore"],
-        correctIndex: 1
-      },
-      {
-        word: "Formidable",
-        options: ["Weak", "Impressive", "Simple"],
-        correctIndex: 1
-      },
-      {
-        word: "Ambiguous",
-        options: ["Clear", "Unclear", "Fast"],
-        correctIndex: 1
-      }
+      { word: "Abundant", options: ["Scarcity", "Plentiful", "Rare"], correctIndex: 1 },
+      { word: "Meticulous", options: ["Careful", "Lazy", "Messy"], correctIndex: 0 },
+      { word: "Mitigate", options: ["Increase", "Reduce", "Ignore"], correctIndex: 1 },
+      { word: "Formidable", options: ["Weak", "Impressive", "Simple"], correctIndex: 1 },
+      { word: "Ambiguous", options: ["Clear", "Unclear", "Fast"], correctIndex: 1 },
+      { word: "Benevolent", options: ["Kind", "Cruel", "Greedy"], correctIndex: 0 },
+      { word: "Ephemeral", options: ["Lasting", "Short-lived", "Heavy"], correctIndex: 1 },
+      { word: "Candid", options: ["Secretive", "Honest", "Shy"], correctIndex: 1 }
     ];
+
+    // --- DATA: Hashtag Pools ---
+    const requiredTags = ["#eptonline", "#English", "#Vocabulary", "#SynonymChallenge"];
+    const examTags = ["#IELTS", "#TOEFL", "#DET", "#PTE", "#StudyAbroad", "#DuolingoEnglishTest", "#IELTSPreparation"];
+    const engagementTags = ["#DailyEnglish", "#LearnEnglish", "#WordOfTheDay", "#EnglishQuiz", "#Grammar"];
 
     let currentQuestion = null;
 
     function getRandomColor() {
-      // Darker, richer gradients for a "Pro" look
       const colors = ["#faf339", "#faf339", "#faf339"];
       return colors[Math.floor(Math.random() * colors.length)];
     }
@@ -142,33 +177,75 @@
         img.onload = () => resolve(img);
         img.onerror = () => {
             console.warn("Failed to load image:", url);
-            resolve(null); // Resolve null to prevent crashing
+            resolve(null);
         };
         img.src = url;
       });
     }
 
+    // --- CAPTION GENERATOR ---
+    function generateCaptionText(question) {
+        const optionLabels = ["A", "B", "C"];
+        
+        let text = `🧠 DAILY VOCABULARY CHALLENGE 🧠\n\n`;
+        text += `Can you find the synonym for: "${question.word}"?\n\n`;
+        
+        question.options.forEach((opt, i) => {
+            text += `${optionLabels[i]}) ${opt}\n`;
+        });
+
+        text += `\n👇 Drop your answer in the comments! 👇\n\n`;
+        text += `Practice more at: https://eptonline.org\n`;
+        text += `Follow us for daily updates:\n`;
+        // Full Links Here
+        text += `🌐 Website: https://eptonline.org\n`;
+        text += `📘 Facebook: https://www.facebook.com/eptonline.org\n`;
+        text += `📸 Instagram: https://www.instagram.com/eptonline_org\n`;
+        text += `📺 YouTube: https://www.youtube.com/@eptonlineOrg\n\n`;
+
+        // Hashtags
+        let tags = [...requiredTags];
+        const shuffledExams = examTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledExams.slice(0, 3));
+        const shuffledEngage = engagementTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledEngage.slice(0, 2));
+
+        text += tags.join(" ");
+        return text;
+    }
+
+    function copyCaption() {
+        const copyText = document.getElementById("captionText");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        btn.style.background = "#21867a";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#2a9d8f";
+        }, 2000);
+    }
+
     async function generateFlashcard() {
       const showAnswer = document.getElementById("showAnswer").checked;
 
-      // Select a random question only if we haven't selected one yet, 
-      // OR if this function was triggered by the "Generate" button (not the checkbox)
-      // Note: For simplicity in this script, we just pick random every time button is clicked.
-      // If checkbox is clicked, we redraw the current question.
-      
-      // Determine if we need a new random question or redraw existing
-      if (!currentQuestion || event && event.type === 'click' && event.target.tagName === 'BUTTON') {
-         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+      if (!currentQuestion || (event && event.type === 'click' && (event.target.classList.contains('btn-gen') || event.target.innerText.includes('Random')))) {
+          currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+          const caption = generateCaptionText(currentQuestion);
+          document.getElementById('captionText').value = caption;
       }
 
       const q = currentQuestion;
 
-      // Clear Canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // --- Background ---
       const color1 = getRandomColor();
-      const color2 = "#c76e08"; // Fade to black at bottom
+      const color2 = "#c76e08"; 
       const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
@@ -180,7 +257,7 @@
       if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
 
       // --- Title ---
-      ctx.fillStyle = "#0a0a0a"; // Gold color for title
+      ctx.fillStyle = "#0a0a0a";
       ctx.font = "bold 40px 'Segoe UI'";
       ctx.textAlign = "center";
       ctx.fillText("VOCABULARY CHALLENGE", canvas.width / 2, 220);
@@ -191,11 +268,11 @@
 
       // --- The Target Word ---
       ctx.fillStyle = "#ffffff";
-      ctx.font = "800 110px 'Arial'"; // Big Bold Font
+      ctx.font = "800 110px 'Arial'"; 
       ctx.shadowColor = "rgba(0,0,0,0.5)";
       ctx.shadowBlur = 10;
       ctx.fillText(`"${q.word}"`, canvas.width / 2, 420);
-      ctx.shadowBlur = 0; // Reset shadow
+      ctx.shadowBlur = 0; 
 
       // --- Options ---
       ctx.font = "bold 45px 'Segoe UI'";
@@ -203,96 +280,86 @@
       const optionLabels = ["A", "B", "C"];
 
       q.options.forEach((opt, i) => {
-        const y = startY + i * 140; // Spacing
+        const y = startY + i * 140; 
         const x = 140;
         const width = 800;
         const height = 100;
 
-        // Logic for highlighting answer
         let strokeColor = "white";
         let fillColor = "transparent";
         let textColor = "white";
 
         if (showAnswer) {
             if (i === q.correctIndex) {
-                strokeColor = "#2a9d8f"; // Green
+                strokeColor = "#2a9d8f"; 
                 fillColor = "rgba(42, 157, 143, 0.2)";
                 textColor = "#4ecdc4";
             } else {
-                strokeColor = "#555"; // Dim others
+                strokeColor = "#555"; 
                 textColor = "#777";
             }
         }
 
-        // Draw Box
         ctx.strokeStyle = strokeColor;
         ctx.fillStyle = fillColor;
         ctx.lineWidth = 4;
         
         ctx.beginPath();
-        ctx.roundRect(x, y, width, height, 20); // Rounded corners
+        ctx.roundRect(x, y, width, height, 20); 
         ctx.stroke();
         ctx.fill();
 
-        // Draw Text (Label + Option)
         ctx.fillStyle = textColor;
         ctx.textAlign = "left";
         ctx.fillText(`${optionLabels[i]})  ${opt}`, x + 40, y + 65);
       });
 
-      // --- Footer ---
+      // --- Footer (REVERTED TO OLD DESIGN) ---
       ctx.fillStyle = "#0a0a0a";
       ctx.font = "15px Arial";
       ctx.textAlign = "left";
       ctx.fillText("Practice More:", 70, 1020);
       
-      // Social Icons
       const fb = await loadImage(fbLogo);
       const insta = await loadImage(instaLogo);
       const yt = await loadImage(ytLogo);
-      
-      // Removed the Instagram text logic for now as requested layout, 
-      // but if you want it back, uncomment below:
-       // Configure Font for all handles
-      
-      // 1. Website Link (Bottom Left)
       const webIcon = await loadImage(webLogoUrl);
       
+      // 1. Website Link (Bottom Left)
       if (webIcon) {
-          ctx.drawImage(webIcon, 50, 1020, 24, 24); // Icon size 24x24
+          ctx.drawImage(webIcon, 50, 1020, 24, 24); 
           
           ctx.font = "bold 20px Arial";
           ctx.fillStyle = "white"; 
           ctx.textAlign = "left";
-          ctx.fillText("eptonline.org", 80, 1040); // Text next to icon
+          ctx.fillText("eptonline.org", 80, 1040); 
       }
-      // 1. Facebook (Starts at 990)
+      
+      // 2. Facebook (Starts at 990)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
           ctx.font = "bold 16px Arial"; 
-          ctx.fillStyle = "white"; // Ensure text is white
+          ctx.fillStyle = "white"; 
           ctx.fillText("@eptonline.org", 905, 1005); 
       }
 
-      // 2. Instagram (Tight gap: +24px)
+      // 3. Instagram (Tight gap: +24px)
       if(insta) {
           ctx.drawImage(insta, 880, 1014, 18, 18);
           ctx.font = "bold 16px Arial"; 
-          ctx.fillStyle = "white"; // Ensure text is white
+          ctx.fillStyle = "white"; 
           ctx.fillText("@eptonline_org", 905, 1029);
       }
 
-      // 3. YouTube (Tight gap: +24px)
+      // 4. YouTube (Tight gap: +24px)
       if(yt) {
           ctx.drawImage(yt, 880, 1038, 18, 18);
           ctx.font = "bold 16px Arial"; 
-          ctx.fillStyle = "white"; // Ensure text is white
+          ctx.fillStyle = "white"; 
           ctx.fillText("@eptonlineOrg", 905, 1053);
       }
- 
     }
 
-    // Helper for rounded rectangles in canvas
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
@@ -308,7 +375,6 @@
 
     function downloadFlashcard() {
       const link = document.createElement("a");
-      // Include the word in the filename
       const word = currentQuestion ? currentQuestion.word : "flashcard";
       link.download = `Vocabulary_${word}_${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
@@ -316,7 +382,9 @@
     }
 
     // Initialize
-    generateFlashcard();
+    window.onload = function() {
+        document.querySelector('.btn-gen').click();
+    };
   </script>
 </body>
 </html>
