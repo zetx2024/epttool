@@ -91,6 +91,7 @@
     // --- ASSETS ---
     const logoUrl = "https://zetx2024.github.io/epttool/instaeptologo.PNG";
     const fbLogo = "https://upload.wikimedia.org/wikipedia/commons/1/16/Facebook-icon-1.png";
+    const ytLogo = "https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png";
     // Using a generic placeholder for Insta to prevent load errors if the wiki link breaks
     // You can replace this with your specific uploaded icon
     const instaLogo = "https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"; 
@@ -247,20 +248,31 @@
       // Social Icons
       const fb = await loadImage(fbLogo);
       const insta = await loadImage(instaLogo);
+      const yt = await loadImage(ytLogo);
       
       // Removed the Instagram text logic for now as requested layout, 
       // but if you want it back, uncomment below:
  
       
+      // 1. Facebook
       if(fb) {
-          ctx.drawImage(fb, 700, 985, 15, 15);
-          ctx.font = "bold 20px Arial";
-          ctx.fillText("@eptonline.org", 740, 1015);
+          ctx.drawImage(fb, 700, 960, 24, 24);      // Moves up to make room
+          ctx.font = "bold 22px Arial";             // Adjusted size
+          ctx.fillText("@eptonline.org", 735, 980); // Aligned text center-ish to icon
       }
+
+      // 2. Instagram
       if(insta) {
-          ctx.drawImage(insta, 700, 1040, 15, 15);
-         ctx.font = "bold 10px Arial";
-          ctx.fillText("@eptonline_org", 740, 1070);
+          ctx.drawImage(insta, 700, 1000, 24, 24);  // 40px gap below FB
+          ctx.font = "bold 22px Arial";
+          ctx.fillText("@eptonline_org", 735, 1020);
+      }
+
+      // 3. YouTube
+      if(yt) {
+          ctx.drawImage(yt, 700, 1040, 24, 24);     // 40px gap below Insta
+          ctx.font = "bold 22px Arial";
+          ctx.fillText("@eptonline", 735, 1060);
       }
  
     }
