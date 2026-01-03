@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grammar Spot the Mistake Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 { margin-bottom: 10px; color: #ddd; }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      margin-bottom: 20px;
+      border: 1px solid #333;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 12px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .btn-gen { background: #e63946; color: white; }
+    .btn-gen:hover { background: #d62839; }
+
+    .btn-dl { background: #457b9d; color: white; }
+    .btn-dl:hover { background: #1d3557; }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      gap: 10px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Spot the Mistake Generator</h2>
+  <canvas id="flashcard" width="1080" height="1080"></canvas>
+
+  <div class="controls">
+    <div class="toggle-container">
+      <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
+      <label for="showAnswer">Show Correct Answer</label>
+    </div>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Sentence</button>
+    <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("flashcard");
+    const ctx = canvas.getContext("2d");
+
+    // --- ASSETS ---
+    const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
+    const fbLogo = "https://zetx2024.github.io/epttool/logo/facebook.png";
+    const ytLogo = "https://zetx2024.github.io/epttool/logo/youtube.png";
+    const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
+    const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
+
+    // --- DATA: Spot the Mistake ---
+    const questions = [
+      {
+        incorrect: "I have finished my work two hours ago.",
+        correct: "I finished my work two hours ago.",
+        explanation: "(Past time থাকলে Past Indefinite হয়)।"
+      },
+      {
+        incorrect: "She don't like to drink coffee.",
+        correct: "She doesn't like to drink coffee.",
+        explanation: "(Third person singular number-এর সাথে doesn't হয়)।" 
+        // Added standard explanation since one wasn't provided, but you can leave blank
+      },
+      {
+        incorrect: "Every students must attend the exam.",
+        correct: "Every student must attend the exam.",
+        explanation: "(Every-র পর singular noun হয়)।"
+      },
+      {
+        incorrect: "I am looking forward to meet you.",
+        correct: "I am looking forward to meeting you.",
+        explanation: "(To-র পর সাধারণত base form বসলেও 'looking forward to' এর পর ing হয়)।"
+      },
+      {
+        incorrect: "He is more taller than his brother.",
+        correct: "He is taller than his brother.",
+        explanation: "(Double comparative হয় না)।"
+      }
+    ];
+
+    let currentQuestion = null;
+
+    function getRandomColor() {
+      // Using Darker Gradients suitable for text readability
+      const colors = ["#0f2027", "#203a43", "#2c5364"]; 
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.warn("Failed to load image:", url);
+            resolve(null);
+        };
+        img.src = url;
+      });
+    }
+
+    // --- Helper Function: Text Wrapping ---
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+        let currentY = y;
+
+        for(let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = context.measureText(testLine);
+          const testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            context.fillText(line, x, currentY);
+            line = words[n] + ' ';
+            currentY += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        context.fillText(line, x, currentY);
+        return currentY + lineHeight; // Return the Y position where the text ended
+    }
+
+    async function generateFlashcard() {
+      const showAnswer = document.getElementById("showAnswer").checked;
+
+      // Select random question logic
+      if (!currentQuestion || (event && event.type === 'click' && event.target.tagName === 'BUTTON')) {
+         currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+      }
+
+      const q = currentQuestion;
+
+      // Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Background ---
+      // Using a solid dark background for better contrast with text sentences
+      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradient.addColorStop(0, "#1a1a1a");
+      gradient.addColorStop(1, "#000000");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // --- Header Logo ---
+      const logo = await loadImage(logoUrl);
+      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
+
+      // --- Main Title ---
+      ctx.fillStyle = "#FFD700"; // Gold
+      ctx.font = "bold 50px 'Segoe UI'";
+      ctx.textAlign = "center";
+      ctx.fillText("SPOT THE MISTAKE", canvas.width / 2, 230);
+      
+      ctx.fillStyle = "#cccccc";
+      ctx.font = "italic 30px 'Segoe UI'";
+      ctx.fillText("(Grammar Challenge)", canvas.width / 2, 280);
+
+      // ===========================
+      // DRAW INCORRECT SENTENCE
+      // ===========================
+      
+      // Label
+      ctx.fillStyle = "#ff4d4d"; // Red color label
+      ctx.font = "bold 35px 'Arial'";
+      ctx.fillText("INCORRECT:", canvas.width / 2, 380);
+
+      // The Sentence Box
+      ctx.fillStyle = "#222";
+      ctx.strokeStyle = "#ff4d4d";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(140, 410, 800, 200, 20); // x, y, w, h, radius
+      ctx.fill();
+      ctx.stroke();
+
+      // The Sentence Text
+      ctx.fillStyle = "white";
+      ctx.font = "50px 'Segoe UI'";
+      // We align center, but for wrapped text logic we generally use start, 
+      // but here we will manually center lines or just simpler:
+      // Let's use the wrapText helper but keeping textAlign center works for single lines, 
+      // for multi-line centered text it's trickier. 
+      // To keep it simple and clean:
+      ctx.textAlign = "center"; 
+      // Note: wrapText above is written for left align logic mostly, let's adjust logic inside:
+      // Since sentences are short enough, we might not need complex wrapping, but let's be safe.
+      // Simple Fill for now as sentences are usually 1-2 lines.
+      
+      const words = q.incorrect.split(" ");
+      let line1 = "";
+      let line2 = "";
+      
+      // Basic manual split if too long (Quick fix for visuals)
+      if (ctx.measureText(q.incorrect).width > 750) {
+          const mid = Math.floor(words.length / 2);
+          line1 = words.slice(0, mid).join(" ");
+          line2 = words.slice(mid).join(" ");
+          ctx.fillText(`"${line1}`, canvas.width / 2, 490);
+          ctx.fillText(`${line2}"`, canvas.width / 2, 550);
+      } else {
+          ctx.fillText(`"${q.incorrect}"`, canvas.width / 2, 520);
+      }
+
+      // ===========================
+      // DRAW ANSWER SECTION
+      // ===========================
+
+      if (showAnswer) {
+        // Label
+        ctx.fillStyle = "#4ecdc4"; // Teal/Green label
+        ctx.font = "bold 35px 'Arial'";
+        ctx.fillText("CORRECT:", canvas.width / 2, 680);
+
+        // The Sentence Box
+        ctx.fillStyle = "#222";
+        ctx.strokeStyle = "#4ecdc4";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.roundRect(140, 710, 800, 200, 20); 
+        ctx.fill();
+        ctx.stroke();
+
+        // The Correct Sentence Text
+        ctx.fillStyle = "white";
+        ctx.font = "bold 50px 'Segoe UI'";
+        
+        // Manual simple wrap logic again
+        if (ctx.measureText(q.correct).width > 750) {
+            const wordsC = q.correct.split(" ");
+            const midC = Math.floor(wordsC.length / 2);
+            ctx.fillText(`"${wordsC.slice(0, midC).join(" ")}`, canvas.width / 2, 790);
+            ctx.fillText(`${wordsC.slice(midC).join(" ")}"`, canvas.width / 2, 850);
+        } else {
+            ctx.fillText(`"${q.correct}"`, canvas.width / 2, 820);
+        }
+
+        // The Explanation Rule (Bangla)
+        ctx.fillStyle = "#f1c40f"; // Yellowish for explanation
+        ctx.font = "italic 30px 'Segoe UI'"; // Ensure font supports Bangla
+        ctx.fillText(q.explanation, canvas.width / 2, 950);
+
+      } else {
+        // Placeholder if answer is hidden
+        ctx.fillStyle = "#555";
+        ctx.font = "bold 40px 'Segoe UI'";
+        ctx.fillText("?", canvas.width / 2, 800);
+        ctx.font = "20px 'Segoe UI'";
+        ctx.fillText("(Tap 'Show Answer' to reveal)", canvas.width / 2, 840);
+      }
+
+      // --- Footer ---
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "15px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Practice More:", 70, 1020);
+      
+      const fb = await loadImage(fbLogo);
+      const insta = await loadImage(instaLogo);
+      const yt = await loadImage(ytLogo);
+      const webIcon = await loadImage(webLogoUrl);
+      
+      if (webIcon) {
+          ctx.drawImage(webIcon, 50, 1020, 24, 24);
+          ctx.font = "bold 20px Arial";
+          ctx.fillStyle = "white"; 
+          ctx.fillText("eptonline.org", 80, 1040); 
+      }
+      
+      if(fb) {
+          ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline.org", 905, 1005); 
+      }
+
+      if(insta) {
+          ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline_org", 905, 1029);
+      }
+
+      if(yt) {
+          ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonlineOrg", 905, 1053);
+      }
+    }
+
+    // Helper for rounded rectangles
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    }
+
+    function downloadFlashcard() {
+      const link = document.createElement("a");
+      const name = currentQuestion ? currentQuestion.incorrect.substring(0, 10).replace(/ /g, "_") : "grammar";
+      link.download = `Grammar_${name}_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    // Initialize
+    generateFlashcard();
+  </script>
+</body>
+</html>
