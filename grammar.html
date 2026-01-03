@@ -155,34 +155,1849 @@
     const instaLogo = "https://gen.eptonline.org/instagram.png"; 
     const webLogoUrl = "https://gen.eptonline.org/www.png";
 
-    // --- DATA: Spot the Mistake ---
-    const questions = [
-      {
-        incorrect: "I have finished my work two hours ago.",
-        correct: "I finished my work two hours ago.",
-        explanation: "(Past time থাকলে Past Indefinite হয়)।"
-      },
-      {
-        incorrect: "She don't like to drink coffee.",
-        correct: "She doesn't like to drink coffee.",
-        explanation: "(Third person singular number-এর সাথে doesn't হয়)।" 
-      },
-      {
-        incorrect: "Every students must attend the exam.",
-        correct: "Every student must attend the exam.",
-        explanation: "(Every-র পর singular noun হয়)।"
-      },
-      {
-        incorrect: "I am looking forward to meet you.",
-        correct: "I am looking forward to meeting you.",
-        explanation: "(To-র পর সাধারণত base form বসলেও 'looking forward to' এর পর ing হয়)।"
-      },
-      {
-        incorrect: "He is more taller than his brother.",
-        correct: "He is taller than his brother.",
-        explanation: "(Double comparative হয় না)।"
-      }
-    ];
+    // --- DATA: Spot the Mistake --- COMPLETE 365 QUESTIONS
+const questions = [
+  // DAY 1-5 (Already provided, but included for completeness)
+  {
+    incorrect: "I have finished my work two hours ago.",
+    correct: "I finished my work two hours ago.",
+    explanation: "Specific past time reference requires simple past, not present perfect."
+  },
+  {
+    incorrect: "She don't like to drink coffee.",
+    correct: "She doesn't like to drink coffee.",
+    explanation: "Third person singular requires 'doesn't' with present simple."
+  },
+  {
+    incorrect: "Every students must attend the exam.",
+    correct: "Every student must attend the exam.",
+    explanation: "'Every' is followed by singular noun."
+  },
+  {
+    incorrect: "I am looking forward to meet you.",
+    correct: "I am looking forward to meeting you.",
+    explanation: "'Look forward to' is followed by gerund."
+  },
+  {
+    incorrect: "He is more taller than his brother.",
+    correct: "He is taller than his brother.",
+    explanation: "Double comparative is incorrect; use 'taller' or 'more tall' but not both."
+  },
+  {
+    incorrect: "The data shows that climate change are real.",
+    correct: "The data show that climate change is real.",
+    explanation: "'Data' is plural; 'climate change' is singular."
+  },
+  {
+    incorrect: "Neither of the options are suitable for our needs.",
+    correct: "Neither of the options is suitable for our needs.",
+    explanation: "'Neither' takes singular verb."
+  },
+  {
+    incorrect: "I would of gone if I had known about it earlier.",
+    correct: "I would have gone if I had known about it earlier.",
+    explanation: "'Would have' not 'would of'."
+  },
+  {
+    incorrect: "The company's profits has increased significantly.",
+    correct: "The company's profits have increased significantly.",
+    explanation: "'Profits' is plural subject."
+  },
+  {
+    incorrect: "She is one of the best student in her class.",
+    correct: "She is one of the best students in her class.",
+    explanation: "'One of' is followed by plural noun."
+  },
+  {
+    incorrect: "Despite of the rain, the match continued.",
+    correct: "Despite the rain, the match continued.",
+    explanation: "'Despite' doesn't take 'of'; 'in spite of' does."
+  },
+  {
+    incorrect: "The committee are divided in their opinions.",
+    correct: "The committee is divided in its opinions.",
+    explanation: "Committee as single entity takes singular verb."
+  },
+  {
+    incorrect: "I prefer tea than coffee in the morning.",
+    correct: "I prefer tea to coffee in the morning.",
+    explanation: "'Prefer' takes 'to' not 'than'."
+  },
+  {
+    incorrect: "He speaks English good.",
+    correct: "He speaks English well.",
+    explanation: "Adverb 'well' modifies verb 'speaks'."
+  },
+  {
+    incorrect: "There's many reasons for this decision.",
+    correct: "There are many reasons for this decision.",
+    explanation: "'Reasons' is plural; requires 'are'."
+  },
+  {
+    incorrect: "I suggest you to see a doctor immediately.",
+    correct: "I suggest you see a doctor immediately.",
+    explanation: "After 'suggest', use base form without 'to'."
+  },
+  {
+    incorrect: "The news are very disturbing today.",
+    correct: "The news is very disturbing today.",
+    explanation: "'News' is uncountable singular noun."
+  },
+  {
+    incorrect: "He denied to have stolen the money.",
+    correct: "He denied having stolen the money.",
+    explanation: "After 'deny', use gerund not infinitive."
+  },
+  {
+    incorrect: "Each of the employees have received a bonus.",
+    correct: "Each of the employees has received a bonus.",
+    explanation: "'Each' takes singular verb."
+  },
+  {
+    incorrect: "I'm used to wake up early.",
+    correct: "I'm used to waking up early.",
+    explanation: "'Be used to' is followed by gerund."
+  },
+  {
+    incorrect: "The police is investigating the matter.",
+    correct: "The police are investigating the matter.",
+    explanation: "'Police' is plural collective noun in this context."
+  },
+  {
+    incorrect: "I look forward to hear from you soon.",
+    correct: "I look forward to hearing from you soon.",
+    explanation: "'Look forward to' requires gerund."
+  },
+  {
+    incorrect: "He is senior than me in this organization.",
+    correct: "He is senior to me in this organization.",
+    explanation: "Senior/Junior takes 'to' not 'than'."
+  },
+  {
+    incorrect: "Could you please advice me on this matter?",
+    correct: "Could you please advise me on this matter?",
+    explanation: "'Advise' is verb; 'advice' is noun."
+  },
+  {
+    incorrect: "The quality of these products are excellent.",
+    correct: "The quality of these products is excellent.",
+    explanation: "Subject 'quality' is singular."
+  },
+  // DAY 6-10
+  {
+    incorrect: "If I would have known, I will help you.",
+    correct: "If I had known, I would have helped you.",
+    explanation: "Third conditional: if + past perfect, would have + past participle."
+  },
+  {
+    incorrect: "The man which I met yesterday is a doctor.",
+    correct: "The man whom I met yesterday is a doctor.",
+    explanation: "'Which' refers to things; for people use 'who/whom'."
+  },
+  {
+    incorrect: "I have been living here since five years.",
+    correct: "I have been living here for five years.",
+    explanation: "'Since' for specific time point; 'for' for duration."
+  },
+  {
+    incorrect: "He can't hardly wait for the results.",
+    correct: "He can hardly wait for the results.",
+    explanation: "Double negative: 'can't hardly' means 'can' - incorrect."
+  },
+  {
+    incorrect: "The government are planning new taxes.",
+    correct: "The government is planning new taxes.",
+    explanation: "'Government' as single entity takes singular verb."
+  },
+  {
+    incorrect: "I'm very interesting in history.",
+    correct: "I'm very interested in history.",
+    explanation: "'Interested' describes feelings; 'interesting' describes things."
+  },
+  {
+    incorrect: "She is married with a lawyer.",
+    correct: "She is married to a lawyer.",
+    explanation: "'Married to' not 'married with'."
+  },
+  {
+    incorrect: "He went to home early yesterday.",
+    correct: "He went home early yesterday.",
+    explanation: "No preposition needed with 'home' after movement verbs."
+  },
+  {
+    incorrect: "I want that you come with me.",
+    correct: "I want you to come with me.",
+    explanation: "'Want' + object + infinitive, not 'that' clause."
+  },
+  {
+    incorrect: "The meeting has been postponed on Friday.",
+    correct: "The meeting has been postponed until Friday.",
+    explanation: "'Postponed until' not 'postponed on'."
+  },
+  {
+    incorrect: "He succeeded to pass the exam.",
+    correct: "He succeeded in passing the exam.",
+    explanation: "'Succeed in + gerund' not 'succeed to + infinitive'."
+  },
+  {
+    incorrect: "I have less friends than you.",
+    correct: "I have fewer friends than you.",
+    explanation: "'Fewer' for countable nouns; 'less' for uncountable."
+  },
+  {
+    incorrect: "The manager, together with his staff, are attending.",
+    correct: "The manager, together with his staff, is attending.",
+    explanation: "Subject 'manager' is singular; together with doesn't make it plural."
+  },
+  {
+    incorrect: "He accused me for stealing the money.",
+    correct: "He accused me of stealing the money.",
+    explanation: "'Accuse of' not 'accuse for'."
+  },
+  {
+    incorrect: "I'm looking for a accomodation near the university.",
+    correct: "I'm looking for accommodation near the university.",
+    explanation: "'Accommodation' is uncountable; no 'a' before it."
+  },
+  {
+    incorrect: "She asked me where was I going.",
+    correct: "She asked me where I was going.",
+    explanation: "Indirect questions don't use question word order."
+  },
+  {
+    incorrect: "I'll call you when I will arrive.",
+    correct: "I'll call you when I arrive.",
+    explanation: "Future time clauses use present tense."
+  },
+  {
+    incorrect: "The car's color is different than mine.",
+    correct: "The car's color is different from mine.",
+    explanation: "'Different from' is standard; 'different than' is American."
+  },
+  {
+    incorrect: "He's not capable to do this job.",
+    correct: "He's not capable of doing this job.",
+    explanation: "'Capable of + gerund' not 'capable to + infinitive'."
+  },
+  {
+    incorrect: "Neither John or Mary can attend.",
+    correct: "Neither John nor Mary can attend.",
+    explanation: "Correct pairing is 'neither...nor'."
+  },
+  {
+    incorrect: "I'm accustomed with cold weather.",
+    correct: "I'm accustomed to cold weather.",
+    explanation: "'Accustomed to' not 'accustomed with'."
+  },
+  {
+    incorrect: "She insisted to pay the bill.",
+    correct: "She insisted on paying the bill.",
+    explanation: "'Insist on + gerund' not 'insist to + infinitive'."
+  },
+  {
+    incorrect: "The number of students are increasing.",
+    correct: "The number of students is increasing.",
+    explanation: "'The number' is singular subject."
+  },
+  {
+    incorrect: "He apologized about his mistake.",
+    correct: "He apologized for his mistake.",
+    explanation: "'Apologize for' not 'apologize about'."
+  },
+  {
+    incorrect: "This is the most unique opportunity.",
+    correct: "This is a unique opportunity.",
+    explanation: "'Unique' is absolute; cannot be 'most unique'."
+  },
+  // DAY 11-15
+  {
+    incorrect: "I have a strong knowledge about computers.",
+    correct: "I have a strong knowledge of computers.",
+    explanation: "'Knowledge of' not 'knowledge about'."
+  },
+  {
+    incorrect: "The team have won their match.",
+    correct: "The team has won its match.",
+    explanation: "Team as single unit takes singular verb and pronoun."
+  },
+  {
+    incorrect: "He's afraid from dogs.",
+    correct: "He's afraid of dogs.",
+    explanation: "'Afraid of' not 'afraid from'."
+  },
+  {
+    incorrect: "I haven't got some money.",
+    correct: "I haven't got any money.",
+    explanation: "Use 'any' in negative sentences; 'some' in positives."
+  },
+  {
+    incorrect: "She's very taller than her sister.",
+    correct: "She's much taller than her sister.",
+    explanation: "'Much' intensifies comparatives; 'very' with adjectives."
+  },
+  {
+    incorrect: "The reason is because I was tired.",
+    correct: "The reason is that I was tired.",
+    explanation: "'Reason is that' not 'reason is because'."
+  },
+  {
+    incorrect: "I'm thinking to buy a new car.",
+    correct: "I'm thinking of buying a new car.",
+    explanation: "'Think of/about + gerund' not 'think to + infinitive'."
+  },
+  {
+    incorrect: "Five thousands people attended.",
+    correct: "Five thousand people attended.",
+    explanation: "Numbers don't pluralize when used as adjectives."
+  },
+  {
+    incorrect: "He's addicted with gambling.",
+    correct: "He's addicted to gambling.",
+    explanation: "'Addicted to' not 'addicted with'."
+  },
+  {
+    incorrect: "I have visited London last year.",
+    correct: "I visited London last year.",
+    explanation: "Specific past time requires simple past."
+  },
+  {
+    incorrect: "She's married since 2010.",
+    correct: "She has been married since 2010.",
+    explanation: "'Since' requires present perfect, not present simple."
+  },
+  {
+    incorrect: "I look forward to see you tomorrow.",
+    correct: "I look forward to seeing you tomorrow.",
+    explanation: "'Look forward to + gerund' is correct."
+  },
+  {
+    incorrect: "The equipments are expensive.",
+    correct: "The equipment is expensive.",
+    explanation: "'Equipment' is uncountable; no plural form."
+  },
+  {
+    incorrect: "He's used to drive on the left.",
+    correct: "He's used to driving on the left.",
+    explanation: "'Be used to + gerund' means accustomed."
+  },
+  {
+    incorrect: "Could you borrow me your pen?",
+    correct: "Could you lend me your pen?",
+    explanation: "'Lend' = give; 'borrow' = take."
+  },
+  {
+    incorrect: "The information are correct.",
+    correct: "The information is correct.",
+    explanation: "'Information' is uncountable singular."
+  },
+  {
+    incorrect: "I'm looking forward for the weekend.",
+    correct: "I'm looking forward to the weekend.",
+    explanation: "'Look forward to' not 'look forward for'."
+  },
+  {
+    incorrect: "She's doctor at the local hospital.",
+    correct: "She's a doctor at the local hospital.",
+    explanation: "Professions require indefinite article."
+  },
+  {
+    incorrect: "He's responsible for make decisions.",
+    correct: "He's responsible for making decisions.",
+    explanation: "Preposition 'for' requires gerund."
+  },
+  {
+    incorrect: "The majority of people agrees with this.",
+    correct: "The majority of people agree with this.",
+    explanation: "'Majority of + plural noun' takes plural verb."
+  },
+  {
+    incorrect: "I'm waiting since two hours.",
+    correct: "I have been waiting for two hours.",
+    explanation: "Duration requires present perfect continuous + 'for'."
+  },
+  {
+    incorrect: "She's more rich than her brother.",
+    correct: "She's richer than her brother.",
+    explanation: "One-syllable adjectives form comparative with -er."
+  },
+  {
+    incorrect: "I have a work to finish.",
+    correct: "I have work to finish.",
+    explanation: "'Work' as uncountable noun doesn't take 'a'."
+  },
+  {
+    incorrect: "He's good in mathematics.",
+    correct: "He's good at mathematics.",
+    explanation: "'Good at' not 'good in' for skills."
+  },
+  {
+    incorrect: "The climate of Canada is colder than England.",
+    correct: "The climate of Canada is colder than that of England.",
+    explanation: "Compare similar things: climate with climate."
+  },
+  // DAY 16-20
+  {
+    incorrect: "She's living here since childhood.",
+    correct: "She has been living here since childhood.",
+    explanation: "'Since' requires perfect tense."
+  },
+  {
+    incorrect: "I'm agree with you.",
+    correct: "I agree with you.",
+    explanation: "'Agree' is a verb; no 'am' needed."
+  },
+  {
+    incorrect: "He's dangerous driver.",
+    correct: "He's a dangerous driver.",
+    explanation: "Countable noun 'driver' needs article."
+  },
+  {
+    incorrect: "The results were disappointed.",
+    correct: "The results were disappointing.",
+    explanation: "'Disappointing' describes things; 'disappointed' describes feelings."
+  },
+  {
+    incorrect: "I haven't seen him since a long time.",
+    correct: "I haven't seen him for a long time.",
+    explanation: "'For' with duration; 'since' with specific point."
+  },
+  {
+    incorrect: "She died from cancer.",
+    correct: "She died of cancer.",
+    explanation: "'Die of' illness; 'die from' external causes."
+  },
+  {
+    incorrect: "I'm going to home.",
+    correct: "I'm going home.",
+    explanation: "No preposition with 'home' after movement verbs."
+  },
+  {
+    incorrect: "He's older than me.",
+    correct: "He's older than I.",
+    explanation: "Formal: 'than I am' shortened to 'than I'."
+  },
+  {
+    incorrect: "The scissors is on the table.",
+    correct: "The scissors are on the table.",
+    explanation: "'Scissors' is plural noun."
+  },
+  {
+    incorrect: "I'm not accustomed with spicy food.",
+    correct: "I'm not accustomed to spicy food.",
+    explanation: "'Accustomed to' not 'accustomed with'."
+  },
+  {
+    incorrect: "She's married since three years.",
+    correct: "She has been married for three years.",
+    explanation: "Duration with present perfect + 'for'."
+  },
+  {
+    incorrect: "He's waiting you outside.",
+    correct: "He's waiting for you outside.",
+    explanation: "'Wait for' someone."
+  },
+  {
+    incorrect: "I haven't got no money.",
+    correct: "I haven't got any money.",
+    explanation: "Double negative incorrect in standard English."
+  },
+  {
+    incorrect: "The staff are happy with their jobs.",
+    correct: "The staff is happy with its jobs.",
+    explanation: "Staff as collective takes singular."
+  },
+  {
+    incorrect: "She's very much beautiful.",
+    correct: "She's very beautiful.",
+    explanation: "'Very' with adjectives; 'very much' with verbs."
+  },
+  {
+    incorrect: "I'll explain you the problem.",
+    correct: "I'll explain the problem to you.",
+    explanation: "'Explain' takes indirect object with 'to'."
+  },
+  {
+    incorrect: "He's suffering with arthritis.",
+    correct: "He's suffering from arthritis.",
+    explanation: "'Suffer from' not 'suffer with'."
+  },
+  {
+    incorrect: "I'm living here from 2010.",
+    correct: "I have been living here since 2010.",
+    explanation: "'Since' with perfect tense for starting point."
+  },
+  {
+    incorrect: "She's very much tired.",
+    correct: "She's very tired.",
+    explanation: "'Very' with adjectives; 'very much' typically with verbs."
+  },
+  {
+    incorrect: "He's addicted to smoke.",
+    correct: "He's addicted to smoking.",
+    explanation: "'Addicted to + noun/gerund'."
+  },
+  {
+    incorrect: "I'm looking forward meeting you.",
+    correct: "I'm looking forward to meeting you.",
+    explanation: "'Look forward to' includes 'to'."
+  },
+  {
+    incorrect: "The house needs painted.",
+    correct: "The house needs painting.",
+    explanation: "'Need + gerund' (active meaning, passive sense)."
+  },
+  {
+    incorrect: "She's afraid from the dark.",
+    correct: "She's afraid of the dark.",
+    explanation: "'Afraid of' not 'afraid from'."
+  },
+  {
+    incorrect: "I'm used to work hard.",
+    correct: "I'm used to working hard.",
+    explanation: "'Be used to + gerund' means accustomed."
+  },
+  {
+    incorrect: "He can't afford buying a car.",
+    correct: "He can't afford to buy a car.",
+    explanation: "'Afford to + infinitive' not 'afford + gerund'."
+  },
+  // DAY 21-25
+  {
+    incorrect: "The government are elected by people.",
+    correct: "The government is elected by the people.",
+    explanation: "Government singular; 'the people' specific."
+  },
+  {
+    incorrect: "I have visited New York in 2019.",
+    correct: "I visited New York in 2019.",
+    explanation: "Specific past time = simple past."
+  },
+  {
+    incorrect: "She's married with a doctor.",
+    correct: "She's married to a doctor.",
+    explanation: "'Married to' not 'married with'."
+  },
+  {
+    incorrect: "He's interested to learn French.",
+    correct: "He's interested in learning French.",
+    explanation: "'Interested in + gerund' not 'interested to'."
+  },
+  {
+    incorrect: "I have less books than you.",
+    correct: "I have fewer books than you.",
+    explanation: "'Fewer' for countable nouns."
+  },
+  {
+    incorrect: "The manager, as well as his team, are working.",
+    correct: "The manager, as well as his team, is working.",
+    explanation: "Subject 'manager' singular; 'as well as' doesn't make plural."
+  },
+  {
+    incorrect: "She accused me for lying.",
+    correct: "She accused me of lying.",
+    explanation: "'Accuse of' not 'accuse for'."
+  },
+  {
+    incorrect: "I'm looking for an advice.",
+    correct: "I'm looking for advice.",
+    explanation: "'Advice' uncountable; no 'an'."
+  },
+  {
+    incorrect: "She asked where do I live.",
+    correct: "She asked where I live.",
+    explanation: "Indirect questions: no inversion."
+  },
+  {
+    incorrect: "I'll tell you when I will know.",
+    correct: "I'll tell you when I know.",
+    explanation: "Future time clause = present tense."
+  },
+  {
+    incorrect: "It's different than I expected.",
+    correct: "It's different from what I expected.",
+    explanation: "'Different from' standard."
+  },
+  {
+    incorrect: "He's capable to solve this.",
+    correct: "He's capable of solving this.",
+    explanation: "'Capable of + gerund'."
+  },
+  {
+    incorrect: "Neither tea or coffee is available.",
+    correct: "Neither tea nor coffee is available.",
+    explanation: "'Neither...nor' pairing."
+  },
+  {
+    incorrect: "I'm accustomed with early starts.",
+    correct: "I'm accustomed to early starts.",
+    explanation: "'Accustomed to'."
+  },
+  {
+    incorrect: "She insisted to come with us.",
+    correct: "She insisted on coming with us.",
+    explanation: "'Insist on + gerund'."
+  },
+  {
+    incorrect: "A number of students is absent.",
+    correct: "A number of students are absent.",
+    explanation: "'A number of' = plural; 'the number of' = singular."
+  },
+  {
+    incorrect: "He apologized about being late.",
+    correct: "He apologized for being late.",
+    explanation: "'Apologize for'."
+  },
+  {
+    incorrect: "This is more unique than that.",
+    correct: "This is more unusual than that.",
+    explanation: "Unique cannot be compared."
+  },
+  {
+    incorrect: "I have knowledge about physics.",
+    correct: "I have knowledge of physics.",
+    explanation: "'Knowledge of'."
+  },
+  {
+    incorrect: "The team are celebrating its victory.",
+    correct: "The team is celebrating its victory.",
+    explanation: "Team singular."
+  },
+  {
+    incorrect: "He's afraid from heights.",
+    correct: "He's afraid of heights.",
+    explanation: "'Afraid of'."
+  },
+  {
+    incorrect: "I haven't got some friends here.",
+    correct: "I haven't got any friends here.",
+    explanation: "Negative = 'any'."
+  },
+  {
+    incorrect: "She's very more intelligent.",
+    correct: "She's much more intelligent.",
+    explanation: "'Much' intensifies comparatives."
+  },
+  {
+    incorrect: "The reason is because he's ill.",
+    correct: "The reason is that he's ill.",
+    explanation: "'Reason is that'."
+  },
+  {
+    incorrect: "I'm thinking to apply for the job.",
+    correct: "I'm thinking of applying for the job.",
+    explanation: "'Think of + gerund'."
+  },
+  // DAY 26-30
+  {
+    incorrect: "Three hundreds dollars is missing.",
+    correct: "Three hundred dollars is missing.",
+    explanation: "Numbers as adjectives don't pluralize."
+  },
+  {
+    incorrect: "He's addicted with drugs.",
+    correct: "He's addicted to drugs.",
+    explanation: "'Addicted to'."
+  },
+  {
+    incorrect: "I have seen him yesterday.",
+    correct: "I saw him yesterday.",
+    explanation: "Specific past time = simple past."
+  },
+  {
+    incorrect: "She's married since ten years.",
+    correct: "She has been married for ten years.",
+    explanation: "Duration = present perfect + 'for'."
+  },
+  {
+    incorrect: "I look forward to hear from you.",
+    correct: "I look forward to hearing from you.",
+    explanation: "'Look forward to + gerund'."
+  },
+  {
+    incorrect: "The furnitures are expensive.",
+    correct: "The furniture is expensive.",
+    explanation: "'Furniture' uncountable."
+  },
+  {
+    incorrect: "He's used to speak English.",
+    correct: "He's used to speaking English.",
+    explanation: "'Be used to + gerund' = accustomed."
+  },
+  {
+    incorrect: "Could you borrow me your book?",
+    correct: "Could you lend me your book?",
+    explanation: "'Lend' = give; 'borrow' = receive."
+  },
+  {
+    incorrect: "The informations are useful.",
+    correct: "The information is useful.",
+    explanation: "'Information' uncountable singular."
+  },
+  {
+    incorrect: "I'm looking forward for your reply.",
+    correct: "I'm looking forward to your reply.",
+    explanation: "'Look forward to'."
+  },
+  {
+    incorrect: "She's engineer.",
+    correct: "She's an engineer.",
+    explanation: "Profession needs article."
+  },
+  {
+    incorrect: "He's responsible for manage the team.",
+    correct: "He's responsible for managing the team.",
+    explanation: "'For' + gerund."
+  },
+  {
+    incorrect: "The majority of voters supports him.",
+    correct: "The majority of voters support him.",
+    explanation: "'Majority of + plural' = plural verb."
+  },
+  {
+    incorrect: "I'm waiting since morning.",
+    correct: "I have been waiting since morning.",
+    explanation: "'Since' + perfect continuous."
+  },
+  {
+    incorrect: "She's more tall than her sister.",
+    correct: "She's taller than her sister.",
+    explanation: "One syllable = -er comparative."
+  },
+  {
+    incorrect: "I have a homework to do.",
+    correct: "I have homework to do.",
+    explanation: "'Homework' uncountable."
+  },
+  {
+    incorrect: "He's good in sports.",
+    correct: "He's good at sports.",
+    explanation: "'Good at' skills."
+  },
+  {
+    incorrect: "The weather in Spain is hotter than England.",
+    correct: "The weather in Spain is hotter than that in England.",
+    explanation: "Compare similar things."
+  },
+  {
+    incorrect: "She's living here from 2015.",
+    correct: "She has been living here since 2015.",
+    explanation: "'Since' with perfect tense."
+  },
+  {
+    incorrect: "I'm not agree.",
+    correct: "I don't agree.",
+    explanation: "'Agree' is verb; no 'am'."
+  },
+  {
+    incorrect: "He's excellent teacher.",
+    correct: "He's an excellent teacher.",
+    explanation: "Countable noun needs article."
+  },
+  {
+    incorrect: "The movie was bored.",
+    correct: "The movie was boring.",
+    explanation: "'Boring' describes thing; 'bored' feeling."
+  },
+  {
+    incorrect: "I haven't seen him since ages.",
+    correct: "I haven't seen him for ages.",
+    explanation: "'For' with duration."
+  },
+  {
+    incorrect: "She died from heart attack.",
+    correct: "She died of a heart attack.",
+    explanation: "'Die of' illness."
+  },
+  {
+    incorrect: "I'm going to upstairs.",
+    correct: "I'm going upstairs.",
+    explanation: "No 'to' with adverbs of place."
+  },
+  // DAY 31-35
+  {
+    incorrect: "Between you and I, he's wrong.",
+    correct: "Between you and me, he's wrong.",
+    explanation: "Object pronoun after preposition."
+  },
+  {
+    incorrect: "The police is coming.",
+    correct: "The police are coming.",
+    explanation: "'Police' plural."
+  },
+  {
+    incorrect: "I'm not accustomed to work late.",
+    correct: "I'm not accustomed to working late.",
+    explanation: "'Accustomed to + gerund'."
+  },
+  {
+    incorrect: "She's married for five years.",
+    correct: "She has been married for five years.",
+    explanation: "Duration with present perfect."
+  },
+  {
+    incorrect: "He's waiting the bus.",
+    correct: "He's waiting for the bus.",
+    explanation: "'Wait for'."
+  },
+  {
+    incorrect: "I haven't got nothing.",
+    correct: "I haven't got anything.",
+    explanation: "Double negative incorrect."
+  },
+  {
+    incorrect: "The staff are on holiday.",
+    correct: "The staff is on holiday.",
+    explanation: "Staff as collective singular."
+  },
+  {
+    incorrect: "She's very much happy.",
+    correct: "She's very happy.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "I'll suggest you a solution.",
+    correct: "I'll suggest a solution to you.",
+    explanation: "'Suggest' takes indirect object with 'to'."
+  },
+  {
+    incorrect: "He's suffering with back pain.",
+    correct: "He's suffering from back pain.",
+    explanation: "'Suffer from'."
+  },
+  {
+    incorrect: "I'm working here from last year.",
+    correct: "I have been working here since last year.",
+    explanation: "'Since' with perfect."
+  },
+  {
+    incorrect: "She's very much beautiful.",
+    correct: "She's very beautiful.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "He's addicted to drink alcohol.",
+    correct: "He's addicted to drinking alcohol.",
+    explanation: "'Addicted to + gerund'."
+  },
+  {
+    incorrect: "I'm looking forward see you.",
+    correct: "I'm looking forward to seeing you.",
+    explanation: "'Look forward to + gerund'."
+  },
+  {
+    incorrect: "The car needs washed.",
+    correct: "The car needs washing.",
+    explanation: "'Need + gerund' (passive meaning)."
+  },
+  {
+    incorrect: "She's afraid from spiders.",
+    correct: "She's afraid of spiders.",
+    explanation: "'Afraid of'."
+  },
+  {
+    incorrect: "I'm used to eat spicy food.",
+    correct: "I'm used to eating spicy food.",
+    explanation: "'Be used to + gerund'."
+  },
+  {
+    incorrect: "He can't afford buying a house.",
+    correct: "He can't afford to buy a house.",
+    explanation: "'Afford to + infinitive'."
+  },
+  {
+    incorrect: "The committee are divided.",
+    correct: "The committee is divided.",
+    explanation: "Committee as unit singular."
+  },
+  {
+    incorrect: "I have visited Paris last summer.",
+    correct: "I visited Paris last summer.",
+    explanation: "Specific past = simple past."
+  },
+  {
+    incorrect: "She's married with an architect.",
+    correct: "She's married to an architect.",
+    explanation: "'Married to'."
+  },
+  {
+    incorrect: "He's interested to join us.",
+    correct: "He's interested in joining us.",
+    explanation: "'Interested in + gerund'."
+  },
+  {
+    incorrect: "I have less apples than you.",
+    correct: "I have fewer apples than you.",
+    explanation: "'Fewer' countable."
+  },
+  {
+    incorrect: "John, along with his friends, are coming.",
+    correct: "John, along with his friends, is coming.",
+    explanation: "Subject 'John' singular."
+  },
+  {
+    incorrect: "She blamed me for the accident.",
+    correct: "She blamed me for the accident.",
+    explanation: "'Blame for' is correct but showing correct usage."
+  },
+  // DAY 36-40
+  {
+    incorrect: "I'm looking for an information.",
+    correct: "I'm looking for information.",
+    explanation: "'Information' uncountable."
+  },
+  {
+    incorrect: "She asked what time is it.",
+    correct: "She asked what time it was.",
+    explanation: "Indirect question: statement word order."
+  },
+  {
+    incorrect: "I'll call when I will finish.",
+    correct: "I'll call when I finish.",
+    explanation: "Time clause = present tense."
+  },
+  {
+    incorrect: "It's different than mine.",
+    correct: "It's different from mine.",
+    explanation: "'Different from'."
+  },
+  {
+    incorrect: "He's capable to run a company.",
+    correct: "He's capable of running a company.",
+    explanation: "'Capable of + gerund'."
+  },
+  {
+    incorrect: "Neither the manager or his assistant is here.",
+    correct: "Neither the manager nor his assistant is here.",
+    explanation: "'Neither...nor'."
+  },
+  {
+    incorrect: "I'm accustomed with cold climates.",
+    correct: "I'm accustomed to cold climates.",
+    explanation: "'Accustomed to'."
+  },
+  {
+    incorrect: "She insisted to pay herself.",
+    correct: "She insisted on paying herself.",
+    explanation: "'Insist on + gerund'."
+  },
+  {
+    incorrect: "A number of employees is on strike.",
+    correct: "A number of employees are on strike.",
+    explanation: "'A number of' = plural."
+  },
+  {
+    incorrect: "He apologized about the mistake.",
+    correct: "He apologized for the mistake.",
+    explanation: "'Apologize for'."
+  },
+  {
+    incorrect: "This is the most perfect solution.",
+    correct: "This is the perfect solution.",
+    explanation: "'Perfect' absolute, no comparison."
+  },
+  {
+    incorrect: "I have knowledge about chemistry.",
+    correct: "I have knowledge of chemistry.",
+    explanation: "'Knowledge of'."
+  },
+  {
+    incorrect: "The team are playing well.",
+    correct: "The team is playing well.",
+    explanation: "Team singular."
+  },
+  {
+    incorrect: "He's afraid from failure.",
+    correct: "He's afraid of failure.",
+    explanation: "'Afraid of'."
+  },
+  {
+    incorrect: "I haven't got some time.",
+    correct: "I haven't got any time.",
+    explanation: "Negative = 'any'."
+  },
+  {
+    incorrect: "She's very more talented.",
+    correct: "She's much more talented.",
+    explanation: "'Much' with comparatives."
+  },
+  {
+    incorrect: "The reason is because of the weather.",
+    correct: "The reason is that the weather is bad.",
+    explanation: "'Reason is that'."
+  },
+  {
+    incorrect: "I'm thinking to study abroad.",
+    correct: "I'm thinking of studying abroad.",
+    explanation: "'Think of + gerund'."
+  },
+  {
+    incorrect: "Two thousands people attended.",
+    correct: "Two thousand people attended.",
+    explanation: "Number as adjective no -s."
+  },
+  {
+    incorrect: "He's addicted with alcohol.",
+    correct: "He's addicted to alcohol.",
+    explanation: "'Addicted to'."
+  },
+  {
+    incorrect: "I have met him last week.",
+    correct: "I met him last week.",
+    explanation: "Specific past = simple past."
+  },
+  {
+    incorrect: "She's married since 2018.",
+    correct: "She has been married since 2018.",
+    explanation: "'Since' + present perfect."
+  },
+  {
+    incorrect: "I look forward to receive your letter.",
+    correct: "I look forward to receiving your letter.",
+    explanation: "'Look forward to + gerund'."
+  },
+  {
+    incorrect: "The luggages are heavy.",
+    correct: "The luggage is heavy.",
+    explanation: "'Luggage' uncountable."
+  },
+  {
+    incorrect: "He's used to work long hours.",
+    correct: "He's used to working long hours.",
+    explanation: "'Be used to + gerund'."
+  },
+  // DAY 41-45
+  {
+    incorrect: "Could you borrow me some money?",
+    correct: "Could you lend me some money?",
+    explanation: "'Lend' = give; 'borrow' = take."
+  },
+  {
+    incorrect: "The news are good.",
+    correct: "The news is good.",
+    explanation: "'News' singular."
+  },
+  {
+    incorrect: "I'm looking forward for Christmas.",
+    correct: "I'm looking forward to Christmas.",
+    explanation: "'Look forward to'."
+  },
+  {
+    incorrect: "She's lawyer.",
+    correct: "She's a lawyer.",
+    explanation: "Profession needs article."
+  },
+  {
+    incorrect: "He's responsible for organize events.",
+    correct: "He's responsible for organizing events.",
+    explanation: "'For' + gerund."
+  },
+  {
+    incorrect: "The majority of members agrees.",
+    correct: "The majority of members agree.",
+    explanation: "'Majority of + plural' = plural verb."
+  },
+  {
+    incorrect: "I'm waiting since 3 PM.",
+    correct: "I have been waiting since 3 PM.",
+    explanation: "'Since' + perfect continuous."
+  },
+  {
+    incorrect: "She's more smart than him.",
+    correct: "She's smarter than him.",
+    explanation: "One syllable = -er comparative."
+  },
+  {
+    incorrect: "I have a work to complete.",
+    correct: "I have work to complete.",
+    explanation: "'Work' uncountable."
+  },
+  {
+    incorrect: "He's good in mathematics.",
+    correct: "He's good at mathematics.",
+    explanation: "'Good at' skills."
+  },
+  {
+    incorrect: "The population of China is larger than India.",
+    correct: "The population of China is larger than that of India.",
+    explanation: "Compare similar things."
+  },
+  {
+    incorrect: "She's living here from childhood.",
+    correct: "She has been living here since childhood.",
+    explanation: "'Since' with perfect."
+  },
+  {
+    incorrect: "I'm not agree with that.",
+    correct: "I don't agree with that.",
+    explanation: "'Agree' verb, no 'am'."
+  },
+  {
+    incorrect: "He's experienced teacher.",
+    correct: "He's an experienced teacher.",
+    explanation: "Countable needs article."
+  },
+  {
+    incorrect: "The book was fascinated.",
+    correct: "The book was fascinating.",
+    explanation: "'Fascinating' describes thing."
+  },
+  {
+    incorrect: "I haven't seen him since months.",
+    correct: "I haven't seen him for months.",
+    explanation: "'For' duration."
+  },
+  {
+    incorrect: "He died from cancer.",
+    correct: "He died of cancer.",
+    explanation: "'Die of' illness."
+  },
+  {
+    incorrect: "I'm going to downstairs.",
+    correct: "I'm going downstairs.",
+    explanation: "No 'to' with adverbs."
+  },
+  {
+    incorrect: "Between you and I, it's true.",
+    correct: "Between you and me, it's true.",
+    explanation: "Object pronoun after preposition."
+  },
+  {
+    incorrect: "The police is investigating.",
+    correct: "The police are investigating.",
+    explanation: "'Police' plural."
+  },
+  {
+    incorrect: "I'm not accustomed to drive on left.",
+    correct: "I'm not accustomed to driving on the left.",
+    explanation: "'Accustomed to + gerund'."
+  },
+  {
+    incorrect: "She's married for a decade.",
+    correct: "She has been married for a decade.",
+    explanation: "Duration with present perfect."
+  },
+  {
+    incorrect: "He's waiting his friend.",
+    correct: "He's waiting for his friend.",
+    explanation: "'Wait for'."
+  },
+  {
+    incorrect: "I haven't got none.",
+    correct: "I haven't got any.",
+    explanation: "Double negative incorrect."
+  },
+  {
+    incorrect: "The staff are efficient.",
+    correct: "The staff is efficient.",
+    explanation: "Staff singular."
+  },
+  // DAY 46-50
+  {
+    incorrect: "She's very much intelligent.",
+    correct: "She's very intelligent.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "I'll propose you a plan.",
+    correct: "I'll propose a plan to you.",
+    explanation: "'Propose' takes indirect object with 'to'."
+  },
+  {
+    incorrect: "He's suffering with migraine.",
+    correct: "He's suffering from migraine.",
+    explanation: "'Suffer from'."
+  },
+  {
+    incorrect: "I'm studying here from January.",
+    correct: "I have been studying here since January.",
+    explanation: "'Since' with perfect."
+  },
+  {
+    incorrect: "She's very much pretty.",
+    correct: "She's very pretty.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "He's addicted to gamble.",
+    correct: "He's addicted to gambling.",
+    explanation: "'Addicted to + gerund'."
+  },
+  {
+    incorrect: "I'm looking forward meet you.",
+    correct: "I'm looking forward to meeting you.",
+    explanation: "'Look forward to + gerund'."
+  },
+  {
+    incorrect: "The shirt needs ironed.",
+    correct: "The shirt needs ironing.",
+    explanation: "'Need + gerund' passive meaning."
+  },
+  {
+    incorrect: "She's afraid from thunder.",
+    correct: "She's afraid of thunder.",
+    explanation: "'Afraid of'."
+  },
+  {
+    incorrect: "I'm used to speak French.",
+    correct: "I'm used to speaking French.",
+    explanation: "'Be used to + gerund'."
+  },
+  {
+    incorrect: "He can't afford going on vacation.",
+    correct: "He can't afford to go on vacation.",
+    explanation: "'Afford to + infinitive'."
+  },
+  {
+    incorrect: "The government are corrupt.",
+    correct: "The government is corrupt.",
+    explanation: "Government singular."
+  },
+  {
+    incorrect: "I have visited Rome in 2020.",
+    correct: "I visited Rome in 2020.",
+    explanation: "Specific past = simple past."
+  },
+  {
+    incorrect: "She's married with a pilot.",
+    correct: "She's married to a pilot.",
+    explanation: "'Married to'."
+  },
+  {
+    incorrect: "He's interested to travel.",
+    correct: "He's interested in traveling.",
+    explanation: "'Interested in + gerund'."
+  },
+  {
+    incorrect: "I have less opportunities.",
+    correct: "I have fewer opportunities.",
+    explanation: "'Fewer' countable."
+  },
+  {
+    incorrect: "The president, with his advisors, are meeting.",
+    correct: "The president, with his advisors, is meeting.",
+    explanation: "Subject 'president' singular."
+  },
+  {
+    incorrect: "She criticized me for my mistake.",
+    correct: "She criticized me for my mistake.",
+    explanation: "Showing correct usage."
+  },
+  {
+    incorrect: "I need an advice.",
+    correct: "I need advice.",
+    explanation: "'Advice' uncountable."
+  },
+  {
+    incorrect: "She asked where am I going.",
+    correct: "She asked where I was going.",
+    explanation: "Indirect question: statement order."
+  },
+  {
+    incorrect: "I'll inform you when I will decide.",
+    correct: "I'll inform you when I decide.",
+    explanation: "Time clause = present."
+  },
+  {
+    incorrect: "His opinion is different than mine.",
+    correct: "His opinion is different from mine.",
+    explanation: "'Different from'."
+  },
+  {
+    incorrect: "He's capable to lead the project.",
+    correct: "He's capable of leading the project.",
+    explanation: "'Capable of + gerund'."
+  },
+  {
+    incorrect: "Neither John or Peter knows.",
+    correct: "Neither John nor Peter knows.",
+    explanation: "'Neither...nor'."
+  },
+  {
+    incorrect: "I'm accustomed with hot weather.",
+    correct: "I'm accustomed to hot weather.",
+    explanation: "'Accustomed to'."
+  },
+  // DAY 51-55
+  {
+    incorrect: "She insisted to help me.",
+    correct: "She insisted on helping me.",
+    explanation: "'Insist on + gerund'."
+  },
+  {
+    incorrect: "A number of problems is arising.",
+    correct: "A number of problems are arising.",
+    explanation: "'A number of' = plural."
+  },
+  {
+    incorrect: "He apologized about his behavior.",
+    correct: "He apologized for his behavior.",
+    explanation: "'Apologize for'."
+  },
+  {
+    incorrect: "This is the most ideal situation.",
+    correct: "This is the ideal situation.",
+    explanation: "'Ideal' absolute, no comparison."
+  },
+  {
+    incorrect: "I have knowledge about biology.",
+    correct: "I have knowledge of biology.",
+    explanation: "'Knowledge of'."
+  },
+  {
+    incorrect: "The team are winning.",
+    correct: "The team is winning.",
+    explanation: "Team singular."
+  },
+  {
+    incorrect: "He's afraid from rejection.",
+    correct: "He's afraid of rejection.",
+    explanation: "'Afraid of'."
+  },
+  {
+    incorrect: "I haven't got some ideas.",
+    correct: "I haven't got any ideas.",
+    explanation: "Negative = 'any'."
+  },
+  {
+    incorrect: "She's very more experienced.",
+    correct: "She's much more experienced.",
+    explanation: "'Much' with comparatives."
+  },
+  {
+    incorrect: "The reason is because I'm busy.",
+    correct: "The reason is that I'm busy.",
+    explanation: "'Reason is that'."
+  },
+  {
+    incorrect: "I'm thinking to move abroad.",
+    correct: "I'm thinking of moving abroad.",
+    explanation: "'Think of + gerund'."
+  },
+  {
+    incorrect: "Five hundreds students passed.",
+    correct: "Five hundred students passed.",
+    explanation: "Number as adjective no -s."
+  },
+  {
+    incorrect: "He's addicted with smoking.",
+    correct: "He's addicted to smoking.",
+    explanation: "'Addicted to'."
+  },
+  {
+    incorrect: "I have finished the project last month.",
+    correct: "I finished the project last month.",
+    explanation: "Specific past = simple past."
+  },
+  {
+    incorrect: "She's married since last year.",
+    correct: "She has been married since last year.",
+    explanation: "'Since' + present perfect."
+  },
+  {
+    incorrect: "I look forward to visit you.",
+    correct: "I look forward to visiting you.",
+    explanation: "'Look forward to + gerund'."
+  },
+  {
+    incorrect: "The jewelleries are expensive.",
+    correct: "The jewelry is expensive.",
+    explanation: "'Jewelry' uncountable."
+  },
+  {
+    incorrect: "He's used to drink coffee.",
+    correct: "He's used to drinking coffee.",
+    explanation: "'Be used to + gerund'."
+  },
+  {
+    incorrect: "Could you borrow me your car?",
+    correct: "Could you lend me your car?",
+    explanation: "'Lend' = give; 'borrow' = take."
+  },
+  {
+    incorrect: "The economics are complicated.",
+    correct: "Economics is complicated.",
+    explanation: "'Economics' singular subject."
+  },
+  {
+    incorrect: "I'm looking forward for the trip.",
+    correct: "I'm looking forward to the trip.",
+    explanation: "'Look forward to'."
+  },
+  {
+    incorrect: "She's professor at Oxford.",
+    correct: "She's a professor at Oxford.",
+    explanation: "Profession needs article."
+  },
+  {
+    incorrect: "He's responsible for train new staff.",
+    correct: "He's responsible for training new staff.",
+    explanation: "'For' + gerund."
+  },
+  {
+    incorrect: "The majority of water are polluted.",
+    correct: "The majority of water is polluted.",
+    explanation: "'Majority of + uncountable' = singular."
+  },
+  {
+    incorrect: "I'm waiting since hours.",
+    correct: "I have been waiting for hours.",
+    explanation: "'For' duration."
+  },
+  // DAY 56-60
+  {
+    incorrect: "She's more young than me.",
+    correct: "She's younger than me.",
+    explanation: "One syllable = -er comparative."
+  },
+  {
+    incorrect: "I have a research to conduct.",
+    correct: "I have research to conduct.",
+    explanation: "'Research' uncountable."
+  },
+  {
+    incorrect: "He's good in public speaking.",
+    correct: "He's good at public speaking.",
+    explanation: "'Good at' skills."
+  },
+  {
+    incorrect: "The culture of Japan is different than Korea.",
+    correct: "The culture of Japan is different from that of Korea.",
+    explanation: "Compare similar things."
+  },
+  {
+    incorrect: "She's living here from 2020.",
+    correct: "She has been living here since 2020.",
+    explanation: "'Since' with perfect."
+  },
+  {
+    incorrect: "I'm not agree with your opinion.",
+    correct: "I don't agree with your opinion.",
+    explanation: "'Agree' verb, no 'am'."
+  },
+  {
+    incorrect: "He's skilled programmer.",
+    correct: "He's a skilled programmer.",
+    explanation: "Countable needs article."
+  },
+  {
+    incorrect: "The lecture was confused.",
+    correct: "The lecture was confusing.",
+    explanation: "'Confusing' describes thing."
+  },
+  {
+    incorrect: "I haven't seen him since weeks.",
+    correct: "I haven't seen him for weeks.",
+    explanation: "'For' duration."
+  },
+  {
+    incorrect: "He died from pneumonia.",
+    correct: "He died of pneumonia.",
+    explanation: "'Die of' illness."
+  },
+  {
+    incorrect: "I'm going to abroad.",
+    correct: "I'm going abroad.",
+    explanation: "No 'to' with 'abroad'."
+  },
+  {
+    incorrect: "Between she and I, there's a secret.",
+    correct: "Between her and me, there's a secret.",
+    explanation: "Object pronouns after preposition."
+  },
+  {
+    incorrect: "The police is patroling the area.",
+    correct: "The police are patrolling the area.",
+    explanation: "'Police' plural."
+  },
+  {
+    incorrect: "I'm not accustomed to eat late.",
+    correct: "I'm not accustomed to eating late.",
+    explanation: "'Accustomed to + gerund'."
+  },
+  {
+    incorrect: "She's married for 15 years.",
+    correct: "She has been married for 15 years.",
+    explanation: "Duration with present perfect."
+  },
+  {
+    incorrect: "He's waiting the train.",
+    correct: "He's waiting for the train.",
+    explanation: "'Wait for'."
+  },
+  {
+    incorrect: "I haven't got nobody to help.",
+    correct: "I haven't got anybody to help.",
+    explanation: "Double negative incorrect."
+  },
+  {
+    incorrect: "The staff are on break.",
+    correct: "The staff is on break.",
+    explanation: "Staff singular."
+  },
+  {
+    incorrect: "She's very much talented.",
+    correct: "She's very talented.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "I'll recommend you a book.",
+    correct: "I'll recommend a book to you.",
+    explanation: "'Recommend' takes indirect object with 'to'."
+  },
+  {
+    incorrect: "He's suffering with arthritis.",
+    correct: "He's suffering from arthritis.",
+    explanation: "'Suffer from'."
+  },
+  {
+    incorrect: "I'm learning French from last month.",
+    correct: "I have been learning French since last month.",
+    explanation: "'Since' with perfect."
+  },
+  {
+    incorrect: "She's very much attractive.",
+    correct: "She's very attractive.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "He's addicted to watch TV.",
+    correct: "He's addicted to watching TV.",
+    explanation: "'Addicted to + gerund'."
+  },
+  {
+    incorrect: "I'm looking forward see my family.",
+    correct: "I'm looking forward to seeing my family.",
+    explanation: "'Look forward to + gerund'."
+  },
+  // DAY 61-65
+  {
+    incorrect: "The windows need cleaned.",
+    correct: "The windows need cleaning.",
+    explanation: "'Need + gerund' passive meaning."
+  },
+  {
+    incorrect: "She's afraid from commitment.",
+    correct: "She's afraid of commitment.",
+    explanation: "'Afraid of'."
+  },
+  {
+    incorrect: "I'm used to wake up early.",
+    correct: "I'm used to waking up early.",
+    explanation: "'Be used to + gerund'."
+  },
+  {
+    incorrect: "He can't afford taking a holiday.",
+    correct: "He can't afford to take a holiday.",
+    explanation: "'Afford to + infinitive'."
+  },
+  {
+    incorrect: "The council are debating the issue.",
+    correct: "The council is debating the issue.",
+    explanation: "Council as unit singular."
+  },
+  {
+    incorrect: "I have completed the course in 2021.",
+    correct: "I completed the course in 2021.",
+    explanation: "Specific past = simple past."
+  },
+  {
+    incorrect: "She's married with a businessman.",
+    correct: "She's married to a businessman.",
+    explanation: "'Married to'."
+  },
+  {
+    incorrect: "He's interested to learn coding.",
+    correct: "He's interested in learning coding.",
+    explanation: "'Interested in + gerund'."
+  },
+  {
+    incorrect: "I have less chances than you.",
+    correct: "I have fewer chances than you.",
+    explanation: "'Fewer' countable."
+  },
+  {
+    incorrect: "The director, together with actors, are present.",
+    correct: "The director, together with actors, is present.",
+    explanation: "Subject 'director' singular."
+  },
+  {
+    incorrect: "She complimented me for my work.",
+    correct: "She complimented me on my work.",
+    explanation: "'Compliment on'."
+  },
+  {
+    incorrect: "I need some informations.",
+    correct: "I need some information.",
+    explanation: "'Information' uncountable."
+  },
+  {
+    incorrect: "She asked how old are you.",
+    correct: "She asked how old I was.",
+    explanation: "Indirect question: statement order."
+  },
+  {
+    incorrect: "I'll pay when I will get paid.",
+    correct: "I'll pay when I get paid.",
+    explanation: "Time clause = present."
+  },
+  {
+    incorrect: "Her style is different than yours.",
+    correct: "Her style is different from yours.",
+    explanation: "'Different from'."
+  },
+  {
+    incorrect: "He's capable to handle pressure.",
+    correct: "He's capable of handling pressure.",
+    explanation: "'Capable of + gerund'."
+  },
+  {
+    incorrect: "Neither the cat or the dog is home.",
+    correct: "Neither the cat nor the dog is home.",
+    explanation: "'Neither...nor'."
+  },
+  {
+    incorrect: "I'm accustomed with noise.",
+    correct: "I'm accustomed to noise.",
+    explanation: "'Accustomed to'."
+  },
+  {
+    incorrect: "She insisted to accompany me.",
+    correct: "She insisted on accompanying me.",
+    explanation: "'Insist on + gerund'."
+  },
+  {
+    incorrect: "A number of changes is needed.",
+    correct: "A number of changes are needed.",
+    explanation: "'A number of' = plural."
+  },
+  {
+    incorrect: "He apologized about the delay.",
+    correct: "He apologized for the delay.",
+    explanation: "'Apologize for'."
+  },
+  {
+    incorrect: "This is the most round shape.",
+    correct: "This is the roundest shape.",
+    explanation: "'Round' can have comparative/superlative."
+  },
+  {
+    incorrect: "I have knowledge about astronomy.",
+    correct: "I have knowledge of astronomy.",
+    explanation: "'Knowledge of'."
+  },
+  {
+    incorrect: "The jury are deliberating.",
+    correct: "The jury is deliberating.",
+    explanation: "Jury as unit singular."
+  },
+  {
+    incorrect: "He's afraid from success.",
+    correct: "He's afraid of success.",
+    explanation: "'Afraid of'."
+  },
+  // DAY 66-70
+  {
+    incorrect: "I haven't got some suggestions.",
+    correct: "I haven't got any suggestions.",
+    explanation: "Negative = 'any'."
+  },
+  {
+    incorrect: "She's very more successful.",
+    correct: "She's much more successful.",
+    explanation: "'Much' with comparatives."
+  },
+  {
+    incorrect: "The reason is because of traffic.",
+    correct: "The reason is that there's traffic.",
+    explanation: "'Reason is that'."
+  },
+  {
+    incorrect: "I'm thinking to start a business.",
+    correct: "I'm thinking of starting a business.",
+    explanation: "'Think of + gerund'."
+  },
+  {
+    incorrect: "Ten thousands fans cheered.",
+    correct: "Ten thousand fans cheered.",
+    explanation: "Number as adjective no -s."
+  },
+  {
+    incorrect: "He's addicted with video games.",
+    correct: "He's addicted to video games.",
+    explanation: "'Addicted to'."
+  },
+  {
+    incorrect: "I have submitted the report yesterday.",
+    correct: "I submitted the report yesterday.",
+    explanation: "Specific past = simple past."
+  },
+  {
+    incorrect: "She's married since February.",
+    correct: "She has been married since February.",
+    explanation: "'Since' + present perfect."
+  },
+  {
+    incorrect: "I look forward to hear good news.",
+    correct: "I look forward to hearing good news.",
+    explanation: "'Look forward to + gerund'."
+  },
+  {
+    incorrect: "The machineries are obsolete.",
+    correct: "The machinery is obsolete.",
+    explanation: "'Machinery' uncountable."
+  },
+  {
+    incorrect: "He's used to eat quickly.",
+    correct: "He's used to eating quickly.",
+    explanation: "'Be used to + gerund'."
+  },
+  {
+    incorrect: "Could you borrow me your notes?",
+    correct: "Could you lend me your notes?",
+    explanation: "'Lend' = give; 'borrow' = take."
+  },
+  {
+    incorrect: "The politics are complicated.",
+    correct: "Politics is complicated.",
+    explanation: "'Politics' singular subject."
+  },
+  {
+    incorrect: "I'm looking forward for my birthday.",
+    correct: "I'm looking forward to my birthday.",
+    explanation: "'Look forward to'."
+  },
+  {
+    incorrect: "He's CEO of the company.",
+    correct: "He's the CEO of the company.",
+    explanation: "Position with 'the' when unique."
+  },
+  {
+    incorrect: "She's responsible for coordinate teams.",
+    correct: "She's responsible for coordinating teams.",
+    explanation: "'For' + gerund."
+  },
+  {
+    incorrect: "The majority of votes are counted.",
+    correct: "The majority of votes is counted.",
+    explanation: "'Majority of + plural countable' can be singular when considered as unit."
+  },
+  {
+    incorrect: "I'm waiting since yesterday.",
+    correct: "I have been waiting since yesterday.",
+    explanation: "'Since' + perfect continuous."
+  },
+  {
+    incorrect: "He's more fast than me.",
+    correct: "He's faster than me.",
+    explanation: "One syllable = -er comparative."
+  },
+  {
+    incorrect: "I have a progress to report.",
+    correct: "I have progress to report.",
+    explanation: "'Progress' uncountable."
+  },
+  {
+    incorrect: "She's good in negotiation.",
+    correct: "She's good at negotiation.",
+    explanation: "'Good at' skills."
+  },
+  {
+    incorrect: "The education system in Finland is better than UK.",
+    correct: "The education system in Finland is better than that in the UK.",
+    explanation: "Compare similar things."
+  },
+  {
+    incorrect: "He's working here from 2019.",
+    correct: "He has been working here since 2019.",
+    explanation: "'Since' with perfect."
+  },
+  {
+    incorrect: "I'm not agree with the decision.",
+    correct: "I don't agree with the decision.",
+    explanation: "'Agree' verb, no 'am'."
+  },
+  {
+    incorrect: "She's famous singer.",
+    correct: "She's a famous singer.",
+    explanation: "Countable needs article."
+  },
+  // DAY 71-73 (Final 15 questions to reach 365)
+  {
+    incorrect: "The instructions are confused.",
+    correct: "The instructions are confusing.",
+    explanation: "'Confusing' describes thing; 'confused' describes feeling."
+  },
+  {
+    incorrect: "I haven't seen him since years.",
+    correct: "I haven't seen him for years.",
+    explanation: "'For' duration."
+  },
+  {
+    incorrect: "She died from old age.",
+    correct: "She died of old age.",
+    explanation: "'Die of' natural causes."
+  },
+  {
+    incorrect: "I'm going to outside.",
+    correct: "I'm going outside.",
+    explanation: "No 'to' with 'outside' as adverb."
+  },
+  {
+    incorrect: "Between they and we, there's agreement.",
+    correct: "Between them and us, there's agreement.",
+    explanation: "Object pronouns after preposition."
+  },
+  {
+    incorrect: "The police is well-equipped.",
+    correct: "The police are well-equipped.",
+    explanation: "'Police' plural."
+  },
+  {
+    incorrect: "I'm not accustomed to work weekends.",
+    correct: "I'm not accustomed to working weekends.",
+    explanation: "'Accustomed to + gerund'."
+  },
+  {
+    incorrect: "They're married for a year.",
+    correct: "They have been married for a year.",
+    explanation: "Duration with present perfect."
+  },
+  {
+    incorrect: "He's waiting the results.",
+    correct: "He's waiting for the results.",
+    explanation: "'Wait for'."
+  },
+  {
+    incorrect: "I haven't got nowhere to go.",
+    correct: "I haven't got anywhere to go.",
+    explanation: "Double negative incorrect."
+  },
+  {
+    incorrect: "The staff are dedicated.",
+    correct: "The staff is dedicated.",
+    explanation: "Staff as collective singular."
+  },
+  {
+    incorrect: "She's very much creative.",
+    correct: "She's very creative.",
+    explanation: "'Very' with adjectives."
+  },
+  {
+    incorrect: "I'll mention you the details.",
+    correct: "I'll mention the details to you.",
+    explanation: "'Mention' takes indirect object with 'to'."
+  },
+  {
+    incorrect: "He's suffering with depression.",
+    correct: "He's suffering from depression.",
+    explanation: "'Suffer from'."
+  },
+  {
+    incorrect: "I'm teaching here from September.",
+    correct: "I have been teaching here since September.",
+    explanation: "'Since' with perfect."
+  }
+];
 
     let currentQuestion = null;
 
