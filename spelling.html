@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spelling Test Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 { margin-bottom: 10px; color: #ddd; text-align: center; }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      max-height: 80vh;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      margin-bottom: 20px;
+      border: 1px solid #333;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .btn-gen { background: #e63946; color: white; }
+    .btn-gen:hover { background: #d62839; }
+
+    .btn-dl { background: #457b9d; color: white; }
+    .btn-dl:hover { background: #1d3557; }
+
+    .btn-copy { background: #2a9d8f; color: white; }
+    .btn-copy:hover { background: #21867a; }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      gap: 10px;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    /* Caption Box Styles */
+    .caption-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .caption-header {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 220px;
+      background: #2b2b2b;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    textarea:focus { outline: 2px solid #457b9d; }
+  </style>
+</head>
+<body>
+
+  <h2>Spelling Test Generator (Confusion Zone)</h2>
+  <canvas id="flashcard" width="1080" height="1080"></canvas>
+
+  <div class="controls">
+    <div class="toggle-container">
+      <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
+      <label for="showAnswer">Show Correct Answer</label>
+    </div>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Spelling</button>
+    <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
+  </div>
+
+  <div class="caption-box">
+    <div class="caption-header">
+      📝 Social Media Caption (Full Links Included)
+    </div>
+    <textarea id="captionText" readonly></textarea>
+    <button class="btn-copy" onclick="copyCaption()">📋 Copy Caption</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("flashcard");
+    const ctx = canvas.getContext("2d");
+
+    // --- ASSETS ---
+    const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
+    const fbLogo = "https://zetx2024.github.io/epttool/logo/facebook.png";
+    const ytLogo = "https://zetx2024.github.io/epttool/logo/youtube.png";
+    const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
+    const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
+
+    // --- DATA: Spelling Test (Confusion Zone) ---
+    const questions = [
+      { word: "Necessary", options: ["Necessary", "Neccessary"], correctIndex: 0, note: "" },
+      { word: "Accommodation", options: ["Accommodation", "Accomodation"], correctIndex: 0, note: "(Double C, Double M)" },
+      { word: "Occurred", options: ["Occurred", "Ocured"], correctIndex: 0, note: "" },
+      { word: "Maintenance", options: ["Maintenance", "Maintainance"], correctIndex: 0, note: "" },
+      { word: "Receive", options: ["Receive", "Recieve"], correctIndex: 0, note: "" }
+    ];
+
+    // --- DATA: Hashtag Pools ---
+    const requiredTags = ["#eptonline", "#SpellingTest", "#IELTSListening", "#ConfusionZone"];
+    const examTags = ["#IELTS", "#TOEFL", "#EnglishGrammar", "#PTE", "#StudyAbroad", "#EnglishSpelling", "#CommonMistakes"];
+    const engagementTags = ["#DailyEnglish", "#LearnEnglish", "#QuizTime", "#EnglishQuiz", "#Grammar"];
+
+    let currentQuestion = null;
+
+    function getRandomColor() {
+      const colors = ["#faf339", "#faf339", "#faf339"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.warn("Failed to load image:", url);
+            resolve(null);
+        };
+        img.src = url;
+      });
+    }
+
+    // --- CAPTION GENERATOR ---
+    function generateCaptionText(question) {
+        const optionLabels = ["A", "B"];
+        
+        let text = `🧠 SPELLING TEST (Confusion Zone) 🧠\n`;
+        text += `IELTS Listening-এ স্পেলিং খুব গুরুত্বপূর্ণ।\n\n`;
+        text += `Which one is correct?\n\n`;
+        
+        question.options.forEach((opt, i) => {
+            text += `${optionLabels[i]}) ${opt}\n`;
+        });
+
+        if(question.note) {
+            text += `\n💡 Hint: ${question.note}\n`;
+        }
+
+        text += `\n👇 Drop your answer in the comments! 👇\n\n`;
+        text += `Practice more at: https://eptonline.org\n`;
+        text += `Follow us for daily updates:\n`;
+        // Full Links Here
+        text += `🌐 Website: https://eptonline.org\n`;
+        text += `📘 Facebook: https://www.facebook.com/eptonline.org\n`;
+        text += `📸 Instagram: https://www.instagram.com/eptonline_org\n`;
+        text += `📺 YouTube: https://www.youtube.com/@eptonlineOrg\n\n`;
+
+        // Hashtags
+        let tags = [...requiredTags];
+        const shuffledExams = examTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledExams.slice(0, 3));
+        const shuffledEngage = engagementTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledEngage.slice(0, 2));
+
+        text += tags.join(" ");
+        return text;
+    }
+
+    function copyCaption() {
+        const copyText = document.getElementById("captionText");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        btn.style.background = "#21867a";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#2a9d8f";
+        }, 2000);
+    }
+
+    async function generateFlashcard() {
+      const showAnswer = document.getElementById("showAnswer").checked;
+
+      if (!currentQuestion || (event && event.type === 'click' && (event.target.classList.contains('btn-gen') || event.target.innerText.includes('Random')))) {
+          currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+          const caption = generateCaptionText(currentQuestion);
+          document.getElementById('captionText').value = caption;
+      }
+
+      const q = currentQuestion;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Background ---
+      const color1 = getRandomColor();
+      const color2 = "#c76e08"; 
+      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // --- Header Logo ---
+      const logo = await loadImage(logoUrl);
+      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
+
+      // --- Title ---
+      ctx.fillStyle = "#0a0a0a";
+      ctx.font = "bold 50px 'Segoe UI'";
+      ctx.textAlign = "center";
+      ctx.fillText("SPELLING TEST", canvas.width / 2, 220);
+      
+      ctx.fillStyle = "#615c56";
+      ctx.font = "italic 35px 'Segoe UI'";
+      ctx.fillText("(Confusion Zone)", canvas.width / 2, 275);
+
+      // --- The Main Question ---
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "800 90px 'Arial'"; 
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 10;
+      // In spelling test, we don't show the answer word in center, we ask the question
+      ctx.fillText("Which is Correct?", canvas.width / 2, 420);
+      ctx.shadowBlur = 0; 
+
+      // --- Options ---
+      ctx.font = "bold 55px 'Segoe UI'";
+      // Adjusted startY since we only have 2 options now, to make it look centered
+      const startY = 580; 
+      const optionLabels = ["A", "B"];
+
+      q.options.forEach((opt, i) => {
+        // Increased spacing slightly for visual balance with fewer options
+        const y = startY + i * 160; 
+        const x = 140;
+        const width = 800;
+        const height = 120;
+
+        let strokeColor = "white";
+        let fillColor = "transparent";
+        let textColor = "white";
+
+        if (showAnswer) {
+            if (i === q.correctIndex) {
+                strokeColor = "#2a9d8f"; 
+                fillColor = "rgba(42, 157, 143, 0.2)";
+                textColor = "#4ecdc4";
+            } else {
+                strokeColor = "#555"; 
+                textColor = "#777";
+            }
+        }
+
+        ctx.strokeStyle = strokeColor;
+        ctx.fillStyle = fillColor;
+        ctx.lineWidth = 4;
+        
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, 20); 
+        ctx.stroke();
+        ctx.fill();
+
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "left";
+        // Centering text vertically in the box
+        ctx.fillText(`${optionLabels[i]})  ${opt}`, x + 50, y + 80);
+      });
+
+      // --- Footer ---
+      ctx.fillStyle = "#0a0a0a";
+      ctx.font = "15px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Practice More:", 70, 1020);
+      
+      const fb = await loadImage(fbLogo);
+      const insta = await loadImage(instaLogo);
+      const yt = await loadImage(ytLogo);
+      const webIcon = await loadImage(webLogoUrl);
+      
+      // 1. Website Link (Bottom Left)
+      if (webIcon) {
+          ctx.drawImage(webIcon, 50, 1020, 24, 24); 
+          
+          ctx.font = "bold 20px Arial";
+          ctx.fillStyle = "white"; 
+          ctx.textAlign = "left";
+          ctx.fillText("eptonline.org", 80, 1040); 
+      }
+      
+      // 2. Facebook (Starts at 990)
+      if(fb) {
+          ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline.org", 905, 1005); 
+      }
+
+      // 3. Instagram (Tight gap: +24px)
+      if(insta) {
+          ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline_org", 905, 1029);
+      }
+
+      // 4. YouTube (Tight gap: +24px)
+      if(yt) {
+          ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonlineOrg", 905, 1053);
+      }
+    }
+
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    }
+
+    function downloadFlashcard() {
+      const link = document.createElement("a");
+      // Use the first option as the filename identifier to avoid spoilers in filename
+      const word = currentQuestion ? currentQuestion.word : "spelling_test";
+      link.download = `Spelling_${word}_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    // Initialize
+    window.onload = function() {
+        document.querySelector('.btn-gen').click();
+    };
+  </script>
+</body>
+</html>
