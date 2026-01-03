@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Weekly Learning</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .card { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; }
+        
+        h2 { color: #2d3436; margin-bottom: 10px; font-size: 22px; }
+        #date-display { color: #636e72; font-size: 14px; margin-bottom: 20px; }
+        
+        .btn-container { display: grid; gap: 12px; }
+        
+        .link-btn {
+            display: block;
+            padding: 16px;
+            background: #0984e3;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .link-btn:hover { background: #074b83; transform: scale(1.02); }
+        
+        /* স্পেশাল দিনের হাইলাইট স্টাইল */
+        .special-day { background: #d63031 !important; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.4);} 70% {box-shadow: 0 0 0 10px rgba(214, 48, 49, 0);} 100% {box-shadow: 0 0 0 0 rgba(214, 48, 49, 0);} }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="date-display"></div>
+    <div id="content-area">
+        </div>
+</div>
+
+<script>
+    function renderPage() {
+        const contentArea = document.getElementById('content-area');
+        const dateDisplay = document.getElementById('date-display');
+        
+        const now = new Date();
+        // সিস্টেম থেকে বারের নাম বের করা (যেমন: Saturday, Monday)
+        const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(now);
+        
+        // তারিখ প্রদর্শন
+        dateDisplay.innerText = now.toDateString();
+
+        // পোস্টের ডাটাবেজ
+        const schedule = {
+            'Saturday': { title: "Vocabulary Quiz (MCQ)", link: "vocab.html" },
+            'Monday':   { title: "Grammar Tip (Learning)", link: "grammar.html" },
+            'Wednesday':{ title: "Speaking Topic (Discussion)", link: "speaking.html" },
+            'Friday':   { title: "Study Motivation/Resources", link: "motivation.html" }
+        };
+
+        // চেক করা আজ কোনো স্পেশাল দিন কি না
+        if (schedule[dayName]) {
+            const post = schedule[dayName];
+            contentArea.innerHTML = `
+                <h2>আজকের বিশেষ টাস্ক (${dayName})</h2>
+                <div class="btn-container">
+                    <a href="${post.link}" class="link-btn special-day">${post.title}</a>
+                </div>
+                <p style="margin-top:15px; font-size:12px; color:#999;">আজকের জন্য শুধুমাত্র এই টাস্কটি নির্ধারিত।</p>
+            `;
+        } else {
+            // অন্য দিনগুলোতে সব বাটন দেখাবে
+            contentArea.innerHTML = `
+                <h2>সবগুলো অপশন দেখুন</h2>
+                <div class="btn-container">
+                    <a href="vocab.html" class="link-btn">Vocabulary</a>
+                    <a href="grammar.html" class="link-btn">Grammar</a>
+                    <a href="speaking.html" class="link-btn">Speaking</a>
+                    <a href="motivation.html" class="link-btn">Resources</a>
+                </div>
+            `;
+        }
+    }
+
+    window.onload = renderPage;
+</script>
+
+</body>
+</html>
