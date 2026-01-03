@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IELTS Speaking Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 { margin-bottom: 10px; color: #ddd; text-align: center; }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      max-height: 80vh;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      margin-bottom: 20px;
+      border: 1px solid #333;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .btn-gen { background: #e63946; color: white; }
+    .btn-gen:hover { background: #d62839; }
+
+    .btn-dl { background: #457b9d; color: white; }
+    .btn-dl:hover { background: #1d3557; }
+
+    .btn-copy { background: #2a9d8f; color: white; }
+    .btn-copy:hover { background: #21867a; }
+
+    /* Caption Box Styles */
+    .caption-box {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #333;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .caption-header {
+      font-size: 18px;
+      color: #aaa;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 220px;
+      background: #2b2b2b;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    textarea:focus { outline: 2px solid #457b9d; }
+  </style>
+</head>
+<body>
+
+  <h2>IELTS Cue Card Generator</h2>
+  <canvas id="flashcard" width="1080" height="1080"></canvas>
+
+  <div class="controls">
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Topic</button>
+    <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
+  </div>
+
+  <div class="caption-box">
+    <div class="caption-header">
+      📝 Social Media Caption (Full Links Included)
+    </div>
+    <textarea id="captionText" readonly></textarea>
+    <button class="btn-copy" onclick="copyCaption()">📋 Copy Caption</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("flashcard");
+    const ctx = canvas.getContext("2d");
+
+    // --- ASSETS ---
+    const logoUrl = "https://zetx2024.github.io/epttool/logo.png";
+    const fbLogo = "https://zetx2024.github.io/epttool/logo/facebook.png";
+    const ytLogo = "https://zetx2024.github.io/epttool/logo/youtube.png";
+    const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
+    const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
+
+    // --- DATA: IELTS Speaking Cue Cards ---
+    const topics = [
+      "Describe a person who has influenced your life.",
+      "Describe a beautiful place you visited in your country.",
+      "Describe an electronic device you find very useful.",
+      "Describe a hobby you would like to start.",
+      "Describe a gift you received that was very special."
+    ];
+
+    // --- DATA: Hashtag Pools ---
+    const requiredTags = ["#eptonline", "#IELTS", "#Speaking", "#CueCard"];
+    const examTags = ["#IELTSPreparation", "#TOEFL", "#EnglishSpeaking", "#StudyAbroad", "#PublicSpeaking"];
+    const engagementTags = ["#EnglishDaily", "#LearnEnglish", "#Discussion", "#IdeaGeneration"];
+
+    let currentTopic = "";
+
+    function getRandomColor() {
+      // Keeping the yellow/gold theme from your previous request, but you can change this
+      const colors = ["#faf339", "#faf339", "#faf339"];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => {
+            console.warn("Failed to load image:", url);
+            resolve(null);
+        };
+        img.src = url;
+      });
+    }
+
+    // --- HELPER: Wrap Text for Long Sentences ---
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+        let currentY = y;
+
+        for(let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = context.measureText(testLine);
+          const testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            context.fillText(line, x, currentY);
+            line = words[n] + ' ';
+            currentY += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        context.fillText(line, x, currentY);
+        return currentY; // Return last Y position
+    }
+
+    // --- CAPTION GENERATOR ---
+    function generateCaptionText(topic) {
+        let text = `🗣️ IELTS SPEAKING CUE CARD 🗣️\n\n`;
+        text += `Topic: ${topic}\n\n`;
+        
+        text += `💡 Idea Generation Challenge:\n`;
+        text += `Write at least 2-3 sentences about this topic in English in the comments below! 👇\n\n`;
+        
+        text += `Practice more at: https://eptonline.org\n`;
+        text += `Follow us for daily updates:\n`;
+        // Full Links Here
+        text += `🌐 Website: https://eptonline.org\n`;
+        text += `📘 Facebook: https://www.facebook.com/eptonline.org\n`;
+        text += `📸 Instagram: https://www.instagram.com/eptonline_org\n`;
+        text += `📺 YouTube: https://www.youtube.com/@eptonlineOrg\n\n`;
+
+        // Hashtags
+        let tags = [...requiredTags];
+        const shuffledExams = examTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledExams.slice(0, 3));
+        const shuffledEngage = engagementTags.sort(() => 0.5 - Math.random());
+        tags.push(...shuffledEngage.slice(0, 2));
+
+        text += tags.join(" ");
+        return text;
+    }
+
+    function copyCaption() {
+        const copyText = document.getElementById("captionText");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        
+        const btn = document.querySelector('.btn-copy');
+        const originalText = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        btn.style.background = "#21867a";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = "#2a9d8f";
+        }, 2000);
+    }
+
+    async function generateFlashcard() {
+      // Logic to prevent generating on load if already exists, 
+      // but here we just generate new on click or init.
+      if (!currentTopic || (event && event.type === 'click')) {
+          currentTopic = topics[Math.floor(Math.random() * topics.length)];
+          const caption = generateCaptionText(currentTopic);
+          document.getElementById('captionText').value = caption;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // --- Background ---
+      const color1 = getRandomColor();
+      const color2 = "#c76e08"; 
+      const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // --- Header Logo ---
+      const logo = await loadImage(logoUrl);
+      if(logo) ctx.drawImage(logo, canvas.width / 2 - 60, 50, 120, 120);
+
+      // --- Title ---
+      ctx.fillStyle = "#0a0a0a";
+      ctx.font = "bold 40px 'Segoe UI'";
+      ctx.textAlign = "center";
+      ctx.fillText("IELTS SPEAKING", canvas.width / 2, 220);
+      
+      ctx.fillStyle = "#615c56";
+      ctx.font = "italic 30px 'Segoe UI'";
+      ctx.fillText("(Idea Generation)", canvas.width / 2, 270);
+
+      // --- Main Topic Box ---
+      // We will draw a semi-transparent box behind the text
+      const boxY = 350;
+      const boxHeight = 400;
+      const boxWidth = 900;
+      const boxX = (canvas.width - boxWidth) / 2;
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 30);
+      ctx.fill();
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // --- The Topic Text ---
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 65px 'Arial'"; 
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 10;
+      ctx.textAlign = "center";
+      
+      // Use wrapText helper to center the sentence inside the box
+      // Start slightly lower than top of box
+      wrapText(ctx, currentTopic, canvas.width / 2, boxY + 140, 850, 85);
+      
+      ctx.shadowBlur = 0; 
+
+      // --- Call to Action (Instruction) on Card ---
+      ctx.font = "italic bold 35px 'Segoe UI'";
+      ctx.fillStyle = "#e0e0e0";
+      ctx.fillText("👇 Write 2-3 sentences in the comments! 👇", canvas.width / 2, boxY + boxHeight + 60);
+
+      // --- Footer (SAME AS BEFORE) ---
+      ctx.fillStyle = "#0a0a0a";
+      ctx.font = "15px Arial";
+      ctx.textAlign = "left";
+      ctx.fillText("Practice More:", 70, 1020);
+      
+      const fb = await loadImage(fbLogo);
+      const insta = await loadImage(instaLogo);
+      const yt = await loadImage(ytLogo);
+      const webIcon = await loadImage(webLogoUrl);
+      
+      // 1. Website Link (Bottom Left)
+      if (webIcon) {
+          ctx.drawImage(webIcon, 50, 1020, 24, 24); 
+          
+          ctx.font = "bold 20px Arial";
+          ctx.fillStyle = "white"; 
+          ctx.textAlign = "left";
+          ctx.fillText("eptonline.org", 80, 1040); 
+      }
+      
+      // 2. Facebook (Starts at 990)
+      if(fb) {
+          ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline.org", 905, 1005); 
+      }
+
+      // 3. Instagram (Tight gap: +24px)
+      if(insta) {
+          ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonline_org", 905, 1029);
+      }
+
+      // 4. YouTube (Tight gap: +24px)
+      if(yt) {
+          ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.font = "bold 16px Arial"; 
+          ctx.fillStyle = "white"; 
+          ctx.fillText("@eptonlineOrg", 905, 1053);
+      }
+    }
+
+    // Polyfill for roundRect if not supported in all browsers
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        if (w < 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    }
+
+    function downloadFlashcard() {
+      const link = document.createElement("a");
+      link.download = `IELTS_Speaking_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    // Initialize
+    window.onload = function() {
+        // Trigger initial generation
+        currentTopic = topics[0]; 
+        generateFlashcard();
+        const caption = generateCaptionText(currentTopic);
+        document.getElementById('captionText').value = caption;
+    };
+  </script>
+</body>
+</html>
