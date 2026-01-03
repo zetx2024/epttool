@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vocabulary Flashcard Generator</title>
+  <title>IELTS Speaking Generator</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,6 +40,7 @@
       width: 100%;
       max-width: 800px;
       margin-bottom: 20px;
+      align-items: center;
     }
 
     button {
@@ -67,12 +68,16 @@
       color: white;
       font-weight: bold;
       gap: 10px;
+      background: #333;
+      padding: 10px 15px;
+      border-radius: 8px;
     }
     
     input[type="checkbox"] {
       width: 20px;
       height: 20px;
       cursor: pointer;
+      accent-color: #2a9d8f;
     }
 
     /* Caption Box Styles */
@@ -115,15 +120,15 @@
 </head>
 <body>
 
-  <h2>Vocabulary Challenge Generator</h2>
+  <h2>IELTS Cue Card Generator</h2>
   <canvas id="flashcard" width="1080" height="1080"></canvas>
 
   <div class="controls">
     <div class="toggle-container">
-      <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
-      <label for="showAnswer">Show Correct Answer</label>
+        <input type="checkbox" id="showAnswer" onchange="generateFlashcard()">
+        <label for="showAnswer">Show Sample Answer</label>
     </div>
-    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Word</button>
+    <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Topic</button>
     <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
   </div>
 
@@ -146,24 +151,36 @@
     const instaLogo = "https://zetx2024.github.io/epttool/logo/instagram.png"; 
     const webLogoUrl = "https://zetx2024.github.io/epttool/logo/www.png";
 
-    // --- DATA: Vocabulary Challenge ---
-    const questions = [
-      { word: "Abundant", options: ["Scarcity", "Plentiful", "Rare"], correctIndex: 1 },
-      { word: "Meticulous", options: ["Careful", "Lazy", "Messy"], correctIndex: 0 },
-      { word: "Mitigate", options: ["Increase", "Reduce", "Ignore"], correctIndex: 1 },
-      { word: "Formidable", options: ["Weak", "Impressive", "Simple"], correctIndex: 1 },
-      { word: "Ambiguous", options: ["Clear", "Unclear", "Fast"], correctIndex: 1 },
-      { word: "Benevolent", options: ["Kind", "Cruel", "Greedy"], correctIndex: 0 },
-      { word: "Ephemeral", options: ["Lasting", "Short-lived", "Heavy"], correctIndex: 1 },
-      { word: "Candid", options: ["Secretive", "Honest", "Shy"], correctIndex: 1 }
+    // --- DATA: IELTS Speaking Cue Cards + Sample Answers ---
+    const topics = [
+      {
+        question: "Describe a person who has influenced your life.",
+        answer: "My grandfather is my biggest influence. He taught me that patience and kindness are stronger than anger, and he always encouraged me to pursue my education."
+      },
+      {
+        question: "Describe a beautiful place you visited in your country.",
+        answer: "I visited Cox's Bazar last winter. The endless sandy beach and the golden sunset over the ocean were mesmerizing and incredibly peaceful."
+      },
+      {
+        question: "Describe an electronic device you find very useful.",
+        answer: "My smartphone is essential. It helps me organize my schedule, stay connected with family, and access information instantly whenever I need it."
+      },
+      {
+        question: "Describe a hobby you would like to start.",
+        answer: "I would love to start photography. Capturing moments and seeing the world through a lens seems like a creative way to appreciate nature."
+      },
+      {
+        question: "Describe a gift you received that was very special.",
+        answer: "I received a handmade watch from my father on my 18th birthday. It is special because he restored it himself, making it a unique family heirloom."
+      }
     ];
 
     // --- DATA: Hashtag Pools ---
-    const requiredTags = ["#eptonline", "#English", "#Vocabulary", "#SynonymChallenge"];
-    const examTags = ["#IELTS", "#TOEFL", "#DET", "#PTE", "#StudyAbroad", "#DuolingoEnglishTest", "#IELTSPreparation"];
-    const engagementTags = ["#DailyEnglish", "#LearnEnglish", "#WordOfTheDay", "#EnglishQuiz", "#Grammar"];
+    const requiredTags = ["#eptonline", "#IELTS", "#Speaking", "#CueCard"];
+    const examTags = ["#IELTSPreparation", "#TOEFL", "#EnglishSpeaking", "#StudyAbroad", "#PublicSpeaking"];
+    const engagementTags = ["#EnglishDaily", "#LearnEnglish", "#Discussion", "#IdeaGeneration"];
 
-    let currentQuestion = null;
+    let currentItem = null;
 
     function getRandomColor() {
       const colors = ["#faf339", "#faf339", "#faf339"];
@@ -183,18 +200,36 @@
       });
     }
 
-    // --- CAPTION GENERATOR ---
-    function generateCaptionText(question) {
-        const optionLabels = ["A", "B", "C"];
-        
-        let text = `🧠 DAILY VOCABULARY CHALLENGE 🧠\n\n`;
-        text += `Can you find the synonym for: "${question.word}"?\n\n`;
-        
-        question.options.forEach((opt, i) => {
-            text += `${optionLabels[i]}) ${opt}\n`;
-        });
+    // --- HELPER: Wrap Text ---
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+        const words = text.split(' ');
+        let line = '';
+        let currentY = y;
 
-        text += `\n👇 Drop your answer in the comments! 👇\n\n`;
+        for(let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = context.measureText(testLine);
+          const testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            context.fillText(line, x, currentY);
+            line = words[n] + ' ';
+            currentY += lineHeight;
+          } else {
+            line = testLine;
+          }
+        }
+        context.fillText(line, x, currentY);
+        return currentY; 
+    }
+
+    // --- CAPTION GENERATOR ---
+    function generateCaptionText(item) {
+        let text = `🗣️ IELTS SPEAKING CUE CARD 🗣️\n\n`;
+        text += `Topic: ${item.question}\n\n`;
+        
+        text += `💡 Idea Generation Challenge:\n`;
+        text += `Write at least 2-3 sentences about this topic in English in the comments below! 👇\n\n`;
+        
         text += `Practice more at: https://eptonline.org\n`;
         text += `Follow us for daily updates:\n`;
         // Full Links Here
@@ -233,13 +268,12 @@
     async function generateFlashcard() {
       const showAnswer = document.getElementById("showAnswer").checked;
 
-      if (!currentQuestion || (event && event.type === 'click' && (event.target.classList.contains('btn-gen') || event.target.innerText.includes('Random')))) {
-          currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-          const caption = generateCaptionText(currentQuestion);
+      // Generate new topic only if clicked or first load
+      if (!currentItem || (event && event.type === 'click' && event.target.classList.contains('btn-gen'))) {
+          currentItem = topics[Math.floor(Math.random() * topics.length)];
+          const caption = generateCaptionText(currentItem);
           document.getElementById('captionText').value = caption;
       }
-
-      const q = currentQuestion;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -260,61 +294,79 @@
       ctx.fillStyle = "#0a0a0a";
       ctx.font = "bold 40px 'Segoe UI'";
       ctx.textAlign = "center";
-      ctx.fillText("VOCABULARY CHALLENGE", canvas.width / 2, 220);
+      ctx.fillText("IELTS SPEAKING", canvas.width / 2, 220);
       
       ctx.fillStyle = "#615c56";
       ctx.font = "italic 30px 'Segoe UI'";
-      ctx.fillText("(Find the Synonym)", canvas.width / 2, 270);
+      ctx.fillText("(Idea Generation)", canvas.width / 2, 270);
 
-      // --- The Target Word ---
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "800 110px 'Arial'"; 
+      // --- Main Box Container ---
+      const boxY = 350;
+      const boxHeight = 450;
+      const boxWidth = 900;
+      const boxX = (canvas.width - boxWidth) / 2;
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 30);
+      ctx.fill();
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // --- CONTENT LOGIC ---
+      ctx.textAlign = "center";
       ctx.shadowColor = "rgba(0,0,0,0.5)";
       ctx.shadowBlur = 10;
-      ctx.fillText(`"${q.word}"`, canvas.width / 2, 420);
+
+      if (!showAnswer) {
+        // --- VIEW 1: QUESTION ONLY ---
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 65px 'Arial'"; 
+        
+        // Center text in box
+        wrapText(ctx, currentItem.question, canvas.width / 2, boxY + 140, 850, 85);
+
+        // Call to action
+        ctx.shadowBlur = 0; 
+        ctx.font = "italic bold 35px 'Segoe UI'";
+        ctx.fillStyle = "#e0e0e0";
+        ctx.fillText("👇 Write 2-3 sentences in the comments! 👇", canvas.width / 2, boxY + boxHeight + 60);
+
+      } else {
+        // --- VIEW 2: QUESTION + SAMPLE ANSWER ---
+        
+        // 1. Question (Top of box, Smaller)
+        ctx.fillStyle = "#faf339"; // Yellow highlight for question
+        ctx.font = "bold 45px 'Arial'"; 
+        // Move Y up
+        let nextY = wrapText(ctx, currentItem.question, canvas.width / 2, boxY + 70, 850, 55);
+
+        // 2. Separator Line
+        ctx.beginPath();
+        ctx.moveTo(boxX + 100, nextY + 30);
+        ctx.lineTo(boxX + boxWidth - 100, nextY + 30);
+        ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 3. Label
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = "#ccc";
+        ctx.font = "italic 24px 'Segoe UI'";
+        ctx.fillText("Sample Idea:", canvas.width / 2, nextY + 70);
+
+        // 4. Sample Answer
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "normal 38px 'Segoe UI'"; 
+        ctx.shadowBlur = 5;
+        // Print answer below label
+        wrapText(ctx, currentItem.answer, canvas.width / 2, nextY + 120, 850, 50);
+      }
+      
       ctx.shadowBlur = 0; 
 
-      // --- Options ---
-      ctx.font = "bold 45px 'Segoe UI'";
-      const startY = 580;
-      const optionLabels = ["A", "B", "C"];
-
-      q.options.forEach((opt, i) => {
-        const y = startY + i * 140; 
-        const x = 140;
-        const width = 800;
-        const height = 100;
-
-        let strokeColor = "white";
-        let fillColor = "transparent";
-        let textColor = "white";
-
-        if (showAnswer) {
-            if (i === q.correctIndex) {
-                strokeColor = "#2a9d8f"; 
-                fillColor = "rgba(42, 157, 143, 0.2)";
-                textColor = "#4ecdc4";
-            } else {
-                strokeColor = "#555"; 
-                textColor = "#777";
-            }
-        }
-
-        ctx.strokeStyle = strokeColor;
-        ctx.fillStyle = fillColor;
-        ctx.lineWidth = 4;
-        
-        ctx.beginPath();
-        ctx.roundRect(x, y, width, height, 20); 
-        ctx.stroke();
-        ctx.fill();
-
-        ctx.fillStyle = textColor;
-        ctx.textAlign = "left";
-        ctx.fillText(`${optionLabels[i]})  ${opt}`, x + 40, y + 65);
-      });
-
-      // --- Footer (REVERTED TO OLD DESIGN) ---
+      // --- Footer ---
       ctx.fillStyle = "#0a0a0a";
       ctx.font = "15px Arial";
       ctx.textAlign = "left";
@@ -325,17 +377,15 @@
       const yt = await loadImage(ytLogo);
       const webIcon = await loadImage(webLogoUrl);
       
-      // 1. Website Link (Bottom Left)
+      // Links
       if (webIcon) {
           ctx.drawImage(webIcon, 50, 1020, 24, 24); 
-          
           ctx.font = "bold 20px Arial";
           ctx.fillStyle = "white"; 
           ctx.textAlign = "left";
           ctx.fillText("eptonline.org", 80, 1040); 
       }
       
-      // 2. Facebook (Starts at 990)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
           ctx.font = "bold 16px Arial"; 
@@ -343,7 +393,6 @@
           ctx.fillText("@eptonline.org", 905, 1005); 
       }
 
-      // 3. Instagram (Tight gap: +24px)
       if(insta) {
           ctx.drawImage(insta, 880, 1014, 18, 18);
           ctx.font = "bold 16px Arial"; 
@@ -351,7 +400,6 @@
           ctx.fillText("@eptonline_org", 905, 1029);
       }
 
-      // 4. YouTube (Tight gap: +24px)
       if(yt) {
           ctx.drawImage(yt, 880, 1038, 18, 18);
           ctx.font = "bold 16px Arial"; 
@@ -360,6 +408,7 @@
       }
     }
 
+    // Polyfill for roundRect
     CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
         if (w < 2 * r) r = w / 2;
         if (h < 2 * r) r = h / 2;
@@ -375,15 +424,17 @@
 
     function downloadFlashcard() {
       const link = document.createElement("a");
-      const word = currentQuestion ? currentQuestion.word : "flashcard";
-      link.download = `Vocabulary_${word}_${Date.now()}.png`;
+      link.download = `IELTS_Speaking_${Date.now()}.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
 
     // Initialize
     window.onload = function() {
-        document.querySelector('.btn-gen').click();
+        currentItem = topics[0];
+        const caption = generateCaptionText(currentItem);
+        document.getElementById('captionText').value = caption;
+        generateFlashcard();
     };
   </script>
 </body>
