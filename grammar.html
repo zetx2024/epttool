@@ -37,6 +37,9 @@
       background: #1e1e1e;
       padding: 15px;
       border-radius: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 800px;
     }
 
     button {
@@ -68,6 +71,55 @@
       height: 20px;
       cursor: pointer;
     }
+
+    /* --- Caption Styles --- */
+    .caption-container {
+      background: #252525;
+      padding: 20px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      border: 1px solid #333;
+    }
+
+    .caption-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .caption-label {
+      color: #FFD700;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px; /* Increased height for more links */
+      background: #121212;
+      border: 1px solid #444;
+      color: #ddd;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: 'Segoe UI', monospace;
+      font-size: 14px;
+      resize: vertical;
+      box-sizing: border-box;
+    }
+
+    .btn-copy {
+      background: #2a9d8f;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-copy:hover { background: #21867a; }
+
   </style>
 </head>
 <body>
@@ -82,6 +134,14 @@
     </div>
     <button class="btn-gen" onclick="generateFlashcard()">🔄 Random Sentence</button>
     <button class="btn-dl" onclick="downloadFlashcard()">⬇️ Download Image</button>
+  </div>
+
+  <div class="caption-container">
+    <div class="caption-header">
+      <span class="caption-label">📱 Social Media Caption</span>
+      <button class="btn-copy" onclick="copyCaption()" id="copyBtn">📋 Copy Caption</button>
+    </div>
+    <textarea id="socialCaption" readonly></textarea>
   </div>
 
   <script>
@@ -106,7 +166,6 @@
         incorrect: "She don't like to drink coffee.",
         correct: "She doesn't like to drink coffee.",
         explanation: "(Third person singular number-এর সাথে doesn't হয়)।" 
-        // Added standard explanation since one wasn't provided, but you can leave blank
       },
       {
         incorrect: "Every students must attend the exam.",
@@ -128,7 +187,6 @@
     let currentQuestion = null;
 
     function getRandomColor() {
-      // Using Darker Gradients suitable for text readability
       const colors = ["#c7aa85", "#c7aa85", "#c7aa85"]; 
       return colors[Math.floor(Math.random() * colors.length)];
     }
@@ -146,45 +204,84 @@
       });
     }
 
-    // --- Helper Function: Text Wrapping ---
-    function wrapText(context, text, x, y, maxWidth, lineHeight) {
-        const words = text.split(' ');
-        let line = '';
-        let currentY = y;
+    // --- CAPTION GENERATION LOGIC ---
+    function generateSocialCaption(questionData) {
+        const headline = "🧠 Grammar Challenge! Can you spot the mistake? 🧐";
+        
+        // Contextual hashtags
+        let specificTags = [];
+        const expl = questionData.explanation.toLowerCase();
+        
+        if(expl.includes("past") || expl.includes("ago")) specificTags.push("#PastTense");
+        if(expl.includes("singular") || expl.includes("plural")) specificTags.push("#SingularPlural");
+        if(expl.includes("comparative")) specificTags.push("#Adjectives");
+        if(expl.includes("verb") || expl.includes("ing")) specificTags.push("#Verbs");
+        if(expl.includes("preposition")) specificTags.push("#Prepositions");
+        if(specificTags.length === 0) specificTags.push("#GrammarRules");
 
-        for(let n = 0; n < words.length; n++) {
-          const testLine = line + words[n] + ' ';
-          const metrics = context.measureText(testLine);
-          const testWidth = metrics.width;
-          if (testWidth > maxWidth && n > 0) {
-            context.fillText(line, x, currentY);
-            line = words[n] + ' ';
-            currentY += lineHeight;
-          } else {
-            line = testLine;
-          }
-        }
-        context.fillText(line, x, currentY);
-        return currentY + lineHeight; // Return the Y position where the text ended
+        // Expanded Random pool hashtags
+        const pool = [
+            "#IELTS", "#TOEFL", "#DET", "#PTE", "#English", "#EnglishLearning", "#StudyAbroad", 
+            "#Grammar", "#Vocabulary", "#ESL", "#EnglishTeacher", "#LearnEnglish", 
+            "#Education", "#EnglishTips", "#DailyEnglish", "#EnglishClass", "#LanguageLearning",
+            "#OnlineEducation", "#EnglishSkills", "#StudyEnglish", "#ImproveEnglish"
+        ];
+        
+        // Shuffle and pick 6 tags
+        const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
+        
+        const allTags = [...specificTags, "#eptonline", ...shuffled].join(" ");
+
+        const caption = `${headline}
+
+❌ Incorrect: "${questionData.incorrect}"
+
+✅ What is the correct sentence? Comment your answer below! 👇
+
+---------------------------------
+🔗 Practice More: https://eptonline.org
+👍 Facebook: https://www.facebook.com/eptonline.org
+📸 Instagram: https://www.instagram.com/eptonline_org
+📺 YouTube: https://www.youtube.com/@eptonlineOrg
+---------------------------------
+
+${allTags}`;
+
+        document.getElementById("socialCaption").value = caption;
+        
+        // Reset copy button
+        const btn = document.getElementById("copyBtn");
+        btn.innerHTML = "📋 Copy Caption";
+        btn.style.background = "#2a9d8f";
+    }
+
+    function copyCaption() {
+        const copyText = document.getElementById("socialCaption");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value).then(() => {
+            const btn = document.getElementById("copyBtn");
+            btn.innerHTML = "✅ Copied!";
+            btn.style.background = "#27ae60";
+        });
     }
 
     async function generateFlashcard() {
       const showAnswer = document.getElementById("showAnswer").checked;
 
-      // Select random question logic
-      if (!currentQuestion || (event && event.type === 'click' && event.target.tagName === 'BUTTON')) {
+      if (!currentQuestion || (window.event && window.event.type === 'click' && window.event.target.classList.contains('btn-gen'))) {
          currentQuestion = questions[Math.floor(Math.random() * questions.length)];
       }
 
       const q = currentQuestion;
+      generateSocialCaption(q);
 
       // Clear Canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // --- Background ---
       const color1 = getRandomColor();
-      const color2 = "#c76e08"; // Fade to black at bottom
-      // Using a solid dark background for better contrast with text sentences
+      const color2 = "#c76e08"; 
       const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
       gradient.addColorStop(0, color1);
       gradient.addColorStop(1, color2);
@@ -205,63 +302,45 @@
       ctx.font = "italic 30px 'Segoe UI'";
       ctx.fillText("(Grammar Challenge)", canvas.width / 2, 280);
 
-      // ===========================
-      // DRAW INCORRECT SENTENCE
-      // ===========================
-      
+      // --- Draw Question ---
       // Label
-      ctx.fillStyle = "#ff4d4d"; // Red color label
+      ctx.fillStyle = "#ff4d4d"; 
       ctx.font = "bold 35px 'Arial'";
       ctx.fillText("INCORRECT?", canvas.width / 2, 380);
 
-      // The Sentence Box
+      // Box
       ctx.fillStyle = "#222";
       ctx.strokeStyle = "#ff4d4d";
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.roundRect(140, 410, 800, 200, 20); // x, y, w, h, radius
+      ctx.roundRect(140, 410, 800, 200, 20); 
       ctx.fill();
       ctx.stroke();
 
-      // The Sentence Text
+      // Text
       ctx.fillStyle = "white";
       ctx.font = "50px 'Segoe UI'";
-      // We align center, but for wrapped text logic we generally use start, 
-      // but here we will manually center lines or just simpler:
-      // Let's use the wrapText helper but keeping textAlign center works for single lines, 
-      // for multi-line centered text it's trickier. 
-      // To keep it simple and clean:
       ctx.textAlign = "center"; 
-      // Note: wrapText above is written for left align logic mostly, let's adjust logic inside:
-      // Since sentences are short enough, we might not need complex wrapping, but let's be safe.
-      // Simple Fill for now as sentences are usually 1-2 lines.
       
       const words = q.incorrect.split(" ");
-      let line1 = "";
-      let line2 = "";
-      
-      // Basic manual split if too long (Quick fix for visuals)
       if (ctx.measureText(q.incorrect).width > 750) {
           const mid = Math.floor(words.length / 2);
-          line1 = words.slice(0, mid).join(" ");
-          line2 = words.slice(mid).join(" ");
+          const line1 = words.slice(0, mid).join(" ");
+          const line2 = words.slice(mid).join(" ");
           ctx.fillText(`"${line1}`, canvas.width / 2, 490);
           ctx.fillText(`${line2}"`, canvas.width / 2, 550);
       } else {
           ctx.fillText(`"${q.incorrect}"`, canvas.width / 2, 520);
       }
 
-      // ===========================
-      // DRAW ANSWER SECTION
-      // ===========================
-
+      // --- Draw Answer ---
       if (showAnswer) {
         // Label
-        ctx.fillStyle = "#4ecdc4"; // Teal/Green label
+        ctx.fillStyle = "#4ecdc4"; 
         ctx.font = "bold 35px 'Arial'";
         ctx.fillText("CORRECT:", canvas.width / 2, 680);
 
-        // The Sentence Box
+        // Box
         ctx.fillStyle = "#222";
         ctx.strokeStyle = "#4ecdc4";
         ctx.lineWidth = 3;
@@ -270,11 +349,10 @@
         ctx.fill();
         ctx.stroke();
 
-        // The Correct Sentence Text
+        // Text
         ctx.fillStyle = "white";
         ctx.font = "bold 50px 'Segoe UI'";
         
-        // Manual simple wrap logic again
         if (ctx.measureText(q.correct).width > 750) {
             const wordsC = q.correct.split(" ");
             const midC = Math.floor(wordsC.length / 2);
@@ -284,40 +362,43 @@
             ctx.fillText(`"${q.correct}"`, canvas.width / 2, 820);
         }
 
-        // The Explanation Rule (Bangla)
-        ctx.fillStyle = "#f1c40f"; // Yellowish for explanation
-        ctx.font = "italic 30px 'Segoe UI'"; // Ensure font supports Bangla
+        // Explanation
+        ctx.fillStyle = "#f1c40f"; 
+        ctx.font = "italic 30px 'Segoe UI'"; 
         ctx.fillText(q.explanation, canvas.width / 2, 950);
 
       } else {
-        // Placeholder if answer is hidden
-        ctx.fillStyle = "#555";
+        ctx.fillStyle = "white";
         ctx.font = "bold 40px 'Segoe UI'";
         ctx.fillText("?", canvas.width / 2, 800);
-        ctx.font = "30px 'Segoe UI'";
+        ctx.font = "40px 'Segoe UI'";
         ctx.fillText("(Comment Down the 'Right Answer')", canvas.width / 2, 840);
       }
 
-      // --- Footer ---
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "15px Arial";
-      ctx.textAlign = "left";
-      ctx.fillText("Practice More:", 70, 1020);
-      
+      // --- Footer Section ---
       const fb = await loadImage(fbLogo);
       const insta = await loadImage(instaLogo);
       const yt = await loadImage(ytLogo);
       const webIcon = await loadImage(webLogoUrl);
       
+      // Website Display (Left Side)
       if (webIcon) {
-          ctx.drawImage(webIcon, 50, 1020, 24, 24);
-          ctx.font = "bold 20px Arial";
-          ctx.fillStyle = "white"; 
-          ctx.fillText("eptonline.org", 80, 1040); 
+          ctx.drawImage(webIcon, 50, 1018, 28, 28);
+          
+          ctx.textAlign = "left";
+          ctx.font = "18px Arial"; 
+          ctx.fillStyle = "#ddd"; 
+          ctx.fillText("Practice more at:", 85, 1025);
+          
+          ctx.font = "bold 22px Arial";
+          ctx.fillStyle = "white";
+          ctx.fillText("https://eptonline.org", 85, 1048); 
       }
       
+      // Social Icons (Right Side)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.textAlign = "left";
           ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
           ctx.fillText("@eptonline.org", 905, 1005); 
@@ -325,6 +406,7 @@
 
       if(insta) {
           ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.textAlign = "left";
           ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
           ctx.fillText("@eptonline_org", 905, 1029);
@@ -332,6 +414,7 @@
 
       if(yt) {
           ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.textAlign = "left";
           ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
           ctx.fillText("@eptonlineOrg", 905, 1053);
