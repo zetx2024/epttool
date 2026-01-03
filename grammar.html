@@ -129,7 +129,7 @@
 
     function getRandomColor() {
       // Using Darker Gradients suitable for text readability
-      const colors = ["#0f2027", "#203a43", "#2c5364"]; 
+      const colors = ["#c7aa85", "#c7aa85", "#c7aa85"]; 
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
@@ -182,10 +182,12 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // --- Background ---
+      const color1 = getRandomColor();
+      const color2 = "#c76e08"; // Fade to black at bottom
       // Using a solid dark background for better contrast with text sentences
       const gradient = ctx.createLinearGradient(0, 0, 0, 1080);
-      gradient.addColorStop(0, "#1a1a1a");
-      gradient.addColorStop(1, "#000000");
+      gradient.addColorStop(0, color1);
+      gradient.addColorStop(1, color2);
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -210,7 +212,7 @@
       // Label
       ctx.fillStyle = "#ff4d4d"; // Red color label
       ctx.font = "bold 35px 'Arial'";
-      ctx.fillText("INCORRECT:", canvas.width / 2, 380);
+      ctx.fillText("INCORRECT?", canvas.width / 2, 380);
 
       // The Sentence Box
       ctx.fillStyle = "#222";
@@ -292,8 +294,8 @@
         ctx.fillStyle = "#555";
         ctx.font = "bold 40px 'Segoe UI'";
         ctx.fillText("?", canvas.width / 2, 800);
-        ctx.font = "20px 'Segoe UI'";
-        ctx.fillText("(Tap 'Show Answer' to reveal)", canvas.width / 2, 840);
+        ctx.font = "30px 'Segoe UI'";
+        ctx.fillText("(Comment Down the 'Right Answer')", canvas.width / 2, 840);
       }
 
       // --- Footer ---
