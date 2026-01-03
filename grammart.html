@@ -72,7 +72,7 @@
       cursor: pointer;
     }
 
-    /* --- New Caption Styles --- */
+    /* --- Caption Styles --- */
     .caption-container {
       background: #252525;
       padding: 20px;
@@ -97,7 +97,7 @@
 
     textarea {
       width: 100%;
-      height: 150px;
+      height: 200px; /* Increased height for more links */
       background: #121212;
       border: 1px solid #444;
       color: #ddd;
@@ -106,7 +106,7 @@
       font-family: 'Segoe UI', monospace;
       font-size: 14px;
       resize: vertical;
-      box-sizing: border-box; /* Fix padding issue */
+      box-sizing: border-box;
     }
 
     .btn-copy {
@@ -114,6 +114,9 @@
       color: white;
       padding: 8px 16px;
       font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
     }
     .btn-copy:hover { background: #21867a; }
 
@@ -205,7 +208,7 @@
     function generateSocialCaption(questionData) {
         const headline = "🧠 Grammar Challenge! Can you spot the mistake? 🧐";
         
-        // Contextual hashtags based on explanation content
+        // Contextual hashtags
         let specificTags = [];
         const expl = questionData.explanation.toLowerCase();
         
@@ -214,12 +217,18 @@
         if(expl.includes("comparative")) specificTags.push("#Adjectives");
         if(expl.includes("verb") || expl.includes("ing")) specificTags.push("#Verbs");
         if(expl.includes("preposition")) specificTags.push("#Prepositions");
-        if(specificTags.length === 0) specificTags.push("#GrammarRules"); // Fallback
+        if(specificTags.length === 0) specificTags.push("#GrammarRules");
 
-        // Random pool hashtags
-        const pool = ["#IELTS", "#TOEFL", "#DET", "#PTE", "#English", "#EnglishLearning", "#StudyAbroad"];
-        // Shuffle and pick 4
-        const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 4);
+        // Expanded Random pool hashtags
+        const pool = [
+            "#IELTS", "#TOEFL", "#DET", "#PTE", "#English", "#EnglishLearning", "#StudyAbroad", 
+            "#Grammar", "#Vocabulary", "#ESL", "#EnglishTeacher", "#LearnEnglish", 
+            "#Education", "#EnglishTips", "#DailyEnglish", "#EnglishClass", "#LanguageLearning",
+            "#OnlineEducation", "#EnglishSkills", "#StudyEnglish", "#ImproveEnglish"
+        ];
+        
+        // Shuffle and pick 6 tags
+        const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
         
         const allTags = [...specificTags, "#eptonline", ...shuffled].join(" ");
 
@@ -229,14 +238,18 @@
 
 ✅ What is the correct sentence? Comment your answer below! 👇
 
-🔗 Practice more at: eptonline.org
-Follow us: @eptonline.org
+---------------------------------
+🔗 Practice More: https://eptonline.org
+👍 Facebook: https://www.facebook.com/eptonline.org
+📸 Instagram: https://www.instagram.com/eptonline_org
+📺 YouTube: https://www.youtube.com/@eptonlineOrg
+---------------------------------
 
 ${allTags}`;
 
         document.getElementById("socialCaption").value = caption;
         
-        // Reset copy button text
+        // Reset copy button
         const btn = document.getElementById("copyBtn");
         btn.innerHTML = "📋 Copy Caption";
         btn.style.background = "#2a9d8f";
@@ -245,7 +258,7 @@ ${allTags}`;
     function copyCaption() {
         const copyText = document.getElementById("socialCaption");
         copyText.select();
-        copyText.setSelectionRange(0, 99999); /* For mobile devices */
+        copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value).then(() => {
             const btn = document.getElementById("copyBtn");
             btn.innerHTML = "✅ Copied!";
@@ -256,15 +269,11 @@ ${allTags}`;
     async function generateFlashcard() {
       const showAnswer = document.getElementById("showAnswer").checked;
 
-      // Select random question logic
-      // Only pick new question if current is null OR triggered by button click
       if (!currentQuestion || (window.event && window.event.type === 'click' && window.event.target.classList.contains('btn-gen'))) {
          currentQuestion = questions[Math.floor(Math.random() * questions.length)];
       }
 
       const q = currentQuestion;
-
-      // Update the Social Media Caption
       generateSocialCaption(q);
 
       // Clear Canvas
@@ -293,16 +302,13 @@ ${allTags}`;
       ctx.font = "italic 30px 'Segoe UI'";
       ctx.fillText("(Grammar Challenge)", canvas.width / 2, 280);
 
-      // ===========================
-      // DRAW INCORRECT SENTENCE
-      // ===========================
-      
+      // --- Draw Question ---
       // Label
       ctx.fillStyle = "#ff4d4d"; 
       ctx.font = "bold 35px 'Arial'";
       ctx.fillText("INCORRECT?", canvas.width / 2, 380);
 
-      // The Sentence Box
+      // Box
       ctx.fillStyle = "#222";
       ctx.strokeStyle = "#ff4d4d";
       ctx.lineWidth = 3;
@@ -311,36 +317,30 @@ ${allTags}`;
       ctx.fill();
       ctx.stroke();
 
-      // The Sentence Text
+      // Text
       ctx.fillStyle = "white";
       ctx.font = "50px 'Segoe UI'";
       ctx.textAlign = "center"; 
       
       const words = q.incorrect.split(" ");
-      let line1 = "";
-      let line2 = "";
-      
       if (ctx.measureText(q.incorrect).width > 750) {
           const mid = Math.floor(words.length / 2);
-          line1 = words.slice(0, mid).join(" ");
-          line2 = words.slice(mid).join(" ");
+          const line1 = words.slice(0, mid).join(" ");
+          const line2 = words.slice(mid).join(" ");
           ctx.fillText(`"${line1}`, canvas.width / 2, 490);
           ctx.fillText(`${line2}"`, canvas.width / 2, 550);
       } else {
           ctx.fillText(`"${q.incorrect}"`, canvas.width / 2, 520);
       }
 
-      // ===========================
-      // DRAW ANSWER SECTION
-      // ===========================
-
+      // --- Draw Answer ---
       if (showAnswer) {
         // Label
         ctx.fillStyle = "#4ecdc4"; 
         ctx.font = "bold 35px 'Arial'";
         ctx.fillText("CORRECT:", canvas.width / 2, 680);
 
-        // The Sentence Box
+        // Box
         ctx.fillStyle = "#222";
         ctx.strokeStyle = "#4ecdc4";
         ctx.lineWidth = 3;
@@ -349,7 +349,7 @@ ${allTags}`;
         ctx.fill();
         ctx.stroke();
 
-        // The Correct Sentence Text
+        // Text
         ctx.fillStyle = "white";
         ctx.font = "bold 50px 'Segoe UI'";
         
@@ -362,13 +362,12 @@ ${allTags}`;
             ctx.fillText(`"${q.correct}"`, canvas.width / 2, 820);
         }
 
-        // The Explanation Rule (Bangla)
+        // Explanation
         ctx.fillStyle = "#f1c40f"; 
         ctx.font = "italic 30px 'Segoe UI'"; 
         ctx.fillText(q.explanation, canvas.width / 2, 950);
 
       } else {
-        // Placeholder if answer is hidden
         ctx.fillStyle = "white";
         ctx.font = "bold 40px 'Segoe UI'";
         ctx.fillText("?", canvas.width / 2, 800);
@@ -376,26 +375,30 @@ ${allTags}`;
         ctx.fillText("(Comment Down the 'Right Answer')", canvas.width / 2, 840);
       }
 
-      // --- Footer ---
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "15px Arial";
-      ctx.textAlign = "left";
-      ctx.fillText("Practice More:", 70, 1020);
-      
+      // --- Footer Section ---
       const fb = await loadImage(fbLogo);
       const insta = await loadImage(instaLogo);
       const yt = await loadImage(ytLogo);
       const webIcon = await loadImage(webLogoUrl);
       
+      // Website Display (Left Side)
       if (webIcon) {
-          ctx.drawImage(webIcon, 50, 1020, 24, 24);
-          ctx.font = "bold 20px Arial";
-          ctx.fillStyle = "white"; 
-          ctx.fillText("eptonline.org", 80, 1040); 
+          ctx.drawImage(webIcon, 50, 1018, 28, 28);
+          
+          ctx.textAlign = "left";
+          ctx.font = "18px Arial"; 
+          ctx.fillStyle = "#ddd"; 
+          ctx.fillText("Practice more at:", 85, 1025);
+          
+          ctx.font = "bold 22px Arial";
+          ctx.fillStyle = "white";
+          ctx.fillText("https://eptonline.org", 85, 1048); 
       }
       
+      // Social Icons (Right Side)
       if(fb) {
           ctx.drawImage(fb, 880, 990, 18, 18);
+          ctx.textAlign = "left";
           ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
           ctx.fillText("@eptonline.org", 905, 1005); 
@@ -403,6 +406,7 @@ ${allTags}`;
 
       if(insta) {
           ctx.drawImage(insta, 880, 1014, 18, 18);
+          ctx.textAlign = "left";
           ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
           ctx.fillText("@eptonline_org", 905, 1029);
@@ -410,6 +414,7 @@ ${allTags}`;
 
       if(yt) {
           ctx.drawImage(yt, 880, 1038, 18, 18);
+          ctx.textAlign = "left";
           ctx.font = "bold 16px Arial"; 
           ctx.fillStyle = "white"; 
           ctx.fillText("@eptonlineOrg", 905, 1053);
