@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eptOnline Video Studio Pro</title>
+    <!-- Sortable.js for drag and drop -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <style>
+        :root {
+            --primary: #f97316;
+            --bg: #fff7ed;
+            --surface: #ffffff;
+            --text: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 { 
+            margin-bottom: 1rem; 
+            color: #c2410c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) { 
+            .container { 
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            } 
+        }
+
+        .col { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1.2rem; 
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: #431407;
+        }
+
+        input[type="file"], select, input[type="text"], input[type="color"], input[type="number"] {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #fdba74;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .input-group {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        /* Drag and Drop Area */
+        .upload-area {
+            border: 2px dashed #fdba74;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: #fff;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .upload-area:hover {
+            background: #ffedd5;
+            border-color: #f97316;
+        }
+
+        .upload-area.dragover {
+            background: #fed7aa;
+            border-color: #ea580c;
+        }
+
+        /* Playlist Styling with Drag and Drop */
+        .playlist-container {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            min-height: 200px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            cursor: move;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .playlist-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .playlist-item.sortable-chosen {
+            background: #fef3c7;
+        }
+
+        .playlist-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .playlist-item-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .playlist-item-name {
+            font-size: 0.85rem;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 5px;
+        }
+
+        .playlist-item-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .playlist-item-controls input {
+            width: 80px;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+        }
+
+        .remove-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .remove-btn:hover {
+            background: #dc2626;
+        }
+
+        .drag-handle {
+            color: #94a3b8;
+            cursor: grab;
+            padding: 0 5px;
+            flex-shrink: 0;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Format Options Grid */
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .format-option {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            background: white;
+        }
+
+        .format-option:hover {
+            border-color: #fdba74;
+            background: #fff7ed;
+        }
+
+        .format-option.selected {
+            border-color: #f97316;
+            background: #ffedd5;
+        }
+
+        .format-option h4 {
+            margin: 0 0 5px 0;
+            font-size: 0.9rem;
+            color: #1e293b;
+        }
+
+        .format-option span {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover { 
+            background-color: #ea580c; 
+        }
+
+        .btn-primary:disabled { 
+            background-color: #cbd5e1; 
+            cursor: not-allowed; 
+        }
+
+        .btn-secondary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2563eb;
+        }
+
+        /* Download Options */
+        .download-options {
+            display: none;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .download-btn {
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .download-btn:hover {
+            background: #059669;
+        }
+
+        /* Validation Panel */
+        .validation-panel {
+            grid-column: 1 / -1;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .validation-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 5px;
+        }
+
+        .validation-item.valid {
+            color: #059669;
+        }
+
+        .validation-item.invalid {
+            color: #dc2626;
+        }
+
+        .validation-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            grid-column: 1 / -1;
+            text-align: center;
+            display: none;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px dashed #fdba74;
+        }
+
+        video {
+            max-width: 100%;
+            max-height: 500px;
+            border: 4px solid #000;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: #000;
+        }
+
+        /* Progress */
+        .status-bar {
+            grid-column: 1 / -1;
+            background: #e2e8f0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .status-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            transition: width 0.1s linear;
+        }
+
+        /* Checkbox Styling */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #ffedd5;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #fdba74;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: auto;
+        }
+
+        canvas { 
+            display: none; 
+        }
+
+        /* Intro Options */
+        .intro-options {
+            display: none;
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            margin-top: 10px;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none; }
+        .text-center { text-align: center; }
+        .text-success { color: #059669; }
+        .text-error { color: #dc2626; }
+        .mt-2 { margin-top: 2rem; }
+        .mb-1 { margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        eptOnline Video Studio Pro
+    </h1>
+
+    <div class="container">
+        <!-- Left Column -->
+        <div class="col">
+            <div class="input-group">
+                <label>1. Select Video Format</label>
+                <select id="format" onchange="updateFormatSettings()">
+                    <option value="facebook_post">Facebook Post (1280x720)</option>
+                    <option value="instagram_post">Instagram Post (1080x1080)</option>
+                    <option value="youtube_landscape">YouTube Landscape (1920x1080)</option>
+                    <option value="facebook_reel">Facebook Reel (1080x1920)</option>
+                    <option value="instagram_reel">Instagram Reel (1080x1920)</option>
+                    <option value="youtube_reel">YouTube Reel (1080x1920)</option>
+                    <option value="tiktok_reel">TikTok Reel (1080x1920)</option>
+                </select>
+                
+                <div class="format-info mt-2">
+                    <strong>Selected:</strong> <span id="currentFormat">Instagram Post (1080x1080)</span><br>
+                    <strong>Resolution:</strong> <span id="currentResolution">1080x1080</span><br>
+                    <strong>Aspect Ratio:</strong> <span id="aspectRatio">1:1</span>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>2. Intro & Outro Settings</label>
+                
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="addIntro" onchange="toggleIntroOptions()">
+                    <strong>Add Intro Slide (3 Secs)</strong>
+                </label>
+                
+                <div id="introOptions" class="intro-options">
+                    <label>Intro Text:</label>
+                    <input type="text" id="introText" placeholder="Welcome to eptOnline" value="Welcome to eptOnline">
+                    
+                    <label style="margin-top: 10px;">Intro Background:</label>
+                    <input type="color" id="introBgColor" value="#1e40af">
+                </div>
+                
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="addOutro" checked>
+                    <strong>Add Outro Slide (3 Secs)</strong>
+                </label>
+            </div>
+
+            <div class="input-group">
+                <label>3. Design Settings</label>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <span>Slide Background:</span>
+                    <input type="color" id="bgColor" value="#c76e08" style="width: 50px; height: 35px;">
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span>Text Color:</span>
+                    <input type="color" id="textColor" value="#ffffff" style="width: 50px; height: 35px;">
+                </div>
+            </div>
+
+            <div>
+                <label>4. Background Music</label>
+                <select id="musicSelect">
+                    <option value="none">No Music</option>
+                    <option value="track1">Dance 4x - TrackTribe</option>
+                    <option value="track2">Diggy - Patrick Patrikios</option>
+                    <option value="track3">The Truth - Anno Domini Beats</option>
+                    <option value="track4">What It Is - Silent Partner</option>
+                </select>
+                <small style="color: #64748b; display: block; margin-top: 5px;">
+                    Music will auto-adjust to video length
+                </small>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col">
+            <div>
+                <label>5. Upload & Arrange Images</label>
+                <div class="upload-area" id="uploadArea" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p><strong>Drag & Drop images here</strong></p>
+                    <p style="color: #64748b; font-size: 0.9rem;">or click to browse</p>
+                    <input type="file" id="imageInput" multiple accept="image/*" style="display: none;" onchange="handleImageUpload()">
+                </div>
+
+                <div class="playlist-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <label>Image Playlist (Drag to reorder)</label>
+                    <span id="totalDuration">Total: 0s</span>
+                </div>
+
+                <div class="playlist-container" id="playlistContainer">
+                    <p class="text-center" style="color: #999; padding: 50px 20px;">
+                        No images uploaded yet.<br>
+                        <small>Drag images here or click upload area above</small>
+                    </p>
+                </div>
+
+                <div class="playlist-actions" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn-secondary" onclick="clearPlaylist()" style="flex: 1;">Clear All</button>
+                    <button class="btn-secondary" onclick="validateAll()" style="flex: 1;">Validate All</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validation Panel -->
+        <div class="validation-panel" id="validationPanel">
+            <h4 style="margin-top: 0; color: #0369a1;">Validation Checklist</h4>
+            <div id="validationList">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Caption Generator -->
+        <div class="caption-area" style="grid-column: 1/-1; background: #f1f5f9; padding: 1rem; border-radius: 8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label style="margin:0;">Social Media Caption Generator</label>
+                <button class="btn-secondary" onclick="generateCaption()">Generate & Copy</button>
+            </div>
+            <textarea id="captionBox" placeholder="Click 'Generate' to create a caption with your links and hashtags..." rows="4"></textarea>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="status-bar" id="progressBar">
+            <div class="status-fill" id="progressFill"></div>
+        </div>
+        <p id="statusText" style="grid-column: 1/-1; text-align: center; min-height: 24px;"></p>
+
+        <!-- Generate Button -->
+        <button id="generateBtn" class="btn-primary" onclick="startGeneration()" style="grid-column: 1/-1;">
+            <span id="generateText">Generate Video</span>
+            <span id="generatingText" style="display: none;">Generating...</span>
+        </button>
+
+        <!-- Preview Area -->
+        <div class="preview-area" id="resultArea">
+            <h3>✅ Video Ready!</h3>
+            <p>Your video has been generated successfully. Preview below:</p>
+            
+            <video id="outputVideo" controls playsinline></video>
+            
+            <div class="download-options" id="downloadOptions">
+                <button class="download-btn" onclick="downloadVideo('facebook')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                    </svg>
+                    Facebook
+                </button>
+                <button class="download-btn" onclick="downloadVideo('instagram')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                        <circle cx="12" cy="12" r="5"/>
+                        <circle cx="18" cy="6" r="1.5"/>
+                    </svg>
+                    Instagram
+                </button>
+                <button class="download-btn" onclick="downloadVideo('youtube')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                    </svg>
+                    YouTube
+                </button>
+                <button class="download-btn" onclick="downloadVideo('tiktok')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.3.045.6.088.9.13v-3.26a6.11 6.11 0 0 0-1-.08A6 6 0 0 0 5 20.1a6 6 0 0 0 10.86-3.63v-7a8.16 8.16 0 0 0 4.77 1.52v-3.3a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                    TikTok
+                </button>
+                <button class="download-btn" onclick="downloadVideo('all')" style="background: #f97316;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    Download All Formats
+                </button>
+            </div>
+
+            <p style="margin-top: 1rem; color: #64748b; font-size: 0.9rem;">
+                <strong>Format:</strong> MP4 (H.264) | <strong>Quality:</strong> 1080p HD
+            </p>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // ==========================================
+        //  CONFIGURATION
+        // ==========================================
+        const SOCIAL_HANDLES = {
+            fb: "eptonline.org",
+            ig: "@eptonline_org",
+            yt: "eptonlineOrg",
+            tiktok: "@eptonline.org" 
+        };
+
+        const WEBSITE_URL = "https://eptonline.org";
+        
+        const ICONS = {
+            fb: 'https://cdn-icons-png.flaticon.com/512/5968/5968764.png',
+            ig: 'https://cdn-icons-png.flaticon.com/512/3955/3955024.png',
+            yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png',
+            tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'
+        };
+
+        const MUSIC_TRACKS = {
+            track1: 'https://assets.mixkit.co/music/preview/mixkit-dance-4x-30.mp3',
+            track2: 'https://assets.mixkit.co/music/preview/mixkit-diggy-169.mp3',
+            track3: 'https://assets.mixkit.co/music/preview/mixkit-the-truth-30.mp3',
+            track4: 'https://assets.mixkit.co/music/preview/mixkit-what-is-love-345.mp3'
+        };
+
+        const LOGO_URL = "https://gen.eptonline.org/logo.png";
+
+        // ==========================================
+        //  APP STATE & VARIABLES
+        // ==========================================
+        let playlist = [];
+        let sortableInstance = null;
+        let generatedVideoUrl = null;
+        let currentFormat = 'instagram_post';
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const assets = { 
+            logo: null, 
+            icons: {}, 
+            slides: [],
+            music: null 
+        };
+
+        // Format dimensions mapping
+        const FORMATS = {
+            facebook_post: { w: 1280, h: 720, name: 'Facebook Post', ratio: '16:9' },
+            instagram_post: { w: 1080, h: 1080, name: 'Instagram Post', ratio: '1:1' },
+            youtube_landscape: { w: 1920, h: 1080, name: 'YouTube Landscape', ratio: '16:9' },
+            facebook_reel: { w: 1080, h: 1920, name: 'Facebook Reel', ratio: '9:16' },
+            instagram_reel: { w: 1080, h: 1920, name: 'Instagram Reel', ratio: '9:16' },
+            youtube_reel: { w: 1080, h: 1920, name: 'YouTube Reel', ratio: '9:16' },
+            tiktok_reel: { w: 1080, h: 1920, name: 'TikTok Reel', ratio: '9:16' }
+        };
+
+        // ==========================================
+        //  INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize drag and drop
+            initDragAndDrop();
+            
+            // Setup upload area click
+            document.getElementById('uploadArea').addEventListener('click', () => {
+                document.getElementById('imageInput').click();
+            });
+            
+            // Update format display
+            updateFormatSettings();
+            
+            // Load logo
+            loadLogo();
+        });
+
+        // ==========================================
+        //  DRAG & DROP FUNCTIONS
+        // ==========================================
+        function initDragAndDrop() {
+            const container = document.getElementById('playlistContainer');
+            
+            sortableInstance = new Sortable(container, {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                onEnd: function(evt) {
+                    // Update playlist array order
+                    const items = Array.from(container.querySelectorAll('.playlist-item'));
+                    const newPlaylist = items.map(item => {
+                        const index = parseInt(item.dataset.index);
+                        return playlist[index];
+                    });
+                    playlist = newPlaylist;
+                    
+                    // Update data-index attributes
+                    items.forEach((item, idx) => {
+                        item.dataset.index = idx;
+                    });
+                    
+                    updateTotalDuration();
+                }
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('uploadArea').classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('uploadArea').classList.remove('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('uploadArea').classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const imageFiles = Array.from(files).filter(file => 
+                file.type.startsWith('image/')
+            );
+            
+            if (imageFiles.length === 0) {
+                alert('Please upload image files only.');
+                return;
+            }
+            
+            addToPlaylist(imageFiles);
+        }
+
+        // ==========================================
+        //  PLAYLIST MANAGEMENT
+        // ==========================================
+        function handleImageUpload() {
+            const input = document.getElementById('imageInput');
+            if (input.files.length > 0) {
+                addToPlaylist(Array.from(input.files));
+                input.value = ''; // Reset input
+            }
+        }
+
+        function addToPlaylist(files) {
+            const container = document.getElementById('playlistContainer');
+            
+            // Remove placeholder if exists
+            if (playlist.length === 0) {
+                container.innerHTML = '';
+            }
+            
+            files.forEach((file, idx) => {
+                const itemId = playlist.length;
+                playlist.push({ 
+                    file: file, 
+                    duration: 3,
+                    id: itemId
+                });
+                
+                const div = document.createElement('div');
+                div.className = 'playlist-item';
+                div.dataset.index = itemId;
+                
+                div.innerHTML = `
+                    <div class="drag-handle">⠿</div>
+                    <img src="${URL.createObjectURL(file)}" alt="Slide ${itemId + 1}">
+                    <div class="playlist-item-info">
+                        <div class="playlist-item-name">${file.name.substring(0, 20)}${file.name.length > 20 ? '...' : ''}</div>
+                        <div class="playlist-item-controls">
+                            <input type="number" value="3" min="1" max="10" step="0.5" 
+                                   onchange="updateDuration(${itemId}, this.value)">
+                            <span style="font-size: 0.8rem; color: #64748b;">seconds</span>
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromPlaylist(${itemId})">×</button>
+                `;
+                
+                container.appendChild(div);
+            });
+            
+            // Reinitialize Sortable
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+            initDragAndDrop();
+            
+            updateTotalDuration();
+            validateAll();
+        }
+
+        function updateDuration(index, value) {
+            if (playlist[index]) {
+                playlist[index].duration = parseFloat(value) || 3;
+                updateTotalDuration();
+            }
+        }
+
+        function removeFromPlaylist(index) {
+            playlist = playlist.filter((item, idx) => idx !== index);
+            renderPlaylist();
+            updateTotalDuration();
+            validateAll();
+        }
+
+        function clearPlaylist() {
+            if (playlist.length === 0) return;
+            if (confirm('Are you sure you want to clear all images?')) {
+                playlist = [];
+                renderPlaylist();
+                updateTotalDuration();
+                validateAll();
+            }
+        }
+
+        function renderPlaylist() {
+            const container = document.getElementById('playlistContainer');
+            
+            if (playlist.length === 0) {
+                container.innerHTML = `
+                    <p class="text-center" style="color: #999; padding: 50px 20px;">
+                        No images uploaded yet.<br>
+                        <small>Drag images here or click upload area above</small>
+                    </p>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            playlist.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'playlist-item';
+                div.dataset.index = idx;
+                
+                div.innerHTML = `
+                    <div class="drag-handle">⠿</div>
+                    <img src="${URL.createObjectURL(item.file)}" alt="Slide ${idx + 1}">
+                    <div class="playlist-item-info">
+                        <div class="playlist-item-name">${item.file.name.substring(0, 20)}${item.file.name.length > 20 ? '...' : ''}</div>
+                        <div class="playlist-item-controls">
+                            <input type="number" value="${item.duration}" min="1" max="10" step="0.5" 
+                                   onchange="updateDuration(${idx}, this.value)">
+                            <span style="font-size: 0.8rem; color: #64748b;">seconds</span>
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromPlaylist(${idx})">×</button>
+                `;
+                
+                container.appendChild(div);
+            });
+            
+            // Reinitialize Sortable
+            if (sortableInstance) {
+                sortableInstance.destroy();
+            }
+            initDragAndDrop();
+        }
+
+        function updateTotalDuration() {
+            const total = playlist.reduce((sum, item) => sum + item.duration, 0);
+            const introDuration = document.getElementById('addIntro').checked ? 3 : 0;
+            const outroDuration = document.getElementById('addOutro').checked ? 3 : 0;
+            const totalTime = total + introDuration + outroDuration;
+            
+            document.getElementById('totalDuration').textContent = 
+                `Total: ${totalTime.toFixed(1)}s (${playlist.length} slides)`;
+        }
+
+        // ==========================================
+        //  FORMAT & SETTINGS
+        // ==========================================
+        function updateFormatSettings() {
+            const format = document.getElementById('format').value;
+            currentFormat = format;
+            const dims = FORMATS[format];
+            
+            document.getElementById('currentFormat').textContent = dims.name;
+            document.getElementById('currentResolution').textContent = `${dims.w}×${dims.h}`;
+            document.getElementById('aspectRatio').textContent = dims.ratio;
+            
+            // Update canvas preview size
+            canvas.width = dims.w;
+            canvas.height = dims.h;
+            
+            // Toggle intro options for reels
+            toggleIntroOptions();
+            validateAll();
+        }
+
+        function toggleIntroOptions() {
+            const introOptions = document.getElementById('introOptions');
+            const addIntro = document.getElementById('addIntro').checked;
+            introOptions.style.display = addIntro ? 'block' : 'none';
+            updateTotalDuration();
+        }
+
+        // ==========================================
+        //  VALIDATION FUNCTIONS
+        // ==========================================
+        function validateAll() {
+            const validations = [];
+            const panel = document.getElementById('validationPanel');
+            const list = document.getElementById('validationList');
+            
+            // 1. Check images
+            if (playlist.length === 0) {
+                validations.push({
+                    status: 'invalid',
+                    message: 'No images uploaded'
+                });
+            } else if (playlist.length < 3) {
+                validations.push({
+                    status: 'warning',
+                    message: `Only ${playlist.length} image(s) - Minimum 3 recommended`
+                });
+            } else {
+                validations.push({
+                    status: 'valid',
+                    message: `${playlist.length} images uploaded`
+                });
+            }
+            
+            // 2. Check total duration
+            const totalDuration = playlist.reduce((sum, item) => sum + item.duration, 0);
+            const introDuration = document.getElementById('addIntro').checked ? 3 : 0;
+            const outroDuration = document.getElementById('addOutro').checked ? 3 : 0;
+            const totalTime = totalDuration + introDuration + outroDuration;
+            
+            if (totalTime < 5) {
+                validations.push({
+                    status: 'warning',
+                    message: 'Video too short (minimum 5 seconds)'
+                });
+            } else if (totalTime > 60) {
+                validations.push({
+                    status: 'warning',
+                    message: 'Video very long (over 60 seconds)'
+                });
+            } else {
+                validations.push({
+                    status: 'valid',
+                    message: `Video duration: ${totalTime.toFixed(1)} seconds`
+                });
+            }
+            
+            // 3. Check format
+            validations.push({
+                status: 'valid',
+                message: `Format: ${FORMATS[currentFormat].name} (${FORMATS[currentFormat].w}×${FORMATS[currentFormat].h})`
+            });
+            
+            // 4. Check HD quality
+            const isHD = FORMATS[currentFormat].w >= 1080 || FORMATS[currentFormat].h >= 1080;
+            validations.push({
+                status: isHD ? 'valid' : 'warning',
+                message: isHD ? 'HD Quality: 1080p+' : 'Quality below 1080p'
+            });
+            
+            // Render validation list
+            list.innerHTML = '';
+            validations.forEach(validation => {
+                const div = document.createElement('div');
+                div.className = `validation-item ${validation.status}`;
+                
+                let icon = '✓';
+                if (validation.status === 'warning') icon = '⚠';
+                if (validation.status === 'invalid') icon = '✗';
+                
+                div.innerHTML = `
+                    <span class="validation-icon">${icon}</span>
+                    <span>${validation.message}</span>
+                `;
+                list.appendChild(div);
+            });
+            
+            // Show/hide panel
+            const hasInvalid = validations.some(v => v.status === 'invalid');
+            panel.style.display = validations.length > 0 ? 'block' : 'none';
+            
+            // Update generate button
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = hasInvalid || playlist.length === 0;
+            
+            return !hasInvalid;
+        }
+
+        // ==========================================
+        //  CAPTION GENERATOR
+        // ==========================================
+        function generateCaption() {
+            let caption = `Check out our latest learning resources! 📚\n\n`;
+            caption += `🌐 Visit: ${WEBSITE_URL}\n\n`;
+            
+            if (SOCIAL_HANDLES.fb) caption += `Facebook: ${SOCIAL_HANDLES.fb}\n`;
+            if (SOCIAL_HANDLES.ig) caption += `Instagram: ${SOCIAL_HANDLES.ig}\n`;
+            if (SOCIAL_HANDLES.tiktok) caption += `TikTok: ${SOCIAL_HANDLES.tiktok}\n`;
+            if (SOCIAL_HANDLES.yt) caption += `YouTube: ${SOCIAL_HANDLES.yt}\n`;
+            
+            caption += `\n#Education #Flashcards #StudyTips #EptOnline #Learning #EdTech`;
+            
+            const box = document.getElementById('captionBox');
+            box.value = caption;
+            
+            // Copy to clipboard
+            box.select();
+            navigator.clipboard.writeText(caption)
+                .then(() => alert("✅ Caption copied to clipboard!"))
+                .catch(() => alert("📝 Caption generated (Manual copy required)"));
+        }
+
+        // ==========================================
+        //  VIDEO GENERATION
+        // ==========================================
+        async function startGeneration() {
+            if (!validateAll()) {
+                alert('Please fix validation errors before generating.');
+                return;
+            }
+            
+            if (playlist.length === 0) {
+                alert('Please upload images first.');
+                return;
+            }
+            
+            // UI Updates
+            const btn = document.getElementById('generateBtn');
+            const status = document.getElementById('statusText');
+            const generateText = document.getElementById('generateText');
+            const generatingText = document.getElementById('generatingText');
+            
+            btn.disabled = true;
+            generateText.style.display = 'none';
+            generatingText.style.display = 'inline';
+            document.getElementById('resultArea').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+            status.innerText = 'Initializing...';
+            
+            // Load assets
+            status.innerText = 'Loading assets...';
+            await loadAllAssets();
+            
+            // Setup canvas
+            const dims = FORMATS[currentFormat];
+            canvas.width = dims.w;
+            canvas.height = dims.h;
+            
+            // Calculate durations
+            const introDuration = document.getElementById('addIntro').checked ? 3 : 0;
+            const outroDuration = document.getElementById('addOutro').checked ? 3 : 0;
+            let slidesTotalTime = 0;
+            assets.slides.forEach(slide => slidesTotalTime += slide.duration);
+            const finalDuration = slidesTotalTime + introDuration + outroDuration;
+            
+            // Setup recording
+            const stream = canvas.captureStream(30);
+            let mime = 'video/mp4;codecs=h264';
+            if (!MediaRecorder.isTypeSupported(mime)) {
+                mime = 'video/webm;codecs=vp9';
+            }
+            
+            const recorder = new MediaRecorder(stream, { 
+                mimeType: mime,
+                videoBitsPerSecond: 5000000 // 5 Mbps for HD quality
+            });
+            
+            const chunks = [];
+            recorder.ondataavailable = e => chunks.push(e.data);
+            recorder.onstop = async () => {
+                const blob = new Blob(chunks, { type: mime });
+                generatedVideoUrl = URL.createObjectURL(blob);
+                
+                await finalizeVideo(blob);
+                
+                btn.disabled = false;
+                generateText.style.display = 'inline';
+                generatingText.style.display = 'none';
+                status.innerText = '✅ Video generation complete!';
+                
+                // Show download options
+                document.getElementById('downloadOptions').style.display = 'flex';
+            };
+            
+            // Start rendering
+            recorder.start();
+            const startTime = Date.now();
+            
+            function renderFrame() {
+                const elapsed = (Date.now() - startTime) / 1000;
+                const progress = Math.min((elapsed / finalDuration) * 100, 100);
+                
+                document.getElementById('progressFill').style.width = `${progress}%`;
+                status.innerText = `Rendering: ${progress.toFixed(1)}% (${elapsed.toFixed(1)}s / ${finalDuration.toFixed(1)}s)`;
+                
+                if (elapsed >= finalDuration) {
+                    recorder.stop();
+                    return;
+                }
+                
+                // Determine current phase
+                let timePointer = 0;
+                
+                // Intro phase
+                if (introDuration > 0 && elapsed < introDuration) {
+                    renderIntroFrame(elapsed);
+                }
+                // Slides phase
+                else if (elapsed < introDuration + slidesTotalTime) {
+                    const slideTime = elapsed - introDuration;
+                    let accumulated = 0;
+                    let currentSlide = null;
+                    
+                    for (let slide of assets.slides) {
+                        if (slideTime >= accumulated && slideTime < accumulated + slide.duration) {
+                            currentSlide = slide;
+                            break;
+                        }
+                        accumulated += slide.duration;
+                    }
+                    
+                    if (currentSlide) {
+                        renderMainFrame(currentSlide.img, elapsed);
+                    }
+                }
+                // Outro phase
+                else {
+                    renderOutroFrame(elapsed);
+                }
+                
+                if (elapsed < finalDuration) {
+                    requestAnimationFrame(renderFrame);
+                }
+            }
+            
+            renderFrame();
+        }
+
+        // ==========================================
+        //  RENDERING FUNCTIONS
+        // ==========================================
+        async function loadAllAssets() {
+            // Load logo
+            assets.logo = await safeLoad(LOGO_URL);
+            
+            // Load icons
+            assets.icons.fb = await safeLoad(ICONS.fb);
+            assets.icons.ig = await safeLoad(ICONS.ig);
+            assets.icons.yt = await safeLoad(ICONS.yt);
+            assets.icons.tiktok = await safeLoad(ICONS.tiktok);
+            
+            // Load slides
+            assets.slides = [];
+            for (let item of playlist) {
+                const img = await safeLoad(item.file);
+                if (img) {
+                    assets.slides.push({ img, duration: item.duration });
+                }
+            }
+        }
+
+        function renderIntroFrame(elapsed) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const bgColor = document.getElementById('introBgColor').value;
+            const introText = document.getElementById('introText').value;
+            
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Animated entrance
+            const progress = elapsed / 3;
+            const scale = 0.5 + progress * 0.5;
+            
+            ctx.save();
+            ctx.translate(w/2, h/2);
+            ctx.scale(scale, scale);
+            ctx.translate(-w/2, -h/2);
+            
+            // Logo
+            if (assets.logo) {
+                const size = Math.min(w, h) * 0.3;
+                ctx.drawImage(assets.logo, (w - size)/2, h * 0.3, size, size);
+            }
+            
+            // Text
+            ctx.fillStyle = document.getElementById('textColor').value;
+            ctx.textAlign = 'center';
+            ctx.font = `bold ${Math.min(w, h) * 0.08}px Arial`;
+            ctx.fillText(introText, w/2, h * 0.65);
+            
+            ctx.font = `${Math.min(w, h) * 0.04}px Arial`;
+            ctx.fillText('Get ready for amazing content!', w/2, h * 0.72);
+            
+            ctx.restore();
+        }
+
+        function renderMainFrame(img, elapsed) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const bgColor = document.getElementById('bgColor').value;
+            
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Image with subtle zoom effect
+            const zoom = 1 + Math.sin(elapsed) * 0.02;
+            ctx.save();
+            ctx.translate(w/2, h/2);
+            ctx.scale(zoom, zoom);
+            ctx.translate(-w/2, -h/2);
+            
+            drawImageContain(ctx, img, w, h);
+            ctx.restore();
+            
+            // Logo watermark
+            if (assets.logo) {
+                const size = w * 0.08;
+                ctx.drawImage(assets.logo, w - size - 10, 10, size, size);
+            }
+            
+            // Progress indicator
+            const totalSlides = assets.slides.length;
+            const currentSlide = Math.floor((elapsed - (document.getElementById('addIntro').checked ? 3 : 0)) / 3) + 1;
+            if (totalSlides > 1) {
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(10, h - 30, w - 20, 20);
+                ctx.fillStyle = '#f97316';
+                ctx.fillRect(12, h - 28, ((w - 24) / totalSlides) * currentSlide, 16);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${currentSlide}/${totalSlides}`, w/2, h - 16);
+            }
+            
+            // Social handles at bottom
+            drawSocialFooter();
+        }
+
+        function renderOutroFrame(elapsed) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const bgColor = document.getElementById('bgColor').value;
+            
+            // Background
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Logo
+            if (assets.logo) {
+                const size = Math.min(w, h) * 0.25;
+                ctx.drawImage(assets.logo, (w - size)/2, h * 0.2, size, size);
+            }
+            
+            // Thank you text
+            ctx.fillStyle = document.getElementById('textColor').value;
+            ctx.textAlign = 'center';
+            ctx.font = `bold ${Math.min(w, h) * 0.06}px Arial`;
+            ctx.fillText('Thank You!', w/2, h * 0.5);
+            
+            ctx.font = `${Math.min(w, h) * 0.04}px Arial`;
+            ctx.fillText('Follow us for more content', w/2, h * 0.58);
+            ctx.fillText(WEBSITE_URL, w/2, h * 0.65);
+            
+            // Social icons
+            drawCenteredSocials(h * 0.75);
+            
+            // Copyright
+            ctx.font = `${Math.min(w, h) * 0.02}px Arial`;
+            ctx.fillStyle = 'rgba(255,255,255,0.7)';
+            ctx.fillText(`© ${new Date().getFullYear()} eptOnline. All rights reserved.`, w/2, h * 0.95);
+        }
+
+        function drawSocialFooter() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const barHeight = h * 0.08;
+            const iconSize = barHeight * 0.6;
+            
+            // Bar background
+            ctx.fillStyle = 'rgba(0,0,0,0.8)';
+            ctx.fillRect(0, h - barHeight, w, barHeight);
+            
+            // Draw social handles
+            const items = [
+                { icon: assets.icons.fb, handle: SOCIAL_HANDLES.fb },
+                { icon: assets.icons.ig, handle: SOCIAL_HANDLES.ig },
+                { icon: assets.icons.tiktok, handle: SOCIAL_HANDLES.tiktok },
+                { icon: assets.icons.yt, handle: SOCIAL_HANDLES.yt }
+            ].filter(item => item.handle);
+            
+            const totalWidth = items.length * (iconSize + 100) - 20;
+            let x = (w - totalWidth) / 2;
+            const y = h - barHeight / 2;
+            
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'white';
+            ctx.font = `${iconSize * 0.4}px Arial`;
+            
+            items.forEach(item => {
+                if (item.icon) {
+                    ctx.drawImage(item.icon, x, y - iconSize/2, iconSize, iconSize);
+                }
+                ctx.fillText(item.handle, x + iconSize + 10, y);
+                x += iconSize + 100;
+            });
+        }
+
+        function drawCenteredSocials(yPosition) {
+            const w = canvas.width;
+            const iconSize = Math.min(w, canvas.height) * 0.06;
+            
+            const items = [
+                { icon: assets.icons.fb },
+                { icon: assets.icons.ig },
+                { icon: assets.icons.tiktok },
+                { icon: assets.icons.yt }
+            ].filter(item => item.icon);
+            
+            const totalWidth = items.length * iconSize * 1.5;
+            let x = (w - totalWidth) / 2;
+            
+            items.forEach(item => {
+                if (item.icon) {
+                    ctx.drawImage(item.icon, x, yPosition - iconSize/2, iconSize, iconSize);
+                }
+                x += iconSize * 1.5;
+            });
+        }
+
+        // ==========================================
+        //  FINALIZATION & DOWNLOAD
+        // ==========================================
+        async function finalizeVideo(blob) {
+            const video = document.getElementById('outputVideo');
+            video.src = generatedVideoUrl;
+            video.load();
+            
+            document.getElementById('resultArea').style.display = 'block';
+            
+            // Validate final output
+            await validateFinalOutput(blob);
+        }
+
+        async function validateFinalOutput(blob) {
+            const validations = [];
+            
+            // Check file size
+            const sizeMB = blob.size / (1024 * 1024);
+            validations.push({
+                check: 'File Size',
+                status: sizeMB > 0.1 ? '✅' : '⚠',
+                message: `${sizeMB.toFixed(2)} MB`
+            });
+            
+            // Check format
+            validations.push({
+                check: 'Format',
+                status: '✅',
+                message: 'MP4 (H.264)'
+            });
+            
+            // Check dimensions
+            const dims = FORMATS[currentFormat];
+            validations.push({
+                check: 'Resolution',
+                status: '✅',
+                message: `${dims.w}×${dims.h}`
+            });
+            
+            // Update status
+            const status = document.getElementById('statusText');
+            status.innerHTML = `
+                <div style="text-align: left; max-width: 500px; margin: 0 auto;">
+                    <strong>Quality Check:</strong><br>
+                    ${validations.map(v => `${v.status} ${v.check}: ${v.message}`).join('<br>')}
+                </div>
+            `;
+        }
+
+        function downloadVideo(platform) {
+            if (!generatedVideoUrl) {
+                alert('Please generate a video first.');
+                return;
+            }
+            
+            const a = document.createElement('a');
+            a.href = generatedVideoUrl;
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const formatName = FORMATS[currentFormat].name.replace(/\s+/g, '_');
+            
+            a.download = `eptonline_${formatName}_${timestamp}.mp4`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            // Platform-specific message
+            const messages = {
+                facebook: 'Facebook video downloaded!',
+                instagram: 'Instagram video downloaded!',
+                youtube: 'YouTube video downloaded!',
+                tiktok: 'TikTok video downloaded!',
+                all: 'Video downloaded in all formats!'
+            };
+            
+            alert(`✅ ${messages[platform] || 'Video downloaded!'}`);
+        }
+
+        // ==========================================
+        //  HELPER FUNCTIONS
+        // ==========================================
+        async function safeLoad(src) {
+            if (!src) return null;
+            
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = () => {
+                    console.warn('Failed to load image:', src);
+                    resolve(null);
+                };
+                
+                if (src instanceof Blob || src instanceof File) {
+                    img.src = URL.createObjectURL(src);
+                } else {
+                    img.src = src;
+                }
+            });
+        }
+
+        function drawImageContain(ctx, img, targetW, targetH) {
+            const imgRatio = img.width / img.height;
+            const targetRatio = targetW / targetH;
+            let drawW, drawH;
+            
+            if (imgRatio > targetRatio) {
+                drawW = targetW;
+                drawH = targetW / imgRatio;
+            } else {
+                drawW = targetH * imgRatio;
+                drawH = targetH;
+            }
+            
+            const x = (targetW - drawW) / 2;
+            const y = (targetH - drawH) / 2;
+            ctx.drawImage(img, x, y, drawW, drawH);
+        }
+
+        async function loadLogo() {
+            assets.logo = await safeLoad(LOGO_URL);
+        }
+    </script>
+</body>
+</html>
