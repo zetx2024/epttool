@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eptOnline Video Studio - Pro</title>
+    <style>
+        :root {
+            --primary: #f97316; /* Brand Orange */
+            --primary-dark: #c2410c;
+            --bg: #fff7ed;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --border: #fdba74;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 { margin-bottom: 0.5rem; color: var(--primary-dark); }
+        .subtitle { margin-bottom: 2rem; color: #64748b; font-size: 0.9rem; }
+
+        .container {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+
+        .col { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: #431407;
+        }
+
+        select, input[type="text"], input[type="color"], textarea {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box; 
+            font-family: inherit;
+        }
+
+        input[type="file"] {
+            border: 1px dashed var(--border);
+            padding: 1rem;
+            background: #fff3e0;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        /* Grouping Inputs */
+        .input-group {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #fed7aa;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        /* Playlist Styling (Drag & Drop) */
+        .playlist-container {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8fafc;
+        }
+
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .playlist-item.dragging {
+            opacity: 0.5;
+            border: 2px dashed var(--primary);
+        }
+
+        .playlist-item:active { cursor: grabbing; }
+
+        .playlist-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            pointer-events: none; /* Prevent img drag conflict */
+        }
+
+        .item-details { flex-grow: 1; display: flex; flex-direction: column; gap: 4px; }
+        .item-name { font-size: 0.85rem; font-weight: 600; color: #334155; }
+        
+        .duration-control { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; }
+        .duration-control input { width: 50px; padding: 2px 5px; }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Caption Generator Area */
+        .caption-area {
+            grid-column: 1 / -1;
+            background: #f1f5f9;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+        }
+        
+        textarea { height: 80px; font-family: monospace; font-size: 0.9rem; }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 6px rgba(249, 115, 22, 0.3);
+        }
+        .btn-primary:hover { background-color: #ea580c; transform: translateY(-1px); }
+        .btn-primary:disabled { background-color: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-secondary {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            grid-column: 1 / -1;
+            text-align: center;
+            display: none;
+            margin-top: 2rem;
+            padding: 2rem;
+            background: #f0fdf4;
+            border: 2px dashed #4ade80;
+            border-radius: 12px;
+        }
+
+        video {
+            max-width: 100%;
+            max-height: 500px;
+            border: 4px solid #000;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1rem;
+        }
+
+        .status-bar {
+            grid-column: 1 / -1;
+            background: #e2e8f0;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            display: none;
+            position: relative;
+        }
+        .status-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #fbbf24);
+            transition: width 0.1s linear;
+        }
+        .status-text-overlay {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 2px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #431407;
+        }
+        
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+
+    <h1>eptOnline Video Studio</h1>
+    <span class="subtitle">Social Media Video Generator • HD Output • Auto-Layout</span>
+
+    <div class="container">
+        
+        <div class="col">
+            <div class="input-group">
+                <label>1. Output Format (Target Platform)</label>
+                <select id="format">
+                    <optgroup label="Vertical Reels (9:16) - 1080x1920">
+                        <option value="reel_fb">Facebook Reel / Story</option>
+                        <option value="reel_ig">Instagram Reel / Story</option>
+                        <option value="reel_tiktok">TikTok</option>
+                        <option value="reel_yt">YouTube Short</option>
+                    </optgroup>
+                    <optgroup label="Square (1:1) - 1080x1080">
+                        <option value="feed_ig">Instagram Post / Facebook Feed</option>
+                    </optgroup>
+                    <optgroup label="Landscape (16:9) - 1920x1080">
+                        <option value="land_yt">YouTube Landscape</option>
+                        <option value="land_fb">Facebook Video</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>2. Visual Settings</label>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                    <span>Background Color:</span>
+                    <input type="color" id="bgColor" value="#f97316" style="width: 60px; padding: 2px; height: 35px;">
+                </div>
+                
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="addIntro" checked> 
+                    <strong>Add Intro Slide (Logo + Title)</strong>
+                </label>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="addOutro" checked> 
+                    <strong>Add Outro Slide (Socials)</strong>
+                </label>
+            </div>
+
+            <div class="input-group">
+                <label>3. Audio</label>
+                <select id="musicSelect">
+                    <option value="none">No Music (Silent)</option>
+                    <option value="track1">Dance 4x - Upbeat</option>
+                    <option value="track2">Diggy - Funky</option>
+                    <option value="track3">The Truth - Dramatic</option>
+                    <option value="track4">What It Is - Chill</option>
+                </select>
+                <small style="color:#666; display:block; margin-top:5px;">Note: Ensure music files are linked in code.</small>
+            </div>
+        </div>
+
+        <div class="col">
+            <div>
+                <label>4. Upload Images (Multiple)</label>
+                <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageUpload()">
+                <small style="color:var(--primary); display:block; margin-top:5px;">Drag items in the list below to reorder.</small>
+            </div>
+
+            <div class="playlist-container" id="playlistContainer">
+                <div style="text-align: center; color: #94a3b8; margin-top: 100px; display:flex; flex-direction:column; align-items:center;">
+                    <span style="font-size:2rem;">📂</span>
+                    <p>No images selected.<br>Upload images to begin sorting.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="caption-area">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <label style="margin:0;">Social Media Caption Helper</label>
+                <button class="btn-secondary" onclick="generateCaption()">Generate & Copy</button>
+            </div>
+            <textarea id="captionBox" placeholder="Click 'Generate' to create a caption with your links..."></textarea>
+        </div>
+
+        <div class="status-bar" id="progressBar">
+            <div class="status-fill" id="progressFill"></div>
+            <div class="status-text-overlay" id="statusText">Ready</div>
+        </div>
+        
+        <button id="generateBtn" class="btn-primary" onclick="startGeneration()" style="grid-column: 1/-1;">Generate High Definition Video</button>
+
+        <div class="preview-area" id="resultArea">
+            <h3 style="margin-top:0; color:#16a34a;">✨ Video Generated Successfully!</h3>
+            <p id="videoDetails" style="font-size:0.9rem; color:#64748b; margin-bottom:1rem;"></p>
+            <video id="outputVideo" controls playsinline></video>
+            <br>
+            <a id="downloadLink" href="#" download="video.mp4">
+                <button style="background-color: #16a34a; padding: 12px 30px; border:none; border-radius:6px; color:white; font-size:1.1rem; cursor:pointer; font-weight:bold; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.3);">
+                    ⬇ Download MP4
+                </button>
+            </a>
+            <button onclick="location.reload()" style="margin-left:10px; padding:12px; background:none; border:1px solid #ccc; border-radius:6px; cursor:pointer; color:#666;">Reset</button>
+        </div>
+
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // ==========================================
+        //  1. CONFIGURATION & ASSETS
+        // ==========================================
+        
+        // Social Handles
+        const SOCIAL_HANDLES = {
+            fb: "eptonline.org",
+            ig: "@eptonline_org",
+            yt: "eptonlineOrg",
+            tiktok: "@eptonline.org" 
+        };
+
+        const WEBSITE_URL = "https://eptonline.org";
+        const BRAND_NAME = "eptOnline";
+        
+        // Icon Assets (High Res)
+        const ICONS = {
+            fb: 'https://cdn-icons-png.flaticon.com/512/5968/5968764.png',
+            ig: 'https://cdn-icons-png.flaticon.com/512/3955/3955024.png',
+            yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png',
+            tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'
+        };
+
+        // Music Tracks (Placeholders - ensure these paths are valid or use URLs)
+        const MUSIC_TRACKS = {
+            track1: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', 
+            track2: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            track3: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+            track4: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+        };
+
+        const LOGO_BASE64 = "https://gen.eptonline.org/logo.png"; // Ensure this is reachable, or use a placeholder
+
+        // ==========================================
+        //  2. STATE & DRAG-AND-DROP LOGIC
+        // ==========================================
+
+        let playlist = []; // Array of { id, file, duration }
+        let draggedItemIndex = null;
+        let uniqueIdCounter = 0;
+
+        const container = document.getElementById('playlistContainer');
+
+        function handleImageUpload() {
+            const input = document.getElementById('imageInput');
+            
+            // Clear default message if it exists
+            if (playlist.length === 0) container.innerHTML = '';
+
+            for (let i = 0; i < input.files.length; i++) {
+                const file = input.files[i];
+                const id = uniqueIdCounter++;
+                
+                // Add to data model
+                playlist.push({ id: id, file: file, duration: 3 });
+                
+                // Add to DOM
+                createPlaylistItem(id, file);
+            }
+            // Reset input for same file re-upload
+            input.value = "";
+        }
+
+        function createPlaylistItem(id, file) {
+            const div = document.createElement('div');
+            div.className = 'playlist-item';
+            div.draggable = true;
+            div.dataset.id = id;
+
+            // Drag Events
+            div.addEventListener('dragstart', handleDragStart);
+            div.addEventListener('dragover', handleDragOver);
+            div.addEventListener('drop', handleDrop);
+            div.addEventListener('dragend', handleDragEnd);
+
+            // Image Thumbnail
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+
+            // Details
+            const details = document.createElement('div');
+            details.className = 'item-details';
+            
+            const name = document.createElement('span');
+            name.className = 'item-name';
+            name.innerText = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
+
+            const durWrap = document.createElement('div');
+            durWrap.className = 'duration-control';
+            durWrap.innerHTML = `Time (sec): <input type="number" min="1" step="0.5" value="3" onchange="updateDuration(${id}, this.value)">`;
+
+            details.appendChild(name);
+            details.appendChild(durWrap);
+
+            // Delete Button
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete-btn';
+            delBtn.innerHTML = '×';
+            delBtn.onclick = () => deleteItem(id, div);
+
+            div.appendChild(img);
+            div.appendChild(details);
+            div.appendChild(delBtn);
+            container.appendChild(div);
+        }
+
+        function updateDuration(id, val) {
+            const item = playlist.find(p => p.id === id);
+            if (item) item.duration = parseFloat(val);
+        }
+
+        function deleteItem(id, domElement) {
+            playlist = playlist.filter(p => p.id !== id);
+            domElement.remove();
+            if (playlist.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: #94a3b8; margin-top: 100px; display:flex; flex-direction:column; align-items:center;"><span style="font-size:2rem;">📂</span><p>No images selected.<br>Upload images to begin sorting.</p></div>`;
+            }
+        }
+
+        // --- Drag & Drop Handlers ---
+        function handleDragStart(e) {
+            this.classList.add('dragging');
+            draggedItemIndex = playlist.findIndex(p => p.id == this.dataset.id);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.playlist-item');
+            if (!dropTarget || dropTarget === this) return;
+
+            const dropIndex = playlist.findIndex(p => p.id == dropTarget.dataset.id);
+
+            // Swap in Data Array
+            if (draggedItemIndex !== -1 && dropIndex !== -1) {
+                const item = playlist.splice(draggedItemIndex, 1)[0];
+                playlist.splice(dropIndex, 0, item);
+                
+                // Re-render list to reflect order
+                refreshPlaylistDOM();
+            }
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedItemIndex = null;
+        }
+
+        function refreshPlaylistDOM() {
+            // Keep the visual elements but re-order them in the container
+            playlist.forEach(item => {
+                const el = container.querySelector(`.playlist-item[data-id='${item.id}']`);
+                container.appendChild(el);
+            });
+        }
+
+        // ==========================================
+        //  3. GENERATION LOGIC
+        // ==========================================
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const assets = { logo: null, icons: {}, slides: [] };
+
+        async function startGeneration() {
+            // 1. Validation
+            if (playlist.length === 0) return alert("❌ Validation Error: Please upload at least one image.");
+            
+            const formatVal = document.getElementById('format').value;
+            const isVertical = formatVal.includes('reel') || formatVal.includes('story') || formatVal.includes('tiktok');
+            const isSquare = formatVal.includes('feed');
+            
+            // 2. Set Dimensions (High Def)
+            let width = 1920, height = 1080; // Default Landscape
+            if (isVertical) { width = 1080; height = 1920; }
+            if (isSquare) { width = 1080; height = 1080; }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // 3. UI Updates
+            const btn = document.getElementById('generateBtn');
+            const statusBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            
+            btn.disabled = true;
+            document.getElementById('resultArea').style.display = 'none';
+            statusBar.style.display = 'block';
+            statusText.innerText = "Initializing assets...";
+
+            try {
+                // 4. Load Assets
+                assets.logo = await safeLoad(LOGO_BASE64);
+                assets.icons.fb = await safeLoad(ICONS.fb);
+                assets.icons.ig = await safeLoad(ICONS.ig);
+                assets.icons.yt = await safeLoad(ICONS.yt);
+                assets.icons.tiktok = await safeLoad(ICONS.tiktok);
+                
+                assets.slides = [];
+                let slidesTotalTime = 0;
+
+                // Load User Images
+                for (let i = 0; i < playlist.length; i++) {
+                    statusText.innerText = `Loading image ${i + 1}/${playlist.length}...`;
+                    const img = await safeLoad(playlist[i].file);
+                    if (img) {
+                        assets.slides.push({ img, duration: playlist[i].duration });
+                        slidesTotalTime += playlist[i].duration;
+                    }
+                }
+
+                // 5. Calculate Timeline
+                const useIntro = document.getElementById('addIntro').checked;
+                const useOutro = document.getElementById('addOutro').checked;
+                const introDur = useIntro ? 3 : 0;
+                const outroDur = useOutro ? 4 : 0;
+                const totalDuration = introDur + slidesTotalTime + outroDur;
+
+                // 6. Audio Setup
+                let audioStream = null;
+                const musicChoice = document.getElementById('musicSelect').value;
+                if (musicChoice !== 'none') {
+                    statusText.innerText = "Processing Audio...";
+                    audioStream = await setupAudio(MUSIC_TRACKS[musicChoice], totalDuration);
+                }
+
+                // 7. Start Recording
+                const stream = canvas.captureStream(30); // 30 FPS
+                if (audioStream) {
+                    audioStream.getAudioTracks().forEach(track => stream.addTrack(track));
+                }
+
+                const mimeType = MediaRecorder.isTypeSupported("video/mp4") ? "video/mp4" : "video/webm;codecs=vp9";
+                const recorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: 5000000 }); // 5Mbps High Quality
+                const chunks = [];
+
+                recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+                
+                recorder.onstop = () => {
+                    finalizeVideo(chunks, mimeType, width, height, totalDuration);
+                    btn.disabled = false;
+                    statusText.innerText = "Complete";
+                };
+
+                recorder.start();
+                
+                // 8. Render Loop
+                const bgColor = document.getElementById('bgColor').value;
+                const startTime = performance.now();
+                
+                function animate() {
+                    const elapsed = (performance.now() - startTime) / 1000;
+                    const pct = Math.min((elapsed / totalDuration) * 100, 100);
+                    
+                    document.getElementById('progressFill').style.width = `${pct}%`;
+                    statusText.innerText = `Rendering: ${Math.round(pct)}%`;
+
+                    if (elapsed >= totalDuration) {
+                        recorder.stop();
+                        return;
+                    }
+
+                    // Render Logic
+                    let relativeTime = elapsed;
+                    
+                    // A. Intro
+                    if (useIntro && relativeTime < introDur) {
+                        renderIntro(ctx, width, height, bgColor, relativeTime);
+                    } 
+                    // B. Slides
+                    else if (relativeTime < (introDur + slidesTotalTime)) {
+                        const slideTime = relativeTime - introDur;
+                        let t = 0;
+                        let currentSlide = null;
+                        for(let s of assets.slides) {
+                            if(slideTime >= t && slideTime < t + s.duration) {
+                                currentSlide = s.img;
+                                break;
+                            }
+                            t += s.duration;
+                        }
+                        if(currentSlide) renderSlide(ctx, currentSlide, width, height, bgColor, formatVal);
+                    } 
+                    // C. Outro
+                    else if (useOutro) {
+                        renderOutro(ctx, width, height, bgColor);
+                    }
+
+                    requestAnimationFrame(animate);
+                }
+                
+                animate();
+
+            } catch (err) {
+                console.error(err);
+                alert("An error occurred during generation: " + err.message);
+                btn.disabled = false;
+            }
+        }
+
+        function finalizeVideo(chunks, mime, w, h, dur) {
+            const blob = new Blob(chunks, { type: mime });
+            const url = URL.createObjectURL(blob);
+            const vid = document.getElementById('outputVideo');
+            const dl = document.getElementById('downloadLink');
+            const details = document.getElementById('videoDetails');
+            
+            // Generate Filename
+            const now = new Date();
+            const ts = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}${now.getMinutes()}`;
+            
+            vid.src = url;
+            dl.href = url;
+            // Force mp4 extension for user convenience (even if webm container)
+            dl.download = `eptOnline_Studio_${w}x${h}_${ts}.mp4`; 
+
+            details.innerHTML = `<strong>Resolution:</strong> ${w}x${h} (HD) | <strong>Duration:</strong> ${dur.toFixed(1)}s | <strong>Format:</strong> ${mime}`;
+            document.getElementById('resultArea').style.display = 'block';
+        }
+
+        // ==========================================
+        //  4. RENDERING FUNCTIONS (The "Magic")
+        // ==========================================
+
+        function renderIntro(ctx, w, h, bg, time) {
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, w, h);
+            
+            // Simple fade in effect
+            const alpha = Math.min(time * 1.5, 1);
+            ctx.globalAlpha = alpha;
+
+            // Center content
+            const cx = w / 2;
+            const cy = h / 2;
+
+            // Logo
+            if (assets.logo) {
+                const size = Math.min(w, h) * 0.4;
+                ctx.drawImage(assets.logo, cx - size/2, cy - size/2 - (h*0.05), size, size);
+            }
+            
+            // Title
+            ctx.fillStyle = "#ffffff";
+            ctx.textAlign = "center";
+            ctx.font = `bold ${Math.min(w, h) * 0.06}px Arial`;
+            ctx.fillText(BRAND_NAME, cx, cy + (Math.min(w, h) * 0.25));
+
+            ctx.globalAlpha = 1.0;
+        }
+
+        function renderSlide(ctx, img, w, h, bg, format) {
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, w, h);
+
+            // Draw Image (Contain)
+            const imgRatio = img.width / img.height;
+            const screenRatio = w / h;
+            let dw, dh, dx, dy;
+
+            if (imgRatio > screenRatio) {
+                dw = w;
+                dh = w / imgRatio;
+                dx = 0;
+                dy = (h - dh) / 2;
+            } else {
+                dh = h;
+                dw = h * imgRatio;
+                dy = 0;
+                dx = (w - dw) / 2;
+            }
+            ctx.drawImage(img, dx, dy, dw, dh);
+
+            // Logo Watermark (Top Right)
+            if (assets.logo) {
+                const lSize = Math.min(w, h) * 0.12;
+                const pad = lSize * 0.2;
+                ctx.globalAlpha = 0.8;
+                ctx.drawImage(assets.logo, w - lSize - pad, pad, lSize, lSize);
+                ctx.globalAlpha = 1.0;
+            }
+
+            // Bottom Bar (for social handles)
+            const barH = h * 0.08;
+            ctx.fillStyle = "rgba(0,0,0,0.7)";
+            ctx.fillRect(0, h - barH, w, barH);
+            
+            ctx.fillStyle = "white";
+            ctx.font = `bold ${barH * 0.4}px Arial`;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText(WEBSITE_URL, w * 0.05, h - (barH/2));
+        }
+
+        function renderOutro(ctx, w, h, bg) {
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            const cx = w / 2;
+            const cy = h / 2;
+            const minDim = Math.min(w, h);
+
+            // "Thanks for watching"
+            ctx.font = `bold ${minDim * 0.08}px Arial`;
+            ctx.fillText("Thanks for watching!", cx, cy - (minDim * 0.1));
+
+            // Social Icons Grid
+            const icons = [
+                { i: assets.icons.fb, t: SOCIAL_HANDLES.fb },
+                { i: assets.icons.ig, t: SOCIAL_HANDLES.ig },
+                { i: assets.icons.tiktok, t: SOCIAL_HANDLES.tiktok }
+            ];
+
+            let yPos = cy + (minDim * 0.1);
+            const iconSize = minDim * 0.08;
+            const fontSize = minDim * 0.05;
+
+            ctx.font = `${fontSize}px Arial`;
+            
+            icons.forEach(item => {
+                if(item.i) {
+                    // Draw icon centered relative to text block?
+                    // Let's simple row approach
+                    const totalW = iconSize + 20 + ctx.measureText(item.t).width;
+                    const startX = cx - (totalW / 2);
+                    
+                    ctx.drawImage(item.i, startX, yPos - (iconSize/2), iconSize, iconSize);
+                    ctx.textAlign = "left";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(item.t, startX + iconSize + 20, yPos);
+                    
+                    yPos += iconSize * 1.5;
+                }
+            });
+        }
+
+        // ==========================================
+        //  5. HELPERS (Audio, Caption, SafeLoad)
+        // ==========================================
+
+        function safeLoad(src) {
+            return new Promise(resolve => {
+                if(!src) resolve(null);
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.onload = () => resolve(img);
+                img.onerror = () => { console.warn("Failed asset:", src); resolve(null); };
+                if (src instanceof Blob || src instanceof File) img.src = URL.createObjectURL(src);
+                else img.src = src;
+            });
+        }
+
+        async function setupAudio(url, duration) {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const actx = new AudioContext();
+                const dest = actx.createMediaStreamDestination();
+                
+                const response = await fetch(url);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await actx.decodeAudioData(arrayBuffer);
+                
+                const source = actx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.loop = true;
+                source.connect(dest);
+                source.start(0);
+                
+                // Stop audio slightly after video ends to clean up
+                setTimeout(() => { 
+                    source.stop(); 
+                    actx.close(); 
+                }, (duration * 1000) + 100);
+                
+                return dest.stream;
+            } catch (e) {
+                console.warn("Audio failed to load, proceeding mute.", e);
+                return null;
+            }
+        }
+
+        function generateCaption() {
+            let caption = `🎥 Check out this video!\n\nExplore more at ${WEBSITE_URL}\n\n👇 Follow us:\n`;
+            if(SOCIAL_HANDLES.fb) caption += `Facebook: ${SOCIAL_HANDLES.fb}\n`;
+            if(SOCIAL_HANDLES.ig) caption += `Instagram: ${SOCIAL_HANDLES.ig}\n`;
+            if(SOCIAL_HANDLES.tiktok) caption += `TikTok: ${SOCIAL_HANDLES.tiktok}\n`;
+            
+            caption += `\n#${BRAND_NAME} #VideoCreator #Content #Viral`;
+            
+            const box = document.getElementById('captionBox');
+            box.value = caption;
+            box.select();
+            navigator.clipboard.writeText(caption);
+            alert("Caption copied to clipboard!");
+        }
+    </script>
+</body>
+</html>
