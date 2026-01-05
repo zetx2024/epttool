@@ -1,733 +1,1020 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Flashcard Studio (Final)</title>
-    <style>
-        :root {
-            --primary: #f97316; /* Brand Orange */
-            --bg: #fff7ed;
-            --surface: #ffffff;
-            --text: #1e293b;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>eptOnline Video Studio — Fixed</title>
+  <style>
+    :root {
+      --primary: #f97316;
+      --bg: #fff7ed;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display:flex;
+      justify-content:center;
+    }
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+    }
+    h1 {
+      margin: 0 0 18px 0;
+      color: #c2410c;
+      font-size: 1.5rem;
+    }
+    .container {
+      background: var(--surface);
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 18px;
+    }
+    @media (max-width: 980px) {
+      .container { grid-template-columns: 1fr; }
+    }
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+    .panel { display:flex; flex-direction:column; gap:12px; }
 
-        h1 { margin-bottom: 1rem; color: #c2410c; }
+    label { font-weight:700; color:#431407; font-size:0.9rem; margin-bottom:6px; display:block; }
+    input[type="file"], select, input[type="text"], input[type="number"], textarea {
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #f3c27a;
+      box-sizing:border-box;
+      font-family:inherit;
+    }
+    .input-row { display:flex; gap:8px; align-items:center; }
+    .small { width:120px; }
 
-        .container {
-            background: var(--surface);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 900px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
+    .playlist {
+      border:1px solid #e6eef6;
+      border-radius:8px;
+      min-height:220px;
+      max-height:420px;
+      overflow:auto;
+      padding:8px;
+      background:#fff;
+    }
 
-        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+    .plist-item {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding:8px;
+      border-radius:6px;
+      margin-bottom:6px;
+      background:#fbf6f2;
+      cursor:grab;
+    }
+    .plist-item.dragging { opacity:0.6; transform:scale(0.995); cursor:grabbing; }
+    .plist-thumb { width:72px; height:72px; object-fit:cover; border-radius:6px; flex-shrink:0; border:1px solid #eee; }
+    .plist-meta { flex:1; display:flex; flex-direction:column; gap:6px; }
+    .plist-actions { display:flex; flex-direction:column; gap:6px; align-items:flex-end; }
 
-        .col { display: flex; flex-direction: column; gap: 1.2rem; }
+    .btn { border:none; border-radius:8px; padding:10px 14px; cursor:pointer; font-weight:700; }
+    .btn-primary { background:var(--primary); color:white; }
+    .btn-secondary { background:#3b82f6; color:white; }
+    .btn-ghost { background:transparent; color:var(--muted); border:1px solid #e6eef6; }
 
-        label {
-            display: block;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            font-size: 0.9rem;
-            color: #431407;
-        }
+    .caption-area { background:#f1f5f9; padding:12px; border-radius:8px; border:1px solid #cbd5e1; }
 
-        input[type="file"], select, input[type="text"], input[type="color"] {
-            width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #fdba74;
-            border-radius: 6px;
-            box-sizing: border-box; 
-            font-family: inherit;
-        }
+    .preview { text-align:center; padding-top:12px; border-top:1px dashed #fdba74; display:none; }
+    video { max-width:100%; border-radius:8px; border:3px solid #000; display:block; margin:12px auto; }
 
-        /* Grouping Inputs */
-        .input-group {
-            background: #fff3e0;
-            padding: 15px;
-            border-radius: 8px;
-        }
+    .status { display:flex; gap:8px; align-items:center; flex-direction:column; }
+    .progress-outer { width:100%; background:#e6eef6; height:12px; border-radius:999px; overflow:hidden; }
+    .progress-fill { width:0%; height:100%; background:var(--primary); transition:width 0.1s linear; }
 
-        /* Playlist Styling */
-        .playlist-container {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            background: #fff;
-        }
+    .small-note { font-size:0.85rem; color:var(--muted); }
 
-        .playlist-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
+    .options { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
 
-        .playlist-item img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        .playlist-item input {
-            width: 70px;
-            padding: 5px;
-        }
-
-        /* Caption Generator Area */
-        .caption-area {
-            grid-column: 1 / -1;
-            background: #f1f5f9;
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid #cbd5e1;
-        }
-        
-        textarea {
-            width: 100%;
-            height: 100px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 0.5rem;
-            box-sizing: border-box;
-            font-family: monospace;
-            margin-top: 0.5rem;
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 1rem;
-            width: 100%;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-primary:hover { background-color: #ea580c; }
-        .btn-primary:disabled { background-color: #cbd5e1; cursor: not-allowed; }
-
-        .btn-secondary {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #ffedd5;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #fdba74;
-            cursor: pointer;
-        }
-
-        /* Preview Area */
-        .preview-area {
-            grid-column: 1 / -1;
-            text-align: center;
-            display: none;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 2px dashed #fdba74;
-        }
-
-        video {
-            max-width: 100%;
-            max-height: 500px;
-            border: 4px solid #000;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .status-bar {
-            grid-column: 1 / -1;
-            background: #e2e8f0;
-            height: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            display: none;
-        }
-        .status-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--primary);
-            transition: width 0.1s linear;
-        }
-        
-        canvas { display: none; }
-    </style>
+    .flex-between { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  </style>
 </head>
 <body>
-
-    <h1>Flashcard Video Studio Pro</h1>
-
+  <div class="wrapper">
+    <h1>eptOnline Video Studio — Updated</h1>
     <div class="container">
-        
-        <div class="col">
-            <div>
-                <label>1. Video Format</label>
-                <select id="format">
-                    <option value="feed">Instagram Feed (1080x1080)</option>
-                    <option value="story">Story / Reels / TikTok (1080x1920)</option>
-                    <option value="youtube">YouTube Landscape (1920x1080)</option>
-                </select>
-            </div>
+      <div class="panel">
+        <!-- Settings -->
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <label>Download Preset / Format</label>
+            <select id="downloadPreset">
+              <option value="instagram_post">Instagram Post (1080×1080)</option>
+              <option value="instagram_reel">Instagram Reel / Story (1080×1920)</option>
+              <option value="tiktok_reel">TikTok Reel (1080×1920)</option>
+              <option value="facebook_reel">Facebook Reel (1080×1920)</option>
+              <option value="youtube_landscape">YouTube Landscape (1920×1080)</option>
+              <option value="facebook_landscape">Facebook Video (1280×720)</option>
+              <option value="youtube_reel">YouTube Short (1080×1920)</option>
+            </select>
+            <div class="small-note">Selecting a preset updates canvas size & framing rules automatically.</div>
+          </div>
 
-            <div class="input-group">
-                <label>2. Design Settings</label>
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                    <span>Background Color:</span>
-                    <input type="color" id="bgColor" value="#f97316" style="width: 50px; padding: 2px; height: 35px;">
-                </div>
-                
-                <label class="checkbox-wrapper">
-                    <input type="checkbox" id="addOutro" checked> 
-                    <strong>Add "Outro" Slide (3 Secs)</strong>
-                </label>
-                <small style="display:block; margin-top:5px; color:#666;">
-                    Shows centered Logo, Social Links (FB, IG, YT, TikTok), and Website.
-                </small>
+          <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+              <label>Background Color</label>
+              <input type="color" id="bgColor" value="#c76e08" />
             </div>
+            <div style="width:140px;">
+              <label>Frames / Sec (default)</label>
+              <input type="number" id="defaultDuration" min="1" value="3" />
+            </div>
+          </div>
 
-            <div>
-                <label>3. Background Music</label>
-                <select id="musicSelect">
-                    <option value="none">No Music</option>
-                    <option value="track1">Peaceful/Nature (Track 1)</option>
-                    <option value="track2">Upbeat/Lofi (Track 2)</option>
-                    <option value="track3">Cinematic (Track 3)</option>
-                </select>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <label style="margin:0;">
+              <input type="checkbox" id="addIntro" checked /> Add Intro
+            </label>
+            <label style="margin:0;">
+              <input type="checkbox" id="addOutro" checked /> Add Outro
+            </label>
+            <label style="margin:0;">
+              <input type="checkbox" id="autoConvertMp4" /> Auto-convert to MP4 (ffmpeg.wasm)
+            </label>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center;">
+            <div style="flex:1;">
+              <label>Intro Duration (secs)</label>
+              <input type="number" id="introDuration" min="1" value="2" />
             </div>
+            <div style="width:140px;">
+              <label>Outro Duration (secs)</label>
+              <input type="number" id="outroDuration" min="1" value="3" />
+            </div>
+          </div>
+
+          <div>
+            <label>Background Music</label>
+            <select id="musicSelect">
+              <option value="none">No Music</option>
+              <option value="track1">Track 1 (local)</option>
+              <option value="track2">Track 2 (local)</option>
+            </select>
+            <div class="small-note">If using local sample tracks, set MUSIC_TRACKS constants.</div>
+          </div>
         </div>
 
-        <div class="col">
-            <div>
-                <label>4. Upload Images</label>
-                <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImageUpload()">
-            </div>
+        <!-- Upload + Playlist -->
+        <div>
+          <label>Upload Images (drag & drop supported)</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input type="file" id="imageInput" accept="image/*" multiple />
+            <button class="btn btn-secondary" id="btnAddFromUrl">Add via URL</button>
+          </div>
+          <div class="small-note">You can drag thumbnails to reorder them. Remove items using the trash icon.</div>
 
-            <label>5. Playlist & Duration (Secs per slide)</label>
-            <div class="playlist-container" id="playlistContainer">
-                <p style="text-align: center; color: #999; margin-top: 50px;">Upload images to see them here.</p>
-            </div>
+          <div class="playlist" id="playlist"></div>
         </div>
 
+        <!-- Caption -->
         <div class="caption-area">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <label style="margin:0;">Social Media Caption Generator</label>
-                <button class="btn-secondary" onclick="generateCaption()">Generate & Copy</button>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label style="margin:0;">Social Media Caption Generator</label>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-ghost" id="btnGenerateCaption">Generate & Copy</button>
             </div>
-            <textarea id="captionBox" placeholder="Click 'Generate' to create a caption with your links and hashtags..."></textarea>
+          </div>
+          <textarea id="captionBox" placeholder="Caption will appear here..." rows="4"></textarea>
         </div>
 
-        <div class="status-bar" id="progressBar"><div class="status-fill" id="progressFill"></div></div>
-        <p id="statusText" style="grid-column: 1/-1; text-align: center;"></p>
-        
-        <button id="generateBtn" class="btn-primary" onclick="startGeneration()" style="grid-column: 1/-1;">Generate Video</button>
+      </div>
 
-        <div class="preview-area" id="resultArea">
-            <h3>Video Ready!</h3>
+      <!-- Right column: controls, preview, status -->
+      <div class="panel">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="flex-between">
+            <div>
+              <label>Filename Prefix</label>
+              <input type="text" id="filenamePrefix" placeholder="eptonline_video" />
+            </div>
+            <div style="width:200px;">
+              <label>Target Platform (download)</label>
+              <select id="downloadSelect">
+                <option value="instagram_post">Instagram Post (1080×1080)</option>
+                <option value="instagram_reel">Instagram Reel (1080×1920)</option>
+                <option value="tiktok_reel">TikTok Reel (1080×1920)</option>
+                <option value="facebook_reel">Facebook Reel (1080×1920)</option>
+                <option value="youtube_landscape">YouTube Landscape (1920×1080)</option>
+                <option value="facebook_landscape">Facebook Video (1280×720)</option>
+                <option value="youtube_reel">YouTube Short (1080×1920)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-primary" id="btnGenerate">Generate Video</button>
+            <button class="btn btn-ghost" id="btnPreviewCanvas">Preview Current Frame</button>
+            <button class="btn btn-ghost" id="btnClear">Clear All</button>
+          </div>
+
+          <div class="status">
+            <div class="progress-outer"><div class="progress-fill" id="progressFill"></div></div>
+            <div id="statusText" class="small-note"></div>
+          </div>
+
+          <div class="preview" id="previewPanel">
+            <h3 style="margin:6px 0 0 0;">Video Ready</h3>
             <video id="outputVideo" controls playsinline></video>
-            <br>
-            <a id="downloadLink" href="#" download="video.mp4">
-                <button style="background-color: #16a34a; width: auto; padding: 10px 40px; border:none; border-radius:6px; color:white; font-size:1rem; cursor:pointer;">Download MP4</button>
-            </a>
+            <div style="display:flex;gap:8px; justify-content:center; margin-top:8px;">
+              <a id="downloadLink" href="#" download><button class="btn btn-primary">Download</button></a>
+              <button class="btn btn-secondary" id="btnConvertIfNeeded">Convert to MP4 (manual)</button>
+            </div>
+            <div id="postChecks" style="margin-top:8px;"></div>
+          </div>
         </div>
 
+        <!-- Hidden canvas used to render frames -->
+        <canvas id="canvas" style="display:none;"></canvas>
+      </div>
     </div>
+  </div>
 
-    <canvas id="canvas"></canvas>
+<script>
+/*
+  eptOnline Video Studio — revised script
+  - Drag-and-drop reorder
+  - Multiple format presets and download options
+  - Intro / Outro per-format handling
+  - Pre-generation validation and post-generation checks
+  - Optional client-side MP4 conversion using ffmpeg.wasm (if enabled)
+*/
 
-    <script>
-        // ==========================================
-        //  1. CONFIGURATION (EDIT HERE)
-        // ==========================================
-        
-        // 1.1 Hardcoded Social Handles (Add your real handles here)
-        const SOCIAL_HANDLES = {
-            fb: "Facebook Name",
-            ig: "@insta_handle",
-            yt: "Channel Name",
-            tiktok: "@tiktok_handle" 
-        };
+/* ============ Configuration ============ */
+const SOCIAL_HANDLES = {
+  fb: "eptonline.org",
+  ig: "@eptonline_org",
+  yt: "eptonlineOrg",
+  tiktok: "@eptonline.org"
+};
 
-        const WEBSITE_URL = "https://eptonline.org";
-        
-        // 1.2 PNG Icon Links
-        const ICONS = {
-            fb: 'https://cdn-icons-png.flaticon.com/512/5968/5968764.png',
-            ig: 'https://cdn-icons-png.flaticon.com/512/3955/3955024.png',
-            yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png',
-            tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'
-        };
+const WEBSITE_URL = "https://eptonline.org";
+const ICONS = {
+  fb: 'https://cdn-icons-png.flaticon.com/512/5968/5968764.png',
+  ig: 'https://cdn-icons-png.flaticon.com/512/3955/3955024.png',
+  yt: 'https://cdn-icons-png.flaticon.com/512/3670/3670147.png',
+  tiktok: 'https://cdn-icons-png.flaticon.com/512/3046/3046121.png'
+};
+// Provide valid URLs for the music files if you want music.
+const MUSIC_TRACKS = {
+  track1: 'path/to/music1.mp3',
+  track2: 'path/to/music2.mp3'
+};
 
-        // 1.3 Music Tracks (Replace with your local paths or URLs)
-        const MUSIC_TRACKS = {
-            track1: 'path/to/music1.mp3', 
-            track2: 'path/to/music2.mp3',
-            track3: 'path/to/music3.mp3'
-        };
+/* ============ State ============ */
+let playlist = []; // { id, file (File|ImageURL string), thumbnailURL, duration }
+let dragSrcIndex = null;
+let assets = { logo: null, icons: {}, slides: [] };
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-        // 1.4 Logo (Base64)
-        const LOGO_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2ZmZCIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTIgMiAxNS4wOSA4LjI2IDIyIDkuMjcgMTcgMTQuMTQgMTguMTggMjEuMDIgMTIgMTcuNzcgNS44MiAyMS4wMiA3IDE0LjE0IDIgOS4yNyA4LjkxIDguMjYgMTIgMiIvPjwvc3ZnPg==";
+/* ============ Utility helpers ============ */
+function uid(prefix='id') { return prefix + '_' + Math.random().toString(36).slice(2,9); }
+function nowTimestamp() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}-${String(d.getMinutes()).padStart(2,'0')}-${String(d.getSeconds()).padStart(2,'0')}`;
+}
 
+/* ============ DOM refs ============ */
+const playlistEl = document.getElementById('playlist');
+const imageInput = document.getElementById('imageInput');
+const btnGenerate = document.getElementById('btnGenerate');
+const progressFill = document.getElementById('progressFill');
+const statusText = document.getElementById('statusText');
+const previewPanel = document.getElementById('previewPanel');
+const outputVideo = document.getElementById('outputVideo');
+const downloadLink = document.getElementById('downloadLink');
+const btnConvertIfNeeded = document.getElementById('btnConvertIfNeeded');
 
-        // ==========================================
-        //  2. APP LOGIC
-        // ==========================================
+/* ============ Playlist UI & Drag/Drop ============ */
 
-        let playlist = []; 
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        const assets = { logo: null, icons: {}, slides: [] };
+imageInput.addEventListener('change', (ev) => {
+  const files = Array.from(ev.target.files || []);
+  addFilesToPlaylist(files);
+});
 
-        function handleImageUpload() {
-            const input = document.getElementById('imageInput');
-            const container = document.getElementById('playlistContainer');
-            
-            if(input.files.length > 0) {
-                container.innerHTML = ''; 
-                playlist = [];
-            }
+document.getElementById('btnAddFromUrl').addEventListener('click', () => {
+  const url = prompt('Enter image URL (direct image link):');
+  if (url) addImageUrlToPlaylist(url);
+});
 
-            for (let i = 0; i < input.files.length; i++) {
-                const file = input.files[i];
-                playlist.push({ file: file, duration: 3 });
+function addFilesToPlaylist(files) {
+  for (const f of files) {
+    const id = uid('slide');
+    const url = URL.createObjectURL(f);
+    playlist.push({ id, file: f, thumbnailURL: url, duration: parseFloat(document.getElementById('defaultDuration').value || 3) });
+  }
+  renderPlaylist();
+}
 
-                const div = document.createElement('div');
-                div.className = 'playlist-item';
-                
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                
-                const name = document.createElement('span');
-                name.innerText = file.name.substring(0, 15) + "...";
-                name.style.flexGrow = 1;
-                name.style.fontSize = "0.9rem";
+function addImageUrlToPlaylist(url) {
+  const id = uid('slide');
+  playlist.push({ id, file: url, thumbnailURL: url, duration: parseFloat(document.getElementById('defaultDuration').value || 3) });
+  renderPlaylist();
+}
 
-                const durInput = document.createElement('input');
-                durInput.type = 'number';
-                durInput.value = 3;
-                durInput.min = 1;
-                durInput.step = 0.5;
-                durInput.addEventListener('change', (e) => {
-                    playlist[i].duration = parseFloat(e.target.value);
-                });
+function renderPlaylist() {
+  playlistEl.innerHTML = '';
+  if (playlist.length === 0) {
+    playlistEl.innerHTML = '<p style="text-align:center;color:#999;margin:20px 0;">Upload images to see them here.</p>';
+    return;
+  }
 
-                div.appendChild(img);
-                div.appendChild(name);
-                div.appendChild(durInput);
-                container.appendChild(div);
-            }
+  playlist.forEach((item, index) => {
+    const div = document.createElement('div');
+    div.className = 'plist-item';
+    div.setAttribute('draggable', 'true');
+    div.dataset.index = index;
+
+    // drag handlers
+    div.addEventListener('dragstart', (e) => {
+      dragSrcIndex = index;
+      div.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    div.addEventListener('dragend', () => {
+      dragSrcIndex = null;
+      document.querySelectorAll('.plist-item').forEach(n => n.classList.remove('dragging'));
+    });
+    div.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    div.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const targetIndex = Number(div.dataset.index);
+      if (dragSrcIndex !== null && dragSrcIndex !== targetIndex) {
+        reorderPlaylist(dragSrcIndex, targetIndex);
+      }
+    });
+
+    const thumb = document.createElement('img');
+    thumb.className = 'plist-thumb';
+    thumb.src = item.thumbnailURL;
+    thumb.alt = 'thumb';
+
+    const meta = document.createElement('div');
+    meta.className = 'plist-meta';
+
+    const name = document.createElement('div');
+    name.textContent = (typeof item.file === 'string') ? (item.file).slice(0,40) : (item.file.name || 'image');
+    name.style.fontWeight = '700';
+    name.style.fontSize = '0.95rem';
+
+    const durRow = document.createElement('div');
+    durRow.style.display='flex';
+    durRow.style.gap='8px';
+    durRow.style.alignItems='center';
+
+    const durInput = document.createElement('input');
+    durInput.type = 'number';
+    durInput.min = '1';
+    durInput.step = '0.5';
+    durInput.value = item.duration;
+    durInput.style.width = '100px';
+    durInput.addEventListener('input', (e) => {
+      const v = parseFloat(e.target.value) || 1;
+      playlist[index].duration = v;
+    });
+
+    durRow.appendChild(durInput);
+    durRow.appendChild(document.createElement('div')).textContent = 'secs';
+
+    meta.appendChild(name);
+    meta.appendChild(durRow);
+
+    const actions = document.createElement('div');
+    actions.className = 'plist-actions';
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'btn btn-ghost';
+    upBtn.title = 'Move up';
+    upBtn.innerHTML = '▲';
+    upBtn.addEventListener('click', () => {
+      if (index > 0) reorderPlaylist(index, index-1);
+    });
+
+    const downBtn = document.createElement('button');
+    downBtn.className = 'btn btn-ghost';
+    downBtn.title = 'Move down';
+    downBtn.innerHTML = '▼';
+    downBtn.addEventListener('click', () => {
+      if (index < playlist.length-1) reorderPlaylist(index, index+1);
+    });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn btn-ghost';
+    removeBtn.title = 'Remove';
+    removeBtn.innerHTML = '🗑';
+    removeBtn.addEventListener('click', () => {
+      URL.revokeObjectURL(item.thumbnailURL);
+      playlist.splice(index, 1);
+      renderPlaylist();
+    });
+
+    actions.appendChild(upBtn);
+    actions.appendChild(downBtn);
+    actions.appendChild(removeBtn);
+
+    div.appendChild(thumb);
+    div.appendChild(meta);
+    div.appendChild(actions);
+
+    playlistEl.appendChild(div);
+  });
+}
+
+function reorderPlaylist(fromIndex, toIndex) {
+  const item = playlist.splice(fromIndex,1)[0];
+  playlist.splice(toIndex,0,item);
+  renderPlaylist();
+}
+
+/* ============ Caption generator ============ */
+document.getElementById('btnGenerateCaption').addEventListener('click', () => {
+  const handleLines = [];
+  if (SOCIAL_HANDLES.fb) handleLines.push(`Facebook: ${SOCIAL_HANDLES.fb}`);
+  if (SOCIAL_HANDLES.ig) handleLines.push(`Instagram: ${SOCIAL_HANDLES.ig}`);
+  if (SOCIAL_HANDLES.tiktok) handleLines.push(`TikTok: ${SOCIAL_HANDLES.tiktok}`);
+  if (SOCIAL_HANDLES.yt) handleLines.push(`YouTube: ${SOCIAL_HANDLES.yt}`);
+  const caption = [
+    "Check out our latest learning resources!",
+    `Visit: ${WEBSITE_URL}`,
+    ...handleLines,
+    "#Education #EptOnline #Learning"
+  ].join("\n");
+  const box = document.getElementById('captionBox');
+  box.value = caption;
+  navigator.clipboard?.writeText(caption).then(() => {
+    alert('Caption copied to clipboard.');
+  }).catch(()=>{ alert('Caption generated. Copy manually.'); });
+});
+
+/* ============ Pre-generation validation ============ */
+
+function validateBeforeGeneration(formatDims, totalExpectedDuration) {
+  const errors = [];
+  if (playlist.length === 0) errors.push("No slides uploaded.");
+  let totalDur = 0;
+  for (const item of playlist) {
+    if (!item.duration || item.duration < 1) errors.push("One or more slides have invalid duration.");
+    totalDur += Number(item.duration || 0);
+  }
+  if (!isFinite(totalExpectedDuration) || totalExpectedDuration < 1) errors.push("Computed final duration invalid.");
+
+  // Check music selection if chosen
+  const musicSel = document.getElementById('musicSelect').value;
+  if (musicSel !== 'none' && !MUSIC_TRACKS[musicSel]) {
+    errors.push("Selected music track is configured but file path is not set in the script (MUSIC_TRACKS).");
+  }
+
+  return { ok: errors.length === 0, errors, totalDur };
+}
+
+/* ============ Asset loader (images & icons) ============ */
+async function loadImageFromSource(src) {
+  // Accept File, Blob, or URL string
+  return new Promise((resolve) => {
+    if (!src) return resolve(null);
+    if (src instanceof File || src instanceof Blob) {
+      const url = URL.createObjectURL(src);
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    } else if (typeof src === 'string') {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = src;
+    } else {
+      resolve(null);
+    }
+  });
+}
+
+/* ============ Rendering primitives ============ */
+
+function setCanvasSizeForPreset(preset) {
+  // Map preset to dims & recommended fps
+  const map = {
+    instagram_post: { w:1080, h:1080, fps:30 },
+    instagram_reel: { w:1080, h:1920, fps:30 },
+    tiktok_reel: { w:1080, h:1920, fps:30 },
+    facebook_reel: { w:1080, h:1920, fps:30 },
+    youtube_landscape: { w:1920, h:1080, fps:30 },
+    facebook_landscape: { w:1280, h:720, fps:30 },
+    youtube_reel: { w:1080, h:1920, fps:30 }
+  };
+  return map[preset] || map.instagram_post;
+}
+
+function drawImageCover(ctx, img, w, h) {
+  // Cover the canvas with the source while preserving aspect ratio
+  const iw = img.width, ih = img.height;
+  const ir = iw / ih;
+  const tr = w / h;
+  let drawW, drawH;
+  if (ir > tr) {
+    // image is wider than target
+    drawH = h;
+    drawW = h * ir;
+  } else {
+    drawW = w;
+    drawH = w / ir;
+  }
+  const x = (w - drawW) / 2;
+  const y = (h - drawH) / 2;
+  ctx.drawImage(img, x, y, drawW, drawH);
+}
+
+function drawLogoTopRight(ctx, w, h, img, scale=0.14) {
+  if (!img) return;
+  const size = Math.round(w * scale);
+  const pad = Math.round(w * 0.02);
+  ctx.drawImage(img, w - size - pad, pad, size, size);
+}
+
+function drawFooterSocialBar(ctx, w, h, format) {
+  const barH = Math.round(w * (format==='youtube_landscape' ? 0.08 : 0.10));
+  const y = h - barH;
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(0, y, w, barH);
+
+  // simple centered text
+  ctx.fillStyle = 'white';
+  ctx.textBaseline = 'middle';
+  const fontSize = Math.max(12, Math.round(barH * 0.4));
+  ctx.font = `bold ${fontSize}px Arial`;
+  const text = `${SOCIAL_HANDLES.ig||''}  ${WEBSITE_URL}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(text, w/2, y + barH/2);
+}
+
+function renderIntroFrame(ctx, w, h, preset) {
+  // Intro content adapted to the preset aspect ratio
+  ctx.fillStyle = document.getElementById('bgColor').value || '#000';
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  const big = Math.round(w * 0.09);
+  ctx.font = `bold ${big}px Arial`;
+  ctx.fillText('Welcome to EptOnline', w/2, h*0.42);
+
+  // small subtitle
+  ctx.font = `${Math.round(w*0.04)}px Arial`;
+  ctx.fillText('Learn • Grow • Succeed', w/2, h*0.52);
+
+  // logo if loaded
+  if (assets.logo) {
+    drawLogoTopRight(ctx, w, h, assets.logo, 0.20);
+  }
+}
+
+function renderOutroFrame(ctx, w, h, preset) {
+  ctx.fillStyle = document.getElementById('bgColor').value || '#000';
+  ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+  ctx.font = `bold ${Math.round(w*0.06)}px Arial`;
+  ctx.fillText('Thank you for watching!', w/2, h*0.45);
+  ctx.font = `${Math.round(w*0.035)}px Arial`;
+  ctx.fillText(WEBSITE_URL, w/2, h*0.55);
+  drawFooterSocialBar(ctx, w, h, preset);
+}
+
+/* ============ Generation core ============ */
+
+async function startGenerationFlow() {
+  if (playlist.length === 0) {
+    return alert('Please upload at least one image before generating.');
+  }
+
+  // Determine preset
+  const preset = document.getElementById('downloadSelect').value;
+  const dims = setCanvasSizeForPreset(preset);
+  canvas.width = dims.w;
+  canvas.height = dims.h;
+  const fps = dims.fps || 30;
+
+  // Build timeline: intro (optional) + slides + outro (optional)
+  const addIntro = !!document.getElementById('addIntro').checked;
+  const addOutro = !!document.getElementById('addOutro').checked;
+  const introDur = Math.max(1, Number(document.getElementById('introDuration').value || 2));
+  const outroDur = Math.max(1, Number(document.getElementById('outroDuration').value || 3));
+
+  // Pre-validation
+  let slidesTotalTime = playlist.reduce((s,i)=>s + Number(i.duration||0),0);
+  const expectedTotal = (addIntro ? introDur : 0) + slidesTotalTime + (addOutro ? outroDur:0);
+  const validation = validateBeforeGeneration(dims, expectedTotal);
+  if (!validation.ok) {
+    const proceed = confirm('Validation found issues:\n\n' + validation.errors.join('\n') + '\n\nProceed anyway?');
+    if (!proceed) return;
+  }
+
+  try {
+    statusText.innerText = 'Loading assets (icons / images)...';
+    progressFill.style.width = '2%';
+    // load logo & icons
+    assets.logo = await loadImageFromSource(ICONS.yt) || null;
+    assets.icons.fb = await loadImageFromSource(ICONS.fb);
+    assets.icons.ig = await loadImageFromSource(ICONS.ig);
+    assets.icons.yt = await loadImageFromSource(ICONS.yt);
+    assets.icons.tiktok = await loadImageFromSource(ICONS.tiktok);
+
+    // load slides
+    assets.slides = [];
+    for (const item of playlist) {
+      statusText.innerText = `Loading image ${playlist.indexOf(item)+1} / ${playlist.length}...`;
+      const img = await loadImageFromSource(item.file);
+      if (!img) {
+        console.warn('Failed to load image', item);
+        continue;
+      }
+      assets.slides.push({img, duration: Number(item.duration)});
+    }
+    if (assets.slides.length === 0) {
+      alert('No loadable images found. Aborting.');
+      return;
+    }
+
+    // AUDIO: attempt to set up music if selected
+    let audioStream = null;
+    let audioCtx, audioSourceNode;
+    const musicChoice = document.getElementById('musicSelect').value;
+    if (musicChoice !== 'none' && MUSIC_TRACKS[musicChoice]) {
+      try {
+        statusText.innerText = 'Loading music...';
+        const resp = await fetch(MUSIC_TRACKS[musicChoice]);
+        if (resp.ok) {
+          const buf = await resp.arrayBuffer();
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const audioBuffer = await audioCtx.decodeAudioData(buf);
+          const dest = audioCtx.createMediaStreamDestination();
+          audioSourceNode = audioCtx.createBufferSource();
+          audioSourceNode.buffer = audioBuffer;
+          audioSourceNode.loop = true;
+          audioSourceNode.connect(dest);
+          audioSourceNode.start();
+          audioStream = dest.stream;
+          // We'll stop audio source after the expected total duration
+          setTimeout(() => {
+            try { audioSourceNode.stop(); audioCtx.close(); } catch(e){}
+          }, (expectedTotal + 1) * 1000);
+        } else {
+          console.warn('Music fetch failed', resp.status);
         }
+      } catch(e) {
+        console.warn('Music load error', e);
+      }
+    }
 
-        // --- CAPTION GENERATOR ---
-        function generateCaption() {
-            let caption = `Check out our latest learning resources! 📚\n\n🌐 Visit: ${WEBSITE_URL}\n\n`;
-            
-            if(SOCIAL_HANDLES.fb) caption += `Facebook: ${SOCIAL_HANDLES.fb}\n`;
-            if(SOCIAL_HANDLES.ig) caption += `Instagram: ${SOCIAL_HANDLES.ig}\n`;
-            if(SOCIAL_HANDLES.tiktok) caption += `TikTok: ${SOCIAL_HANDLES.tiktok}\n`;
-            if(SOCIAL_HANDLES.yt) caption += `YouTube: ${SOCIAL_HANDLES.yt}\n`;
-            
-            caption += `\n#Education #Flashcards #StudyTips #EptOnline #Learning #EdTech`;
+    // start capture stream & MediaRecorder
+    const captureStream = canvas.captureStream(fps);
+    if (audioStream) {
+      audioStream.getAudioTracks().forEach(t => captureStream.addTrack(t));
+    }
 
-            const box = document.getElementById('captionBox');
-            box.value = caption;
-            
-            // Copy
-            box.select();
-            navigator.clipboard.writeText(caption)
-                .then(() => alert("Caption copied to clipboard!"))
-                .catch(() => alert("Caption generated (Manual copy required)"));
+    // Try to find best mime
+    let mime = 'video/mp4';
+    if (!MediaRecorder.isTypeSupported(mime)) {
+      // Try VP9/VP8 webm fallbacks
+      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) mime = 'video/webm;codecs=vp9';
+      else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) mime = 'video/webm;codecs=vp8';
+      else mime = 'video/webm';
+    }
+
+    statusText.innerText = `Recording using mime: ${mime}`;
+    progressFill.style.width = '5%';
+
+    const recorder = new MediaRecorder(captureStream, { mimeType: mime });
+    const chunks = [];
+    recorder.ondataavailable = (e) => { if (e.data && e.data.size) chunks.push(e.data); };
+    recorder.onerror = (e) => { console.error('Recorder error', e); };
+    recorder.onstart = () => { console.log('recorder started'); };
+    recorder.onstop = async () => {
+      progressFill.style.width = '95%';
+      statusText.innerText = 'Finalizing video...';
+
+      const blob = new Blob(chunks, { type: mime });
+      let blobUrl = URL.createObjectURL(blob);
+      outputVideo.src = blobUrl;
+      previewPanel.style.display = 'block';
+
+      const prefix = document.getElementById('filenamePrefix').value.trim() || 'eptonline_video';
+      const fname = `${prefix}_${nowTimestamp()}`;
+      const selectedConvert = document.getElementById('autoConvertMp4').checked;
+
+      if (selectedConvert && mime.indexOf('webm') !== -1) {
+        // attempt client-side transcode to mp4 via ffmpeg.wasm
+        try {
+          await convertWebmToMp4ClientSide(blob, `${fname}.mp4`);
+          statusText.innerText = 'Conversion to MP4 completed client-side.';
+        } catch (err) {
+          console.warn('Client-side conversion failed', err);
+          // fall back to webm download
+          downloadLink.href = blobUrl;
+          downloadLink.download = `${fname}.${mime.includes('mp4') ? 'mp4' : 'webm'}`;
         }
+      } else {
+        downloadLink.href = blobUrl;
+        // set extension based on mime
+        const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+        downloadLink.download = `${fname}.${ext}`;
+      }
 
-        async function startGeneration() {
-            if (playlist.length === 0) return alert("Please upload images first.");
+      // Post-checks: load metadata and compare
+      runPostGenerationChecks(blob, expectedTotal, dims).catch(()=>{});
+      progressFill.style.width = '100%';
+      statusText.innerText = 'Done.';
+    };
 
-            const format = document.getElementById('format').value;
-            const bgColor = document.getElementById('bgColor').value;
-            const useOutro = document.getElementById('addOutro').checked;
-            const musicChoice = document.getElementById('musicSelect').value;
-            const btn = document.getElementById('generateBtn');
-            const status = document.getElementById('statusText');
+    // begin rendering frames and recording
+    recorder.start(1000); // request data every second
+    statusText.innerText = 'Recording started...';
+    progressFill.style.width = '8%';
 
-            // Reset UI
-            btn.disabled = true;
-            document.getElementById('resultArea').style.display = 'none';
-            document.getElementById('progressBar').style.display = 'block';
+    // render timeline frames
+    const timeline = [];
+    if (addIntro) timeline.push({type:'intro', duration: introDur});
+    for (const s of assets.slides) timeline.push({type:'slide', img: s.img, duration: s.duration});
+    if (addOutro) timeline.push({type:'outro', duration: outroDur});
 
-            // Set Canvas Dimensions
-            const dims = {
-                feed: { w: 1080, h: 1080 },
-                story: { w: 1080, h: 1920 },
-                youtube: { w: 1920, h: 1080 }
-            };
-            canvas.width = dims[format].w;
-            canvas.height = dims[format].h;
+    let elapsed = 0;
+    let timelineIndex = 0;
+    const startTime = performance.now();
 
-            // --- LOAD ASSETS ---
-            status.innerText = "Loading assets...";
-            
-            assets.logo = await safeLoad(LOGO_BASE64);
-            assets.icons.fb = await safeLoad(ICONS.fb);
-            assets.icons.ig = await safeLoad(ICONS.ig);
-            assets.icons.yt = await safeLoad(ICONS.yt);
-            assets.icons.tiktok = await safeLoad(ICONS.tiktok);
-            
-            assets.slides = [];
-            let slidesTotalTime = 0;
-            
-            for (let item of playlist) {
-                const img = await safeLoad(item.file);
-                if (img) {
-                    assets.slides.push({ img, duration: item.duration });
-                    slidesTotalTime += item.duration;
-                }
-            }
+    function renderTick() {
+      const now = performance.now();
+      elapsed = (now - startTime) / 1000;
+      // compute progress
+      const progressPct = Math.min((elapsed / expectedTotal) * 100, 99);
+      progressFill.style.width = progressPct + '%';
+      statusText.innerText = `Rendering: ${elapsed.toFixed(1)}s / ${expectedTotal.toFixed(1)}s`;
 
-            if(assets.slides.length === 0) {
-                alert("Error: No images loaded.");
-                btn.disabled = false;
-                return;
-            }
-
-            // Calc Total Duration
-            const outroDuration = useOutro ? 3 : 0;
-            const finalDuration = slidesTotalTime + outroDuration;
-
-            // --- AUDIO SETUP ---
-            let audioCtx, audioDest, audioStream;
-            
-            if (musicChoice !== 'none') {
-                try {
-                    status.innerText = "Loading Music...";
-                    const trackUrl = MUSIC_TRACKS[musicChoice];
-                    if(trackUrl.includes('path/to/')) {
-                        console.warn("Using dummy music path.");
-                    }
-
-                    const response = await fetch(trackUrl);
-                    if (!response.ok) throw new Error("Music file not found");
-                    const buf = await response.arrayBuffer();
-
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const audioBuf = await audioCtx.decodeAudioData(buf);
-                    
-                    audioDest = audioCtx.createMediaStreamDestination();
-                    audioStream = audioDest.stream;
-                    
-                    const src = audioCtx.createBufferSource();
-                    src.buffer = audioBuf;
-                    src.loop = true;
-                    src.connect(audioDest);
-                    src.start(0);
-                    setTimeout(() => {
-                        try { src.stop(); audioCtx.close(); } catch(e){}
-                    }, finalDuration * 1000 + 500); 
-                } catch(e) { 
-                    console.error("Audio Load Error:", e);
-                    // Continue without music if fail
-                }
-            }
-
-            // --- RECORDING ---
-            const stream = canvas.captureStream(30); 
-            if (audioStream) audioStream.getAudioTracks().forEach(t => stream.addTrack(t));
-
-            let mime = 'video/mp4';
-            if (!MediaRecorder.isTypeSupported(mime)) mime = 'video/webm;codecs=vp9';
-
-            const recorder = new MediaRecorder(stream, { mimeType: mime });
-            const chunks = [];
-            
-            recorder.ondataavailable = e => chunks.push(e.data);
-            recorder.onstop = () => {
-                const blob = new Blob(chunks, { type: mime });
-                const url = URL.createObjectURL(blob);
-                const vid = document.getElementById('outputVideo');
-                const dl = document.getElementById('downloadLink');
-                
-                vid.src = url;
-                dl.href = url;
-                dl.download = `flashcard_video.mp4`; 
-
-                document.getElementById('resultArea').style.display = 'block';
-                status.innerText = "Done!";
-                btn.disabled = false;
-            };
-
-            recorder.start();
-            status.innerText = "Rendering Video...";
-
-            // --- RENDER LOOP ---
-            const startTime = Date.now();
-            
-            function draw() {
-                const elapsed = (Date.now() - startTime) / 1000;
-                const progress = Math.min((elapsed / finalDuration) * 100, 100);
-                
-                document.getElementById('progressFill').style.width = `${progress}%`;
-                status.innerText = `Rendering: ${elapsed.toFixed(1)}s / ${finalDuration.toFixed(1)}s`;
-
-                if (elapsed >= finalDuration) {
-                    recorder.stop();
-                    return;
-                }
-
-                if (elapsed < slidesTotalTime) {
-                    // SLIDE PHASE
-                    let timePointer = 0;
-                    let currentImg = null;
-                    for (let s of assets.slides) {
-                        if (elapsed >= timePointer && elapsed < timePointer + s.duration) {
-                            currentImg = s.img;
-                            break;
-                        }
-                        timePointer += s.duration;
-                    }
-                    if (currentImg) renderMainFrame(currentImg, bgColor, format);
-                } else {
-                    // OUTRO PHASE
-                    if (useOutro) renderOutroFrame(bgColor, format);
-                }
-                
-                requestAnimationFrame(draw);
-            }
-            
-            draw();
+      // find current segment
+      let tPtr = 0;
+      let curSeg = null;
+      for (const seg of timeline) {
+        if (elapsed >= tPtr && elapsed < tPtr + seg.duration) {
+          curSeg = seg;
+          break;
         }
+        tPtr += seg.duration;
+      }
 
-        // ==========================================
-        //  3. DRAWING FUNCTIONS
-        // ==========================================
-        
-        // --- 1. Main Slide Frame ---
-        function renderMainFrame(img, bgColor, format) {
-            const w = canvas.width;
-            const h = canvas.height;
+      // If no segment (elapsed >= expectedTotal) then stop
+      if (!curSeg) {
+        // finish
+        try { recorder.stop(); } catch(e){ console.warn(e); }
+        return;
+      }
 
-            // Background
-            ctx.fillStyle = bgColor; 
-            ctx.fillRect(0, 0, w, h);
+      // Render according to segment
+      if (curSeg.type === 'intro') {
+        renderIntroFrame(ctx, canvas.width, canvas.height, preset);
+      } else if (curSeg.type === 'outro') {
+        renderOutroFrame(ctx, canvas.width, canvas.height, preset);
+      } else if (curSeg.type === 'slide') {
+        // Draw background
+        ctx.fillStyle = document.getElementById('bgColor').value || '#000';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        drawImageCover(ctx, curSeg.img, canvas.width, canvas.height);
+        drawLogoTopRight(ctx, canvas.width, canvas.height, assets.logo, 0.12);
+        drawFooterSocialBar(ctx, canvas.width, canvas.height, preset);
+      }
 
-            // Image
-            drawImageContain(ctx, img, w, h);
+      // request next frame
+      requestAnimationFrame(renderTick);
+    }
 
-            // Logo (Top Right)
-            if (assets.logo) {
-                const size = w * 0.15; // Scaled to Width
-                const pad = w * 0.02;
-                ctx.drawImage(assets.logo, w - size - pad, pad, size, size);
-            }
+    // kick off rendering loop
+    requestAnimationFrame(renderTick);
 
-            // Footer Bar
-            drawSocialBar(ctx, w, h, format);
-        }
+    // Safety: force stop after slightly more than expected duration
+    setTimeout(() => {
+      if (recorder.state === 'recording') {
+        try { recorder.stop(); } catch(e){ console.warn(e); }
+      }
+    }, (expectedTotal + 2) * 1000);
 
-        // --- 2. Outro Frame (Centered) ---
-        function renderOutroFrame(bgColor, format) {
-            const w = canvas.width;
-            const h = canvas.height;
+  } catch (err) {
+    console.error('Generation error', err);
+    alert('An error occurred: ' + (err.message || err));
+    statusText.innerText = 'Error during generation.';
+  }
+}
 
-            // Background
-            ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, w, h);
+/* ============ Post-generation checks ============ */
 
-            // Setup Text
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            
-            // Adjust vertical positions based on layout
-            let logoY, textY, socialY;
-            
-            if (format === 'story') { // Vertical
-                logoY = h * 0.35;
-                textY = h * 0.5;
-                socialY = h * 0.6; 
-            } else { // Square or Landscape
-                logoY = h * 0.25;
-                textY = h * 0.5;
-                socialY = h * 0.65;
-            }
+async function runPostGenerationChecks(blob, expectedDuration, dims) {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(video.src);
+      const duration = video.duration;
+      const checks = [];
+      // duration tolerance
+      const tol = 0.9; // allow small differences
+      if (Math.abs(duration - expectedDuration) > 1.2) {
+        checks.push(`Duration mismatch: expected ${expectedDuration.toFixed(1)}s, actual ${duration.toFixed(1)}s`);
+      } else {
+        checks.push(`Duration OK (${duration.toFixed(1)}s)`);
+      }
+      // resolution check
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      if (vw !== dims.w || vh !== dims.h) {
+        checks.push(`Resolution: expected ${dims.w}×${dims.h}, actual ${vw}×${vh} (player may scale; check source file).`);
+      } else {
+        checks.push(`Resolution OK (${vw}×${vh})`);
+      }
+      const post = document.getElementById('postChecks');
+      post.innerHTML = checks.map(c => `<div class="small-note">${c}</div>`).join('');
+      resolve(true);
+    };
+    video.onerror = () => {
+      resolve(false);
+    };
+    const url = URL.createObjectURL(blob);
+    video.src = url;
+  });
+}
 
-            // 1. Logo
-            if(assets.logo) {
-                const size = w * 0.25; // 25% of width
-                const x = (w - size) / 2;
-                ctx.drawImage(assets.logo, x, logoY - (size/2), size, size);
-            }
+/* ============ Optional: ffmpeg.wasm conversion ============ */
 
-            // 2. Website Text
-            ctx.font = `bold ${w * 0.05}px Arial`;
-            ctx.fillText(WEBSITE_URL, w/2, textY);
+// Note: This will fetch ffmpeg.wasm from CDN and run in the browser. It is heavy.
+let ffmpegLoaded = false;
+let ffmpegCore = null;
+async function loadFFmpeg() {
+  if (ffmpegLoaded) return ffmpegCore;
+  statusText.innerText = 'Loading ffmpeg.wasm (this may take time)...';
+  // Use @ffmpeg/ffmpeg via CDN
+  const { createFFmpeg, fetchFile } = FFmpeg || window.FFmpeg || {};
+  if (typeof createFFmpeg !== 'function') {
+    // If not present, dynamically load the library
+    await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.1/dist/ffmpeg.min.js');
+  }
+  const ffmpegModule = createFFmpeg({ log: true });
+  await ffmpegModule.load();
+  ffmpegLoaded = true;
+  ffmpegCore = { ffmpegModule, fetchFile: window.FFmpeg?.fetchFile || fetchFile };
+  return ffmpegCore;
+}
 
-            // 3. "Follow Us"
-            ctx.font = `${w * 0.035}px Arial`;
-            ctx.fillText("Follow us for more!", w/2, textY + (w * 0.06));
+async function convertWebmToMp4ClientSide(webmBlob, outputFilename) {
+  if (!window.createFFmpeg) {
+    // load script
+    await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.1/dist/ffmpeg.min.js');
+  }
+  const { createFFmpeg, fetchFile } = window.FFmpeg;
+  const ffmpeg = createFFmpeg({ log: true });
+  await ffmpeg.load();
+  statusText.innerText = 'Converting to MP4 (client-side)...';
+  const inName = 'input.webm';
+  const outName = 'out.mp4';
+  ffmpeg.FS('writeFile', inName, await fetchFile(webmBlob));
+  // Transcode with reasonable settings (fast preset)
+  await ffmpeg.run('-i', inName, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23', outName);
+  const data = ffmpeg.FS('readFile', outName);
+  const convertedBlob = new Blob([data.buffer], { type: 'video/mp4' });
+  const url = URL.createObjectURL(convertedBlob);
+  downloadLink.href = url;
+  downloadLink.download = outputFilename;
+  outputVideo.src = url;
+  statusText.innerText = 'MP4 conversion finished.';
+  return true;
+}
 
-            // 4. Centered Socials
-            drawCenteredSocials(ctx, w, h, socialY);
-        }
+function loadScript(url) {
+  return new Promise((resolve, reject) => {
+    // Do not load twice
+    if (document.querySelector(`script[src="${url}"]`)) return resolve();
+    const s = document.createElement('script');
+    s.src = url;
+    s.onload = () => resolve();
+    s.onerror = (e) => reject(e);
+    document.head.appendChild(s);
+  });
+}
 
-        // --- 3. Footer Bar (Dynamic Resizing) ---
-        function drawSocialBar(ctx, w, h, format) {
-            let barHeight = w * 0.08; 
-            // Clamp min/max for extreme aspect ratios
-            if (format === 'youtube') barHeight = h * 0.12; 
-            
-            const fontSize = barHeight * 0.35;
-            const iconSize = barHeight * 0.5;
+/* ============ Wire UI controls ============ */
 
-            // Draw Bar Background
-            ctx.fillStyle = "rgba(0,0,0,0.8)";
-            ctx.fillRect(0, h - barHeight, w, barHeight);
+document.getElementById('btnGenerate').addEventListener('click', async () => {
+  // Basic pre-check: ensure playlist exists
+  const preset = document.getElementById('downloadSelect').value;
+  const dims = setCanvasSizeForPreset(preset);
+  // calculate expected total
+  const intro = document.getElementById('addIntro').checked ? Number(document.getElementById('introDuration').value || 2) : 0;
+  const outro = document.getElementById('addOutro').checked ? Number(document.getElementById('outroDuration').value || 3) : 0;
+  const slidesTotal = playlist.reduce((s,i)=>s + Number(i.duration||0), 0);
+  const expectedTotal = intro + slidesTotal + outro;
 
-            // Draw Items
-            const startY = h - (barHeight/2);
-            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize, true);
-        }
+  const v = validateBeforeGeneration(dims, expectedTotal);
+  if (!v.ok) {
+    // Show issues and ask confirm
+    const proceed = confirm('The following issues were detected:\n\n' + v.errors.join('\n') + '\n\nProceed anyway?');
+    if (!proceed) return;
+  }
 
-        // --- 4. Centered Socials (For Outro) ---
-        function drawCenteredSocials(ctx, w, h, startY) {
-            const iconSize = w * 0.08; 
-            const fontSize = w * 0.05; 
-            
-            drawHorizontalHandles(ctx, w, startY, iconSize, fontSize, false);
-        }
+  // If user set autoConvertMp4 checked, ensure FFmpeg lib is available (will be loaded on demand in the flow).
+  if (document.getElementById('autoConvertMp4').checked) {
+    // warn about load time
+    const ok = confirm('Client-side MP4 conversion will load a large wasm (ffmpeg.wasm) and may be slow. Continue?');
+    if (!ok) return;
+    // attempt to preload library (optional)
+    try { await loadScript('https://unpkg.com/@ffmpeg/ffmpeg@0.11.1/dist/ffmpeg.min.js'); } catch(e) { console.warn('ffmpeg load prefetch failed', e); }
+  }
 
-        // Helper to draw handles horizontally with Auto-Scaling
-        function drawHorizontalHandles(ctx, w, centerY, iconSize, fontSize, isFooter) {
-            
-            // Prepare active items
-            const items = [];
-            const hList = SOCIAL_HANDLES;
-            if (hList.fb) items.push({ icon: assets.icons.fb, text: hList.fb });
-            if (hList.ig) items.push({ icon: assets.icons.ig, text: hList.ig });
-            if (hList.tiktok) items.push({ icon: assets.icons.tiktok, text: hList.tiktok });
-            if (hList.yt) items.push({ icon: assets.icons.yt, text: hList.yt });
+  // disable UI until done
+  btnGenerate.disabled = true;
+  await startGenerationFlow();
+  btnGenerate.disabled = false;
+});
 
-            if(items.length === 0) return;
+document.getElementById('btnPreviewCanvas').addEventListener('click', () => {
+  // quick render of first slide or intro preview
+  const preset = document.getElementById('downloadSelect').value;
+  const dims = setCanvasSizeForPreset(preset);
+  canvas.width = dims.w;
+  canvas.height = dims.h;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const addIntro = document.getElementById('addIntro').checked;
+  if (addIntro) {
+    renderIntroFrame(ctx, canvas.width, canvas.height, preset);
+  } else if (playlist.length > 0) {
+    const src = playlist[0].file;
+    loadImageFromSource(src).then(img => {
+      if (!img) return alert('Cannot load preview image.');
+      ctx.fillStyle = document.getElementById('bgColor').value || '#000';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      drawImageCover(ctx, img, canvas.width, canvas.height);
+      drawLogoTopRight(ctx, canvas.width, canvas.height, assets.logo, 0.12);
+      drawFooterSocialBar(ctx, canvas.width, canvas.height, preset);
+    });
+  } else {
+    alert('No slides to preview. Add images or enable Intro.');
+  }
+});
 
-            // 1. Calculate ideal width
-            let gap = w * 0.04;
-            ctx.font = `bold ${fontSize}px Arial`;
-            
-            let totalWidth = 0;
-            items.forEach(item => {
-                const textW = ctx.measureText(item.text).width;
-                totalWidth += iconSize + (gap/2) + textW;
-            });
-            totalWidth += (items.length - 1) * gap;
+document.getElementById('btnClear').addEventListener('click', () => {
+  if (!confirm('Clear all uploaded slides?')) return;
+  playlist.forEach(p => URL.revokeObjectURL(p.thumbnailURL));
+  playlist = [];
+  renderPlaylist();
+  previewPanel.style.display = 'none';
+  statusText.innerText = '';
+  progressFill.style.width = '0%';
+});
 
-            // 2. SCALE TO FIT (Crucial for Reels/Stories)
-            // If totalWidth > 90% of screen, scale everything down
-            const safeWidth = w * 0.95; 
-            let scale = 1;
+btnConvertIfNeeded.addEventListener('click', async () => {
+  // attempt to convert currently loaded video blob in outputVideo to mp4
+  const src = outputVideo.src;
+  if (!src) return alert('No generated video to convert.');
+  // fetch blob
+  try {
+    const resp = await fetch(src);
+    const blob = await resp.blob();
+    const prefix = document.getElementById('filenamePrefix').value.trim() || 'eptonline_video';
+    await convertWebmToMp4ClientSide(blob, `${prefix}_${nowTimestamp()}.mp4`);
+    alert('Conversion finished (if succeeded, check Download button).');
+  } catch (e) {
+    console.error(e);
+    alert('Conversion failed: ' + (e.message || e));
+  }
+});
 
-            if (totalWidth > safeWidth) {
-                scale = safeWidth / totalWidth;
-                // Apply scale
-                iconSize *= scale;
-                fontSize *= scale;
-                gap *= scale;
-                // Recalculate total width with new scale to center correctly
-                ctx.font = `bold ${fontSize}px Arial`; // Reset font with new size
-                totalWidth = 0;
-                items.forEach(item => {
-                    const textW = ctx.measureText(item.text).width;
-                    totalWidth += iconSize + (gap/2) + textW;
-                });
-                totalWidth += (items.length - 1) * gap;
-            }
+/* Initialize playlist UI state */
+renderPlaylist();
 
-            // 3. Draw
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "white";
+/* Optional: preload sample icons (non-blocking) */
+(async function preloadIcons(){
+  assets.icons.fb = await loadImageFromSource(ICONS.fb);
+  assets.icons.ig = await loadImageFromSource(ICONS.ig);
+  assets.icons.yt = await loadImageFromSource(ICONS.yt);
+  assets.icons.tiktok = await loadImageFromSource(ICONS.tiktok);
+})();
 
-            let currentX = (w - totalWidth) / 2;
-
-            items.forEach(item => {
-                // Icon
-                if (item.icon) {
-                    ctx.drawImage(item.icon, currentX, centerY - (iconSize/2), iconSize, iconSize);
-                }
-                currentX += iconSize + (gap/2);
-                
-                // Text
-                ctx.fillText(item.text, currentX, centerY);
-                currentX += ctx.measureText(item.text).width + gap;
-            });
-        }
-
-        // ==========================================
-        //  HELPERS
-        // ==========================================
-        async function safeLoad(src) {
-            if(!src) return null;
-            return new Promise(resolve => {
-                const img = new Image();
-                img.crossOrigin = "anonymous"; 
-                img.onload = () => resolve(img);
-                img.onerror = () => {
-                    console.warn("Failed to load image:", src);
-                    resolve(null);
-                }
-                if (src instanceof Blob) img.src = URL.createObjectURL(src);
-                else img.src = src;
-            });
-        }
-
-        function drawImageContain(ctx, img, targetW, targetH) {
-            const imgRatio = img.width / img.height;
-            const targetRatio = targetW / targetH;
-            let drawW, drawH;
-
-            if (imgRatio > targetRatio) {
-                drawW = targetW;
-                drawH = targetW / imgRatio;
-            } else {
-                drawW = targetH * imgRatio;
-                drawH = targetH;
-            }
-            const x = (targetW - drawW) / 2;
-            const y = (targetH - drawH) / 2;
-            ctx.drawImage(img, x, y, drawW, drawH);
-        }
-    </script>
+</script>
 </body>
 </html>
